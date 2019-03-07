@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- -->
+<launch>
+    <arg name="delay" default="5"/>
+
+    <!-- <rosparam command="load" file="$(find msc_thesis)/param/params.yaml"/> -->
+
+    <!-- Initiating the OpenNI2 constelation -->
+    <include file="$(find openni2_launch)/launch/openni2.launch"/>
+
+    <!-- Initializing OctoMap Server with the right params -->
+    <group> 
+
+        <remap from="cloud_in" to="camera/depth_registered/points" />
+        <param name="~frame_id" value="camera_rgb_optical_frame" />
+        <node name="octomap_server" pkg="octomap_server" type="octomap_server_node" />
+
+    </group>
+
+    <!-- Rviz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find msc_thesis)/config/rviz.rviz"/>
+
+</launch>
