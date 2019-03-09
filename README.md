@@ -61,9 +61,12 @@ Now you must go to /src/fanuc and only leave the followin folders (where it's m6
 - fanuc
 - fanuc_driver
 - fanuc_m6ib_moveit_config
+- fanuc_m6ib_moveit_plugins
 - fanuc_m6ib_support
 - fanuc_resources
 - LICENSE
 - readme.md
+
+If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241).
 
 After this run ```catkin_make``` to try everything.
