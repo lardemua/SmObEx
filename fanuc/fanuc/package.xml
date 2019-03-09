@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>fanuc</name>
+  <version>0.4.4</version>
+  <description>ROS-Industrial support for Fanuc manipulators (metapackage).</description>
+  <author>G.A. vd. Hoorn (TU Delft Robotics Institute)</author>
+  <maintainer email="g.a.vanderhoorn@tudelft.nl">G.A. vd. Hoorn (TU Delft Robotics Institute)</maintainer>
+  <license>BSD</license>
+
+  <url type="website">http://wiki.ros.org/fanuc</url>
+  <url type="bugtracker">https://github.com/ros-industrial/fanuc/issues</url>
+  <url type="repository">https://github.com/ros-industrial/fanuc</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>fanuc_driver</exec_depend>
+  <exec_depend>fanuc_lrmate200ib3l_moveit_config</exec_depend>
+  <exec_depend>fanuc_lrmate200ib_moveit_config</exec_depend>
+  <exec_depend>fanuc_lrmate200ib_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_lrmate200ib_support</exec_depend>
+  <exec_depend>fanuc_lrmate200ic5h_moveit_config</exec_depend>
+  <exec_depend>fanuc_lrmate200ic5l_moveit_config</exec_depend>
+  <exec_depend>fanuc_lrmate200ic_moveit_config</exec_depend>
+  <exec_depend>fanuc_lrmate200ic_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_lrmate200ic_support</exec_depend>
+  <exec_depend>fanuc_m10ia_moveit_config</exec_depend>
+  <exec_depend>fanuc_m10ia_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_m10ia_support</exec_depend>
+  <exec_depend>fanuc_m16ib20_moveit_config</exec_depend>
+  <exec_depend>fanuc_m16ib_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_m16ib_support</exec_depend>
+  <exec_depend>fanuc_m20ia10l_moveit_config</exec_depend>
+  <exec_depend>fanuc_m20ia_moveit_config</exec_depend>
+  <exec_depend>fanuc_m20ia_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_m20ia_support</exec_depend>
+  <exec_depend>fanuc_m430ia2f_moveit_config</exec_depend>
+  <exec_depend>fanuc_m430ia2p_moveit_config</exec_depend>
+  <exec_depend>fanuc_m430ia_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_m430ia_support</exec_depend>
+  <exec_depend>fanuc_m6ib_moveit_config</exec_depend>
+  <exec_depend>fanuc_m6ib_moveit_plugins</exec_depend>
+  <exec_depend>fanuc_m6ib_support</exec_depend>
+  <exec_depend>fanuc_resources</exec_depend>
+
+  <export>
+    <metapackage/>
+    <architecture_independent/>
+    <rosindex>
+      <tags>
+        <tag>metapackage</tag>
+        <tag>fanuc</tag>
+        <tag>industrial</tag>
+        <tag>ros-industrial</tag>
+      </tags>
+    </rosindex>
+    <ros_industrial>
+      <support_level value="community" />
+    </ros_industrial>
+  </export>
+</package>
