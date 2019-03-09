@@ -58,11 +58,11 @@ rosdep install --from-paths src --ignore-src --rosdistro melodic
 
 Now you must go to /src/fanuc and only leave the followin folders (where it's m6ib, it should be your robot model):
 
--fanuc
--fanuc_driver
--fanuc_m6ib_moveit_config
--fanuc_m6ib_support
--LICENSE
--readme.md
+- fanuc
+- fanuc_driver
+- fanuc_m6ib_moveit_config
+- fanuc_m6ib_support
+- LICENSE
+- readme.md
 
 After this run ```catkin_make``` to try everything.
