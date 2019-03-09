@@ -62,6 +62,7 @@ Now you must go to /src/fanuc and only leave the followin folders (where it's m6
 - fanuc_driver
 - fanuc_m6ib_moveit_config
 - fanuc_m6ib_support
+- fanuc_resources
 - LICENSE
 - readme.md
 
