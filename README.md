@@ -88,3 +88,17 @@ cd ..
 
 catkin_make
 ```
+
+# See the robot
+
+```
+roslaunch fanuc_m6ib_support test_m6ib.launch
+```
+
+If the graphics aren't right, the solution is [on this issue](https://github.com/ros-visualization/rviz/issues/1249#issuecomment-403351217). So all you have to do is
+
+```
+export LC_NUMERIC="en_US.UTF-8"
+
+roslaunch fanuc_m6ib_support test_m6ib.launch
+```
