@@ -26,7 +26,9 @@ Fanuc Robot M6iB/6S
 
 Asus Xtion PRO LIVE
 
-# ROS Industrial and FANUC installation guide
+# Installation guides
+
+## ROS Industrial and FANUC
 
 ```
 sudo apt-get install ros-melodic-industrial-core
@@ -70,3 +72,19 @@ Now you must go to /src/fanuc and only leave the followin folders (where it's m6
 If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the fanuc_m6ib_moveit_plugins/m6ib_kinematics/src/fanuc_m6ib_manipulator_ikfast_moveit_plugin.cpp.
 
 After this run ```catkin_make``` to try everything.
+
+## Aruco Hand Eye
+
+```
+cd ~/catkin_ws/src
+
+git clone https://github.com/pal-robotics/aruco_ros
+
+git clone https://github.com/lagadic/vision_visp
+
+git clone https://github.com/jhu-lcsr/aruco_hand_eye
+
+cd ..
+
+catkin_make
+```
