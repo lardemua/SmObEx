@@ -41,7 +41,7 @@ git clone -b kinetic-devel https://github.com/ros-industrial/universal_robot.git
 
 rosdep update
 
-rosdep install --from-paths src --ignore-src --rosdistro melodic
+<!-- rosdep install --from-paths src --ignore-src --rosdistro melodic -->
 
 catkin_make
 
