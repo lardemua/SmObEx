@@ -20,11 +20,11 @@ LAR: Laboratory of Automation and Robotics
 - [x] Single view OctoMap visualization in Rviz
 - [x] Installed ROS Industrial on the Fanuc m6ib/6s
 - [x] Connected ROS to the Fanuc
-- [ ] Updated the Fanuc package
+- [x] Updated the Fanuc package
      - [x] Updated the xacro file
-     - [x] Updated the stl 
+     - [x] Updated the stl
      - [x] Create the support package 
-     - [ ] Create MoveIt "package"
+     - [x] Create MoveIt "package"
 - [ ] Calibrate Xtion
 
 # Built with
@@ -110,7 +110,7 @@ Everything is based on [this tutorial](http://wiki.ros.org/fanuc/Tutorials/Runni
 ## Moving the joint with the interface
 
 ```
-roslaunch fanuc_m6ib_support test_m6ib.launch
+roslaunch fanuc_m6ib_support test_m6ib6s.launch
 ```
 
 If the graphics aren't right, the solution is [on this issue](https://github.com/ros-visualization/rviz/issues/1249#issuecomment-403351217). So all you have to do is
@@ -128,4 +128,4 @@ Set the IP of the machine to 192.168.0.200
 
 On the TP, run rosstate
 
-On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib.launch robot_ip:=192.168.0.230```
+On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6S.launch robot_ip:=192.168.0.230```
