@@ -91,6 +91,10 @@ catkin_make
 
 # See the robot
 
+Everything is based on [this tutorial](http://wiki.ros.org/fanuc/Tutorials/Running).
+
+## Moving the joint with the interface
+
 ```
 roslaunch fanuc_m6ib_support test_m6ib.launch
 ```
@@ -102,3 +106,12 @@ export LC_NUMERIC="en_US.UTF-8"
 
 roslaunch fanuc_m6ib_support test_m6ib.launch
 ```
+## Moving the robot with the TP
+
+Wire connect the robot to the machine.
+
+Set the IP of the machine to 192.168.0.200
+
+On the TP, run rosstate
+
+On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib.launch robot_ip:=192.168.0.230```
