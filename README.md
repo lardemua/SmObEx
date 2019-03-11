@@ -4,15 +4,42 @@ My Mechanical Engineering Masters Thesis in the field of Robotis.
 
 ## Thesis title
 
-Smart object exploration by robotic manipulator
+__Smart object exploration by robotic manipulator__
+
+Department of Mechanical Engineering (DEM), University of Aveiro (UA)
+
+LAR: Laboratory of Automation and Robotics
+
+2019
 
 ## Advisor
 
 Miguel Riem de Oliveira [GitHub](https://github.com/miguelriemoliveira/)
 
-Department of Mechanical Engineering, University of Aveiro
+DEM, UA
 
-LAR: Laboratory of Automation and Robotics
+Aveiro, Portugal
+
+## Co-Advisor
+
+Rafael Arrais [GitHub](https://github.com/rarrais)
+
+INESC TEC
+
+Porto, Portugal
+
+# Table of contents
+
+- [Completed tasks](#completed-tasks)
+- [Built with](#built-with)
+  * [Hardware](#hardware)
+- [Installation guides](#installation-guides)
+  * [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
+  * [Aruco Hand Eye](#aruco-hand-eye)
+- [See the robot](#see-the-robot)
+  * [Moving the joint with the interface](#moving-the-joint-with-the-interface)
+  * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
+  * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
 
 # Completed tasks
 
@@ -30,7 +57,7 @@ LAR: Laboratory of Automation and Robotics
 
 # Built with
 
-- [ROS](http://www.ros.org/)
+- [ROS Melodic](http://www.ros.org/)
 - [OpenNi 2](http://wiki.ros.org/openni2_launch/)
 - [Octomap Server](http://wiki.ros.org/octomap_server)
 - [FANUC Driver](http://wiki.ros.org/fanuc) (based on)
@@ -47,20 +74,6 @@ Asus Xtion PRO LIVE
 
 ```
 sudo apt-get install ros-melodic-industrial-core
-
-cd ~/catkin_ws
-
-git clone https://github.com/ros-industrial/abb ./src/abb
-
-catkin_make --pkg abb
-
-git clone -b kinetic-devel https://github.com/ros-industrial/universal_robot.git ./src/universal_robot
-
-rosdep update
-
-<!-- rosdep install --from-paths src --ignore-src --rosdistro melodic -->
-
-catkin_make
 
 sudo apt-get install ros-melodic-ros-canopen
 ```
@@ -88,7 +101,7 @@ If you try to compile now it won't work, what you need to do is to follow [this 
 
 After this run ```catkin_make``` to try everything.
 
-Note: added my implementation to the m6ib6s.
+**Note: added my implementation to the m6ib6s.**
 
 ## Aruco Hand Eye
 
