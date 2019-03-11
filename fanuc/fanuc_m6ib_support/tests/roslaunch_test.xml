@@ -37,4 +37,49 @@
       <arg name="use_bswap" value="false" />
     </include>
   </group>
+
+
+
+
+
+
+
+
+
+
+  <group ns="load_m6ib6s__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/load_m6ib6s.launch"/>
+  </group>
+
+  <group ns="test_m6ib6s__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/test_m6ib6s.launch"/>
+  </group>
+
+  <group ns="robot_interface_streaming_m6ib6s__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/robot_interface_streaming_m6ib6s.launch">
+      <arg name="robot_ip" value="$(arg ip_str)" />
+    </include>
+  </group>
+
+  <group ns="robot_state_visualize_m6ib6s__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/robot_state_visualize_m6ib6s.launch">
+      <arg name="robot_ip" value="$(arg ip_str)" />
+    </include>
+  </group>
+
+
+  <!-- without bswap -->
+  <group ns="robot_interface_streaming_m6ib6s_f__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/robot_interface_streaming_m6ib6s.launch">
+      <arg name="robot_ip" value="$(arg ip_str)" />
+      <arg name="use_bswap" value="false" />
+    </include>
+  </group>
+
+  <group ns="robot_state_visualize_m6ib6s_f__">
+    <include file="$(find fanuc_m6ib6s_support)/launch/robot_state_visualize_m6ib6s.launch">
+      <arg name="robot_ip" value="$(arg ip_str)" />
+      <arg name="use_bswap" value="false" />
+    </include>
+  </group>
 </launch>

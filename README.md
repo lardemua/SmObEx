@@ -20,12 +20,12 @@ LAR: Laboratory of Automation and Robotics
 - [x] Single view OctoMap visualization in Rviz
 - [x] Installed ROS Industrial on the Fanuc m6ib/6s
 - [x] Connected ROS to the Fanuc
-- [] Updated the Fanuc package
+- [ ] Updated the Fanuc package
      - [x] Updated the xacro file
      - [x] Updated the stl 
      - [x] Create the support package 
-     - [] Create MoveIt "package"
-- [] Calibrate Xtion
+     - [ ] Create MoveIt "package"
+- [ ] Calibrate Xtion
 
 # Built with
 
