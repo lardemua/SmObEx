@@ -14,11 +14,25 @@ Department of Mechanical Engineering, University of Aveiro
 
 LAR: Laboratory of Automation and Robotics
 
+# Completed tasks
+
+- [x] Retrived Point Cloud from camera and visualized in Rviz
+- [x] Single view OctoMap visualization in Rviz
+- [x] Installed ROS Industrial on the Fanuc m6ib/6s
+- [x] Connected ROS to the Fanuc
+- [] Updated the Fanuc package
+     - [x] Updated the xacro file
+     - [x] Updated the stl 
+     - [x] Create the support package 
+     - [] Create MoveIt "package"
+- [] Calibrate Xtion
+
 # Built with
 
 - [ROS](http://www.ros.org/)
 - [OpenNi 2](http://wiki.ros.org/openni2_launch/)
 - [Octomap Server](http://wiki.ros.org/octomap_server)
+- [FANUC Driver](http://wiki.ros.org/fanuc) (based on)
 
 ## Hardware
 
