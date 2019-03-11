@@ -25,6 +25,7 @@ LAR: Laboratory of Automation and Robotics
      - [x] Updated the stl
      - [x] Create the support package 
      - [x] Create MoveIt "package"
+- [ ] Move using MoveIt
 - [ ] Calibrate Xtion
 
 # Built with
@@ -87,6 +88,8 @@ If you try to compile now it won't work, what you need to do is to follow [this 
 
 After this run ```catkin_make``` to try everything.
 
+Note: added my implementation to the m6ib6s.
+
 ## Aruco Hand Eye
 
 ```
@@ -128,4 +131,10 @@ Set the IP of the machine to 192.168.0.200
 
 On the TP, run rosstate
 
-On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6S.launch robot_ip:=192.168.0.230```
+On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230```
+
+## Moving the robot with MoveIt
+
+Start the ros TPE program inauto mode.
+
+In the terminal run ```roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230```
