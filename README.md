@@ -150,8 +150,9 @@ On the TP, run rosstate
 On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230```
 
 ## Moving the robot with MoveIt
-~~
+
+~~Not yet working~~
+
 Start the ros TPE program inauto mode.
 
 In the terminal run ```roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230```
-~~
