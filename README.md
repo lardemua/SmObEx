@@ -64,6 +64,9 @@ Porto, Portugal
 - [OpenNi 2](http://wiki.ros.org/openni2_launch/)
 - [Octomap Server](http://wiki.ros.org/octomap_server)
 - [FANUC Driver](http://wiki.ros.org/fanuc) (based on)
+- [ARUCO / VISP Hand-Eye Calibration](https://github.com/jhu-lcsr/aruco_hand_eye)
+   * [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
+   * [visp](https://github.com/lagadic/vision_visp)  
 
 ## Hardware
 
@@ -102,7 +105,7 @@ Now you must go to /src/fanuc and only leave the followin folders (where it's m6
 
 If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the fanuc_m6ib_moveit_plugins/m6ib_kinematics/src/fanuc_m6ib_manipulator_ikfast_moveit_plugin.cpp.
 
-After this run ```catkin_make``` to try everything.
+After this run `catkin_make` to try everything.
 
 **Note: added my implementation to the m6ib6s.**
 
@@ -147,12 +150,31 @@ Set the IP of the machine to 192.168.0.200
 
 On the TP, run rosstate
 
-On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230```
+On the Linux machine, run `roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230`
 
 ## Moving the robot with MoveIt
 
-~~Not yet working~~
+*Not yet working*
 
 Start the ros TPE program inauto mode.
 
-In the terminal run ```roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230```
+In the terminal run `roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230`
+
+# Calibration
+
+For the calibration do the following steps:
+
+1. place the ArUco marker
+
+2. edit the smobex_calibration/launch/aruco_hand_in_eye.launch
+   * "marker_parent_frame" is the base of the robot
+   * "camera_parent_frame" is the end effector    
+   * "camera_frame" is thee camera frame you want to reference
+
+3. run `roslaunch smobex_calibration aruco_hand_in_eye.launch`
+
+4. take some shots
+
+5. when satisfied, note down the values from the terminal 
+
+6. update the values in the bringup.launch (they should be updated on a separate file, but couldn't implement it yet...)
