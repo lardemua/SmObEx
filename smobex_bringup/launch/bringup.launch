@@ -2,6 +2,7 @@
 <!-- -->
 <launch>
     <arg name="delay" default="5"/>
+    <arg name="robot_ip" value="192.168.0.230"/>
 
     <!-- <rosparam command="load" file="$(find msc_thesis)/param/params.yaml"/> -->
 
@@ -12,10 +13,17 @@
     <group> 
 
         <remap from="cloud_in" to="camera/depth_registered/points" />
-        <param name="~frame_id" value="camera_rgb_optical_frame" />
+        <!-- <param name="~frame_id" value="camera_rgb_optical_frame" /> -->
+        <param name="~frame_id" value="base_link" />
         <node name="octomap_server" pkg="octomap_server" type="octomap_server_node" />
 
     </group>
+
+    <!-- initializing robot_state_visualize_m6ib6s withou rviz -->
+
+    <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch">
+        <arg name="robot_ip" value="$(arg robot_ip)" />
+    </include>
 
     <!-- Rviz for visualization -->
     <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/rviz.rviz" required="true"/>

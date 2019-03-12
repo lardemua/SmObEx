@@ -4,7 +4,7 @@ My Mechanical Engineering Masters Thesis in the field of Robotis.
 
 ## Thesis title
 
-__Smart object exploration by robotic manipulator__
+*Smart object exploration by robotic manipulator*
 
 Department of Mechanical Engineering (DEM), University of Aveiro (UA)
 
@@ -54,6 +54,9 @@ Porto, Portugal
      - [x] Create MoveIt "package"
 - [ ] Move using MoveIt
 - [ ] Calibrate Xtion
+     - [x] Configure Rviz with Xtion + Robot
+     - [ ] Obtained the tf from the end effector to tha camera
+     - [ ] Implemented the tf
 
 # Built with
 
@@ -134,7 +137,7 @@ If the graphics aren't right, the solution is [on this issue](https://github.com
 ```
 export LC_NUMERIC="en_US.UTF-8"
 
-roslaunch fanuc_m6ib_support test_m6ib.launch
+roslaunch fanuc_m6ib_support test_m6ib6s.launch
 ```
 ## Moving the robot with the TP
 
@@ -147,7 +150,8 @@ On the TP, run rosstate
 On the Linux machine, run ```roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230```
 
 ## Moving the robot with MoveIt
-
+~~
 Start the ros TPE program inauto mode.
 
 In the terminal run ```roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230```
+~~
