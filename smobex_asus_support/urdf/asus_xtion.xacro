@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<robot name="asus_xtion" xmlns:xacro="http://wiki.ros.org/xacro">
-  <xacro:include filename="$(find smobex_asus_support)/urdf/asus_xtion_macro.xacro"/>
-  <xacro:asus_xtion prefix=""/>
-</robot>

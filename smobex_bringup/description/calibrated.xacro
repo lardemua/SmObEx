@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fanuc_xtion">
+
+    <xacro:include filename="$(find fanuc_m6ib_support)/urdf/m6ib6s_macro.xacro"/>
+    <xacro:fanuc_m6ib6s prefix=""/>
+
+    <xacro:include filename="$(find hector_sensors_description)/urdf/asus_camera.urdf.xacro"/>
+    <xacro:asus_camera name="camera" parent="flange">
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+    </xacro:asus_camera>
+
+    <joint name="camera_xtion_joint" type="fixed">
+        <!-- <origin rpy="${roll} ${pitch} ${yaw}" xyz="${x} ${y} ${z}"/> -->
+        <origin xyz="1.00000 1.00000 1.00000" rpy="0.00000 0.00000 0.00000"/>
+        <parent link="flange"/>
+        <child link="camera_link"/>
+    </joint>
+
+</robot>

@@ -181,3 +181,5 @@ For the calibration do the following steps:
 5. when satisfied, note down the values from the terminal 
 
 6. update the values in the bringup.launch (they should be updated on a separate file, but couldn't implement it yet...)
+
+![aruco calibration](./files/calibration_aruco.png)
