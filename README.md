@@ -56,7 +56,7 @@ Porto, Portugal
 - [ ] Move using MoveIt
 - [ ] Calibrate Xtion
      - [x] Configure Rviz with Xtion + Robot
-     - [ ] Obtained the tf from the end effector to tha camera
+     - [ ] Obtained the tf from the end effector to the camera
      - [ ] Implemented the tf
 
 # Built with
@@ -68,6 +68,7 @@ Porto, Portugal
 - [ARUCO / VISP Hand-Eye Calibration](https://github.com/jhu-lcsr/aruco_hand_eye)
    * [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
    * [visp](https://github.com/lagadic/vision_visp)  
+- [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
 
 ## Hardware
 

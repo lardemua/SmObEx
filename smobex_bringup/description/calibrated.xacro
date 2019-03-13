@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fanuc_xtion">
 
+    <xacro:include filename="calib_vals.xacro"/>
+
     <xacro:include filename="$(find fanuc_m6ib_support)/urdf/m6ib6s_macro.xacro"/>
     <xacro:fanuc_m6ib6s prefix=""/>
 
@@ -10,8 +12,8 @@
     </xacro:asus_camera>
 
     <joint name="camera_xtion_joint" type="fixed">
-        <!-- <origin rpy="${roll} ${pitch} ${yaw}" xyz="${x} ${y} ${z}"/> -->
-        <origin xyz="1.00000 1.00000 1.00000" rpy="0.00000 0.00000 0.00000"/>
+        <origin rpy="${roll} ${pitch} ${yaw}" xyz="${x} ${y} ${z}"/>
+        <!-- <origin xyz="1.00000 1.00000 1.00000" rpy="0.00000 0.00000 0.00000"/> -->
         <parent link="flange"/>
         <child link="camera_link"/>
     </joint>

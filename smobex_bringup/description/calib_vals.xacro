@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!--This xacro contains six xacro propperties representing a transformation obtained through calibration-->
+  <xacro:property name="roll" value="0.0"/>
+  <xacro:property name="pitch" value="0.0"/>
+  <xacro:property name="yaw" value="0.0"/>
+  <xacro:property name="x" value="0.0"/>
+  <xacro:property name="y" value="0.0"/>
+  <xacro:property name="z" value="0.0"/>
+</robot>
