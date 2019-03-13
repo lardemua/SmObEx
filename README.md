@@ -40,6 +40,7 @@ Porto, Portugal
   * [Moving the joint with the interface](#moving-the-joint-with-the-interface)
   * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
   * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
+- [Calibration](#calibration)
 
 # Completed tasks
 
@@ -108,6 +109,8 @@ If you try to compile now it won't work, what you need to do is to follow [this 
 After this run `catkin_make` to try everything.
 
 **Note: added my implementation to the m6ib6s.**
+
+![robot on rviz](./file/fanuc_m6ib6s_implement.png)
 
 ## Aruco Hand Eye
 

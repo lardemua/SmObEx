@@ -21,14 +21,19 @@
     </group>
 
     <!-- Initializing robot_state_visualize_m6ib6s withou rviz -->
-    <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch">
+    <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch" ns="m6ib6s">
         <arg name="robot_ip" value="$(arg robot_ip)" />
     </include>
+
+    <group ns="xtion">
+        <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find smobex_asus_support)/urdf/asus_xtion.xacro'" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    </group>
 
     <!-- Static tf from calibration -->
     <node pkg="tf" type="static_transform_publisher" name="xtion_tf" args="$(arg calib_vals)" />
 
     <!-- Rviz for visualization -->
-    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/rviz.rviz" required="true"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/rviz2.rviz" required="true"/>
 
 </launch>
