@@ -110,7 +110,7 @@ After this run `catkin_make` to try everything.
 
 **Note: added my implementation to the m6ib6s.**
 
-![robot on rviz](./file/fanuc_m6ib6s_implement.png)
+![robot on rviz](./files/fanuc_m6ib6s_implement.png)
 
 ## Aruco Hand Eye
 
