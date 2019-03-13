@@ -8,12 +8,6 @@
     <!-- Initiating the OpenNI2 constelation -->
     <include file="$(find openni2_launch)/launch/openni2.launch"/>
 
-    <!-- Initializing robot_state_visualize_m6ib6s withou rviz -->
-    <!-- <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch"> -->
-    <include file="$(find smobex_bringup)/launch/robot_xtion.launch">
-        <arg name="robot_ip" value="$(arg robot_ip)" />
-    </include>
-
     <!-- Operating mode -->
     <group unless="$(arg calibration)">
 
@@ -26,6 +20,11 @@
             <node name="octomap_server" pkg="octomap_server" type="octomap_server_node" />
 
         </group>
+
+        <!-- Initializing robot and camera calibrated -->
+        <include file="$(find smobex_bringup)/launch/robot_xtion.launch">
+            <arg name="robot_ip" value="$(arg robot_ip)" />
+        </include>
 
         <!-- Rviz for visualization -->
         <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
@@ -49,6 +48,14 @@
             <arg name="reference_frame" value="/camera_link"/>
             <arg name="camera_frame" value="/camera_rgb_optical_frame"/>
         </include>
+
+        <!-- Initializing robot only -->
+        <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch">
+            <arg name="robot_ip" value="$(arg robot_ip)" />
+        </include>
+
+        <!-- Initializing only camera -->
+        <param name="camera_description" command="$(find xacro)/xacro --inorder '$(find smobex_bringup)/urdf/xtion.xacro'" />
 
         <!-- Rviz for visualization -->
         <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/calibration_mode.rviz" required="true"/>

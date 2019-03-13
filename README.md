@@ -170,17 +170,6 @@ For the calibration do the following steps:
 
 1. place the ArUco marker
 
-2. edit the smobex_calibration/launch/aruco_hand_in_eye.launch
-   * "marker_parent_frame" is the base of the robot
-   * "camera_parent_frame" is the end effector    
-   * "camera_frame" is thee camera frame you want to reference
-
-3. run `roslaunch smobex_calibration aruco_hand_in_eye.launch`
-
-4. take some shots
-
-5. when satisfied, note down the values from the terminal 
-
-6. update the values in the bringup.launch (they should be updated on a separate file, but couldn't implement it yet...)
+2. run `roslaunch smobex_bringup bringup.launch calibration:=true`
 
 ![aruco calibration](./files/calibration_aruco.png)

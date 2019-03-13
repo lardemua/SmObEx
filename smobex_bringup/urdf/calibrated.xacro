@@ -7,9 +7,9 @@
     <xacro:fanuc_m6ib6s prefix=""/>
 
     <xacro:include filename="$(find hector_sensors_description)/urdf/asus_camera.urdf.xacro"/>
-    <xacro:asus_camera name="camera" parent="flange">
+    <xacro:asus_camera_model name="camera" parent="flange">
         <origin rpy="0 0 0" xyz="0 0 0"/>
-    </xacro:asus_camera>
+    </xacro:asus_camera_model>
 
     <joint name="camera_xtion_joint" type="fixed">
         <origin rpy="${roll} ${pitch} ${yaw}" xyz="${x} ${y} ${z}"/>
