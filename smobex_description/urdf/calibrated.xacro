@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fanuc_xtion">
 
-    <xacro:include filename="calib_vals.xacro"/>
+    <xacro:include filename="$(find smobex_calibration)/calibration/calib_vals.xacro"/>
 
     <xacro:include filename="$(find fanuc_m6ib_support)/urdf/m6ib6s_macro.xacro"/>
     <xacro:fanuc_m6ib6s prefix=""/>

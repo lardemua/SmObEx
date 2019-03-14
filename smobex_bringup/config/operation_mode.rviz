@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /m6iB/6S1
         - /TF1/Frames1
         - /TF1/Tree1
       Splitter Ratio: 0.5
@@ -273,25 +274,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.344464302062988
+      Distance: 3.578427791595459
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.139364093542099
+        Y: 0.2619918882846832
+        Z: 0.6445808410644531
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6197971105575562
+      Pitch: -0.12020225077867508
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.7722017765045166
+      Yaw: 6.1853814125061035
     Saved: ~
 Window Geometry:
   Camera_RGBimage:

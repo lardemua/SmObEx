@@ -61,7 +61,8 @@ Porto, Portugal
 - [ ] Calibrate Xtion
      - [x] Configure Rviz with Xtion + Robot
      - [x] Obtained the tf from the end effector to the camera
-     - [ ] Implemented the tf automatically
+     - [x] Implemented the tf automatically
+     - [ ] Get the best calibration possible
 
 # Built with
 
@@ -178,10 +179,13 @@ For the calibration do the following steps:
 
 2. run `roslaunch smobex_bringup bringup.launch calibration:=true`. If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
+3. to store the calibration, open another terminal and run `rosrun smobex_calibration store_calibration.py` (thnaks to @miguelriemoliveira for the source code).
+
 ![calibration terminal](./files/calib_terminal.png)
 
-
 ![calibration rviz](./files/calib_rviz.png)
+
+**Note: verify if store_calibration.py as running permissions.**
 
 ## Operation mode
 
