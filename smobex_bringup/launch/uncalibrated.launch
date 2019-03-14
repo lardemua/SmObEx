@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="robot_ip" doc="IP of controller" />
+
+    <include file="$(find smobex_bringup)/launch/robot_connect_params.launch">
+        <arg name="robot_ip" value="$(arg robot_ip)" />
+    </include>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find fanuc_m6ib_support)/urdf/m6ib6s.xacro'" />
+
+    <param name="camera_description" command="$(find xacro)/xacro --inorder '$(find smobex_bringup)/urdf/xtion.xacro'" />
+
+</launch>

@@ -164,12 +164,23 @@ Start the ros TPE program inauto mode.
 
 In the terminal run `roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230`
 
-# Calibration
+# Usage
+
+## Calibration Mode
 
 For the calibration do the following steps:
 
 1. place the ArUco marker
 
-2. run `roslaunch smobex_bringup bringup.launch calibration:=true`
+2. run `roslaunch smobex_bringup bringup.launch calibration:=true`. If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
-![aruco calibration](./files/calibration_aruco.png)
+![calibration terminal](./files/calib_terminal.png)
+
+
+![calibration rviz](./files/calib_rviz.png)
+
+## Operation mode
+
+1. run `roslaunch smobex_bringup bringup.launch`
+
+![running mode](./files/running.png)

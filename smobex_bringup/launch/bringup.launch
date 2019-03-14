@@ -22,7 +22,7 @@
         </group>
 
         <!-- Initializing robot and camera calibrated -->
-        <include file="$(find smobex_bringup)/launch/robot_xtion.launch">
+        <include file="$(find smobex_bringup)/launch/calibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
@@ -49,13 +49,10 @@
             <arg name="camera_frame" value="/camera_rgb_optical_frame"/>
         </include>
 
-        <!-- Initializing robot only -->
-        <include file="$(find smobex_bringup)/launch/robot_state_visualize_m6ib6s.launch">
+        <!-- Launch camera and fanuc as separate robots -->
+        <include file="$(find smobex_bringup)/launch/uncalibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
-
-        <!-- Initializing only camera -->
-        <param name="camera_description" command="$(find xacro)/xacro --inorder '$(find smobex_bringup)/urdf/xtion.xacro'" />
 
         <!-- Rviz for visualization -->
         <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/calibration_mode.rviz" required="true"/>

@@ -25,8 +25,4 @@
         <arg name="use_bswap" value="$(arg use_bswap)" />
     </include>
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find smobex_bringup)/urdf/calibrated.xacro'" />
-
 </launch>
