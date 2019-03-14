@@ -40,7 +40,11 @@ Porto, Portugal
   * [Moving the joint with the interface](#moving-the-joint-with-the-interface)
   * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
   * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
-- [Calibration](#calibration)
+- [Usage](#usage)
+  * [Calibration Mode](#calibration-mode)
+  * [Operation mode](#operation-mode)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Completed tasks
 
@@ -56,8 +60,8 @@ Porto, Portugal
 - [ ] Move using MoveIt
 - [ ] Calibrate Xtion
      - [x] Configure Rviz with Xtion + Robot
-     - [ ] Obtained the tf from the end effector to the camera
-     - [ ] Implemented the tf
+     - [x] Obtained the tf from the end effector to the camera
+     - [ ] Implemented the tf automatically
 
 # Built with
 

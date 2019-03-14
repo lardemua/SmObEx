@@ -22,7 +22,7 @@
         </group>
 
         <!-- Initializing robot and camera calibrated -->
-        <include file="$(find smobex_bringup)/launch/calibrated.launch">
+        <include file="$(find smobex_description)/launch/calibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
@@ -50,7 +50,7 @@
         </include>
 
         <!-- Launch camera and fanuc as separate robots -->
-        <include file="$(find smobex_bringup)/launch/uncalibrated.launch">
+        <include file="$(find smobex_description)/launch/uncalibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
