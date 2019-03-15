@@ -30,7 +30,6 @@ Porto, Portugal
 
 # Table of contents
 
-- [Completed tasks](#completed-tasks)
 - [Built with](#built-with)
   * [Hardware](#hardware)
 - [Installation guides](#installation-guides)
@@ -41,7 +40,8 @@ Porto, Portugal
   * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
   * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
 - [Usage](#usage)
-  * [Calibration Mode](#calibration-mode)
+  * [Intrinsic Calibration](#intrinsic-calibration)
+  * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
   * [Operation mode](#operation-mode)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -58,11 +58,13 @@ Porto, Portugal
      - [x] Create the support package 
      - [x] Create MoveIt "package"
 - [ ] Move using MoveIt
-- [ ] Calibrate Xtion
+- [x] Calibrate Xtion
      - [x] Configure Rviz with Xtion + Robot
      - [x] Obtained the tf from the end effector to the camera
      - [x] Implemented the tf automatically
-     - [ ] Get the best calibration possible
+     - [x] Get the best calibration possible (intrinsic and extrisic)
+- [ ] Multiple view model of the world
+- [ ] Restrict the volume to generate the model
 
 # Built with
 
@@ -74,7 +76,7 @@ Porto, Portugal
    * [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
    * [visp](https://github.com/lagadic/vision_visp)  
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
-camera calibraton
+- [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
 
 ## Hardware
 
@@ -172,19 +174,27 @@ In the terminal run `roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execut
 
 # Usage
 
-## Calibration Mode
+## Intrinsic Calibration
+
+The intrinsic calibration process was done following [this tutorial](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration).
+
+![intrinsic calibration calibration](./files/intrinsic_calib.png)
+
+## Extrinsic Calibration Mode
+
+Video: [SmObEx - ROS aruco hand2eye extrinsic calibration](https://youtu.be/zZ-sPsrrcI0)
 
 For the calibration do the following steps:
 
-1. place the ArUco marker
+1. place the ArUco marker (on smobex_bringup/launch/bringup.launch put the correct marker id and size)
 
 2. run `roslaunch smobex_bringup bringup.launch calibration:=true`. If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
-3. to store the calibration, open another terminal and run `rosrun smobex_calibration store_calibration.py` (thnaks to @miguelriemoliveira for the source code).
-
-![calibration terminal](./files/calib_terminal.png)
+3. to store the calibration, open another terminal and run `rosrun smobex_calibration store_calibration.py` (thanks to @miguelriemoliveira for the source code).
 
 ![calibration rviz](./files/calib_rviz.png)
+
+![calibration terminal](./files/calib_terminal.png)
 
 **Note: verify if store_calibration.py as running permissions.**
 
