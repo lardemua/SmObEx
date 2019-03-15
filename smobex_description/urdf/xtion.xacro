@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fanuc_xtion">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="xtion">
 
     <link name="flange" />
 
     <xacro:include filename="$(find hector_sensors_description)/urdf/asus_camera.urdf.xacro"/>
+    
     <xacro:asus_camera_model name="camera" parent="flange">
         <origin rpy="0 0 0" xyz="0 0 0"/>
     </xacro:asus_camera_model>
