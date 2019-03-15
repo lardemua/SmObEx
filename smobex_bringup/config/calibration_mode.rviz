@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /m6ib6s1
-        - /m6ib6s1/Status1
         - /xtion1
         - /xtion1/Status1
         - /TF1/Frames1
@@ -181,8 +180,6 @@ Visualization Manager:
           Value: true
         flange:
           Value: false
-        hand_eye//camera/rgb/aruco_marker_frame:
-          Value: true
         link_1:
           Value: false
         link_2:
@@ -213,15 +210,7 @@ Visualization Manager:
                   link_5:
                     link_6:
                       flange:
-                        camera_link:
-                          camera_depth_frame:
-                            camera_depth_optical_frame:
-                              {}
-                          camera_rgb_frame:
-                            camera_rgb_optical_frame:
-                              {}
-                          hand_eye//camera/rgb/aruco_marker_frame:
-                            {}
+                        {}
                       tool0:
                         {}
       Update Interval: 0
@@ -296,10 +285,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.03479748219251633
+      Pitch: 0.14479748904705048
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.065401077270508
+      Yaw: 0.2754019498825073
     Saved: ~
 Window Geometry:
   Displays:

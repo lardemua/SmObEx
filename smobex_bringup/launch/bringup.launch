@@ -22,7 +22,7 @@
         </group>
 
         <!-- Initializing robot and camera calibrated -->
-        <include file="$(find smobex_description)/launch/calibrated.launch">
+        <include file="$(find smobex_calibration)/launch/calibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
@@ -35,22 +35,34 @@
     <group if="$(arg calibration)">
 
         <include file="$(find aruco_hand_eye)/launch/aruco_hand_eye.launch">
+
+            <!-- ArUco gigante -->
             <arg name="markerid" value="617"/>
             <arg name="markersize" value="0.621"/>
+
+            <!-- ArUco mini -->
+            <!-- <arg name="markerid" value="585"/>
+            <arg name="markersize" value="0.082"/> -->
+
             <arg name="publish_tf" value="true"/>
             <arg name="interactive" value="false"/>
+            <arg name="sample_rate" value="2" />
 
             <arg name="marker_parent_frame" value="/base_link"/>
             <arg name="camera_parent_frame" value="/flange"/>
 
             <arg name="camera" value="/camera/rgb"/>
-            <!-- <arg name="camera_frame" value="/camera_link"/> -->
             <arg name="reference_frame" value="/camera_link"/>
             <arg name="camera_frame" value="/camera_rgb_optical_frame"/>
+            <arg name="marker_frame" value="/hand_eye/camera/rgb/aruco_marker_frame"/>
+
+            <arg name="xyz_optical_base" value="[0.000, 0.022, 0.000]"/>
+            <arg name="rpy_optical_base" value="[-1.571, -0.000, -1.571]"/>
+
         </include>
 
         <!-- Launch camera and fanuc as separate robots -->
-        <include file="$(find smobex_description)/launch/uncalibrated.launch">
+        <include file="$(find smobex_calibration)/launch/uncalibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
