@@ -74,6 +74,7 @@ Porto, Portugal
    * [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
    * [visp](https://github.com/lagadic/vision_visp)  
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
+camera calibraton
 
 ## Hardware
 

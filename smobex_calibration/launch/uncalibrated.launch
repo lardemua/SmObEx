@@ -8,10 +8,17 @@
         <arg name="robot_ip" value="$(arg robot_ip)" />
     </include>
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find fanuc_m6ib_support)/urdf/m6ib6s.xacro'" />
+    <param name="manipulator_description" command="$(find xacro)/xacro --inorder '$(find fanuc_m6ib_support)/urdf/m6ib6s.xacro'" />
 
     <param name="camera_description" command="$(find xacro)/xacro --inorder '$(find smobex_description)/urdf/xtion.xacro'" />
+    
+    <node name="robot_state_publisher_manipulator" pkg="robot_state_publisher" type="robot_state_publisher" >
+        <remap from="robot_description" to="manipulator_description" />
+    </node>
+
+    <node name="robot_state_publisher_camera" pkg="robot_state_publisher" type="robot_state_publisher" >
+        <remap from="robot_description" to="camera_description" />
+    </node>
+
 
 </launch>

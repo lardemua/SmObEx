@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /m6ib6s1
         - /xtion1
-        - /xtion1/Status1
         - /TF1/Frames1
       Splitter Ratio: 0.4277978241443634
     Tree Height: 709
@@ -113,7 +112,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
       Name: m6ib6s
-      Robot Description: robot_description
+      Robot Description: manipulator_description
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -180,6 +179,8 @@ Visualization Manager:
           Value: true
         flange:
           Value: false
+        hand_eye/camera/rgb/aruco_marker_frame:
+          Value: true
         link_1:
           Value: false
         link_2:
@@ -210,7 +211,15 @@ Visualization Manager:
                   link_5:
                     link_6:
                       flange:
-                        {}
+                        camera_link:
+                          camera_depth_frame:
+                            camera_depth_optical_frame:
+                              {}
+                          camera_rgb_frame:
+                            camera_rgb_optical_frame:
+                              {}
+                          hand_eye/camera/rgb/aruco_marker_frame:
+                            {}
                       tool0:
                         {}
       Update Interval: 0
@@ -270,25 +279,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.160433769226074
+      Distance: 2.7276856899261475
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.24838986992835999
-        Y: 0.11438456177711487
-        Z: 0.3904763460159302
+        X: 0.7077195644378662
+        Y: 0.061866648495197296
+        Z: 0.12391693145036697
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.14479748904705048
+      Pitch: 0.2197975218296051
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.2754019498825073
+      Yaw: 1.0604015588760376
     Saved: ~
 Window Geometry:
   Displays:

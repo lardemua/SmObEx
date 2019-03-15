@@ -101,6 +101,10 @@ if __name__ == "__main__":
     y = trans[1]
     z = trans[2]
 
+    print('xyz' + str(trans))
+    print('rpy' + str(eul))
+    
+
     ### write to a xml ###
     #filename = rospack.get_path('tangerinebot_calibration') + "/calibration/default.urdf.xacro"
     filename = rospack.get_path('smobex_calibration') + "/calibration/calib_vals.xacro"
@@ -125,4 +129,4 @@ if __name__ == "__main__":
     fo.close()
 
     #print('Estimated calibration is stored. You may run the calibrated system with\nroslaunch tangerinebot_bringup bringup.launch calibrated:=true\n')
-    print('Estimated calibration is stored. You may run the calibrated system with\nroslaunch smobex_bringup bringup.launch\n')
+    print('Estimated calibration is saved to file' + filename + '. You may run the calibrated system with\nroslaunch smobex_bringup bringup.launch\n')
