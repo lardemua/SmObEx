@@ -188,7 +188,13 @@ For the calibration do the following steps:
 
 1. place the ArUco marker (on smobex_bringup/launch/bringup.launch put the correct marker id and size)
 
-2. run `roslaunch smobex_bringup bringup.launch calibration:=true`. If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
+2. run 
+
+```bash 
+`roslaunch smobex_bringup bringup.launch calibration:=true`
+```
+
+If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
 3. to store the calibration, open another terminal and run `rosrun smobex_calibration store_calibration.py` (thanks to @miguelriemoliveira for the source code).
 
