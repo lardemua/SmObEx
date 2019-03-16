@@ -30,6 +30,7 @@ Porto, Portugal
 
 # Table of contents
 
+- [Completed tasks](#completed-tasks)
 - [Built with](#built-with)
   * [Hardware](#hardware)
 - [Installation guides](#installation-guides)
@@ -62,7 +63,7 @@ Porto, Portugal
      - [x] Configure Rviz with Xtion + Robot
      - [x] Obtained the tf from the end effector to the camera
      - [x] Implemented the tf automatically
-     - [x] Get the best calibration possible (intrinsic and extrisic)
+     - [x] Get the best calibration possible (RGB intrinsic and camera extrisic)
 - [ ] Multiple view model of the world
 - [ ] Restrict the volume to generate the model
 
@@ -102,22 +103,20 @@ git clone -b indigo https://github.com/ros-industrial/fanuc.git
 rosdep install --from-paths src --ignore-src --rosdistro melodic
 ```
 
-Now you must go to /src/fanuc and only leave the followin folders (where it's m6ib, it should be your robot model):
+If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the ~/catkin_ws/src/fanuc directory run
 
-- fanuc
-- fanuc_driver
-- fanuc_m6ib_moveit_config
-- fanuc_m6ib_moveit_plugins
-- fanuc_m6ib_support
-- fanuc_resources
-- LICENSE
-- readme.md
+```bash
+find . -type f -exec sed -i 's/boost\:\:shared_ptr/std\:\:shared_ptr/g' {} \;
+find . -type f -exec sed -i 's/boost\:\:const_pointer_cast/std\:\:const_pointer_cast/g' {} \;
+```
 
-If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the fanuc_m6ib_moveit_plugins/m6ib_kinematics/src/fanuc_m6ib_manipulator_ikfast_moveit_plugin.cpp.
+This will change two lines in every fanuc_X_manipulator_ikfast_moveit_plugin.cpp so they now compile.
 
 After this run `catkin_make` to try everything.
 
 **Note: added my implementation to the m6ib6s.**
+
+Already made a pull request with the M6iB/6S implementation. It has the same problem and solution described in the previous lines. 
 
 ![robot on rviz](./files/fanuc_m6ib6s_implement.png)
 
