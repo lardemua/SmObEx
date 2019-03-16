@@ -164,7 +164,7 @@ On the TP, run rosstate
 
 On the Linux machine, run 
 
-```bahs
+```bash
 roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230
 ```
 
@@ -206,7 +206,7 @@ If Rviz xtion Robot Description gives error state because of links from the robo
 
 3. to store the calibration, open another terminal and run 
 
-```bahs
+```bash
 rosrun smobex_calibration store_calibration.py
 ```
 
