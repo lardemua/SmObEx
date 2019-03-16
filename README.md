@@ -88,7 +88,7 @@ Asus Xtion PRO LIVE
 
 ## ROS Industrial and FANUC
 
-```
+```bash
 sudo apt-get install ros-melodic-industrial-core
 
 sudo apt-get install ros-melodic-ros-canopen
@@ -96,7 +96,7 @@ sudo apt-get install ros-melodic-ros-canopen
 
 Ah this stage, ROS Industrial is installed. Now the FANUC part.
 
-```
+```bash
 git clone -b indigo https://github.com/ros-industrial/fanuc.git
 
 rosdep install --from-paths src --ignore-src --rosdistro melodic
@@ -123,7 +123,7 @@ After this run `catkin_make` to try everything.
 
 ## Aruco Hand Eye
 
-```
+```bash
 cd ~/catkin_ws/src
 
 git clone https://github.com/pal-robotics/aruco_ros
@@ -149,7 +149,7 @@ roslaunch fanuc_m6ib_support test_m6ib6s.launch
 
 If the graphics aren't right, the solution is [on this issue](https://github.com/ros-visualization/rviz/issues/1249#issuecomment-403351217). So all you have to do is
 
-```
+```bash
 export LC_NUMERIC="en_US.UTF-8"
 
 roslaunch fanuc_m6ib_support test_m6ib6s.launch
@@ -162,7 +162,11 @@ Set the IP of the machine to 192.168.0.200
 
 On the TP, run rosstate
 
-On the Linux machine, run `roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230`
+On the Linux machine, run 
+
+```bahs
+roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230
+```
 
 ## Moving the robot with MoveIt
 
@@ -170,7 +174,11 @@ On the Linux machine, run `roslaunch fanuc_m6ib_support robot_state_visualize_m6
 
 Start the ros TPE program inauto mode.
 
-In the terminal run `roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230`
+In the terminal run 
+
+```bash
+roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230
+```
 
 # Usage
 
@@ -191,12 +199,18 @@ For the calibration do the following steps:
 2. run 
 
 ```bash 
-`roslaunch smobex_bringup bringup.launch calibration:=true`
+roslaunch smobex_bringup bringup.launch calibration:=true
 ```
 
 If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
-3. to store the calibration, open another terminal and run `rosrun smobex_calibration store_calibration.py` (thanks to @miguelriemoliveira for the source code).
+3. to store the calibration, open another terminal and run 
+
+```bahs
+rosrun smobex_calibration store_calibration.py
+```
+
+(thanks to @miguelriemoliveira for the source code).
 
 ![calibration rviz](./files/calib_rviz.png)
 
@@ -206,6 +220,10 @@ If Rviz xtion Robot Description gives error state because of links from the robo
 
 ## Operation mode
 
-1. run `roslaunch smobex_bringup bringup.launch`
+1. run 
+
+```bash 
+roslaunch smobex_bringup bringup.launch
+```
 
 ![running mode](./files/running.png)
