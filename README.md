@@ -49,8 +49,13 @@ Porto, Portugal
 
 # Completed tasks
 
+Week 10
+
 - [x] Retrived Point Cloud from camera and visualized in Rviz
 - [x] Single view OctoMap visualization in Rviz
+
+Week 11
+
 - [x] Installed ROS Industrial on the Fanuc m6ib/6s
 - [x] Connected ROS to the Fanuc
 - [x] Updated the Fanuc package
@@ -58,16 +63,27 @@ Porto, Portugal
      - [x] Updated the stl
      - [x] Create the support package 
      - [x] Create MoveIt "package"
-- [ ] Move using MoveIt
 - [x] Calibrate Xtion
      - [x] Configure Rviz with Xtion + Robot
      - [x] Obtained the tf from the end effector to the camera
      - [x] Implemented the tf automatically
      - [x] Get the best calibration possible (RGB intrinsic and camera extrisic)
-- [ ] Multiple view model of the world
+
+Week 12
+
+- [ ] Accumulated Point Cloud to check calibration
 - [ ] Restrict the volume to generate the model
+- [ ] Multiple view model of the world
+- [ ] Move using MoveIt
 
 # Built with
+
+## Hardware
+
+- [Fanuc Robot M6iB/6S](https://www.robots.com/robots/fanuc-m-6ib-6s)
+- [Asus Xtion PRO LIVE](https://www.asus.com/3D-Sensor/Xtion_PRO_LIVE/)
+
+## Software
 
 - [ROS Melodic](http://www.ros.org/)
 - [OpenNi 2](http://wiki.ros.org/openni2_launch/)
@@ -78,12 +94,6 @@ Porto, Portugal
    * [visp](https://github.com/lagadic/vision_visp)  
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
 - [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
-
-## Hardware
-
-Fanuc Robot M6iB/6S
-
-Asus Xtion PRO LIVE
 
 # Installation guides
 
@@ -185,11 +195,17 @@ roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false
 
 The intrinsic calibration process was done following [this tutorial](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration).
 
+```bash
+roslaunch openni2_launch openni2.launch 
+
+rosrun camera_calibration cameracalibrator.py image:=/camera/rgb/image_raw camera:=/camera/rgb --size 8x6 --square 0.105
+```
+
 ![intrinsic calibration calibration](./files/intrinsic_calib.png)
 
 ## Extrinsic Calibration Mode
 
-Video: [SmObEx - ROS aruco hand2eye extrinsic calibration](https://youtu.be/zZ-sPsrrcI0)
+**_Video_**: [SmObEx - ROS aruco hand2eye extrinsic calibration](https://youtu.be/zZ-sPsrrcI0)
 
 For the calibration do the following steps:
 
