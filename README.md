@@ -33,6 +33,7 @@ Porto, Portugal
 - [Completed tasks](#completed-tasks)
 - [Built with](#built-with)
   * [Hardware](#hardware)
+  * [Software](#software)
 - [Installation guides](#installation-guides)
   * [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
   * [Aruco Hand Eye](#aruco-hand-eye)
@@ -43,6 +44,8 @@ Porto, Portugal
 - [Usage](#usage)
   * [Intrinsic Calibration](#intrinsic-calibration)
   * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
+  * [Recording mode](#recording-mode)
+    + [Resultados](#resultados)
   * [Operation mode](#operation-mode)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -71,9 +74,9 @@ Week 11
 
 Week 12
 
-- [ ] Accumulated Point Cloud to check calibration
+- [x] Accumulated Point Cloud to check calibration
 - [ ] Restrict the volume to generate the model
-- [ ] Multiple view model of the world
+- [x] Multiple view model of the world
 - [ ] Move using MoveIt
 
 # Built with
@@ -94,6 +97,8 @@ Week 12
    * [visp](https://github.com/lagadic/vision_visp)  
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
 - [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
+
+rustbot
 
 # Installation guides
 
@@ -232,6 +237,42 @@ rosrun smobex_calibration store_calibration.py
 ![calibration terminal](./files/calib_terminal.png)
 
 **Note: verify if store_calibration.py as running permissions.**
+
+## Recording mode
+
+To record the point cloud run 
+
+```bash
+roslaunch smobex_bringup bringup.launch record:=true
+```
+
+(You must change the saving path in the launch file)
+
+If at any moment you desire to save the OctoMap run 
+
+```bash
+rosrun octomap_server octomap_saver -f test.ot
+```
+
+To visualize the point cloud or the OctoMap run, respectivelly, 
+
+```bash
+pcl_viewer auto_save.pcd
+
+octovis test.bt
+```
+
+### Resultados
+
+360 degree mapping of LAR files:
+
+- [Octree](./files/test.bt)
+
+- [Point Cloud](./files/auto_save.pcd)
+
+![LAR_360_octomap](./files/LAR_360_octomap.png)
+
+![LAR_360_pointCloud](./files/LAR_360_pointCloud.png)
 
 ## Operation mode
 

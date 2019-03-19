@@ -3,32 +3,40 @@
 <launch>
 
     <arg name="calibration" default="false" />
+    <arg name="record" default="false"/>
     <arg name="robot_ip" value="192.168.0.230"/>
 
     <!-- Initiating the OpenNI2 constelation -->
     <include file="$(find openni2_launch)/launch/openni2.launch">
         <arg name="publish_tf" value="false"/>
     </include>
+
     <!-- Operating mode -->
     <group unless="$(arg calibration)">
 
         <!-- Initializing OctoMap Server with the right params -->
-        <group>
-
+        <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
             <remap from="cloud_in" to="camera/depth_registered/points" />
-            <!-- <param name="~frame_id" value="camera_rgb_optical_frame" /> -->
             <param name="~frame_id" value="base_link" />
-            <node name="octomap_server" pkg="octomap_server" type="octomap_server_node" />
-
-        </group>
+        </node>
 
         <!-- Initializing robot and camera calibrated -->
         <include file="$(find smobex_calibration)/launch/calibrated.launch">
             <arg name="robot_ip" value="$(arg robot_ip)" />
         </include>
 
-        <!-- Rviz for visualization -->
-        <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
+        <group unless="$(arg record)">
+            <!-- Rviz for visualization -->
+            <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
+        </group>
+
+        <!-- Record point cloud and OctoMap -->
+        <!-- <node if="$(arg record)" pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud2file" output="screen"> -->
+        <node if="$(arg record)" pkg="rustbot_accumulate_point_clouds" type="accumulatepointcloud" name="accumulatedpointcloud2file" output="screen">
+            <remap from="input" to="camera/depth_registered/points"/>
+            <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/> <!-- file is saved in ~/.ros -->
+            <remap from="map" to="base_link"/>
+        </node>
 
     </group>
 
