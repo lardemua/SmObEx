@@ -289,6 +289,8 @@ roslaunch smobex_bringup bringup.launch online:=false
 
 ### Define Space Mode
 
+**_Video_**: [SmObEx - OctoMap mapping of selected volume of the world](https://youtu.be/pa0htI7LZPg)
+
 ```bash 
 roslaunch smobex_bringup bringup.launch config_space:=true
 ```

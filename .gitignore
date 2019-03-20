@@ -54,3 +54,4 @@ qtcreator-*
 CATKIN_IGNORE
 
 .setup_assistant
+*.bin

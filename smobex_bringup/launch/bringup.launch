@@ -24,7 +24,7 @@
         </include>
 
         <!-- Init point cloud spacial filter -->
-        <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen" required="true">
+        <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" >
 
             <param name="point_cloud_in" value="/camera/depth_registered/points"/>
             <param name="fixed_frame_id" value="/base_link"/>
@@ -32,7 +32,7 @@
             <param name="configure" value="$(arg config_space)"/>
             <param name="voxelize" value="false"/>
 
-            <rosparam unless="$(arg config_space)" file="$(find point_cloud_spatial_filter)/params/default_params.yaml" command="load" />
+            <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
 
             <!-- If you want to overwrite the defaults          
             <param name="x_voxel" value="0.3"/>
@@ -45,6 +45,8 @@
             <param name="x_min" value="0"/>
             <param name="y_min" value="0"/>
             <param name="z_min" value="0"/> 
+
+            <param name="params_path" value="$(find smobex_bringup)"/>
 
         </node>
 
