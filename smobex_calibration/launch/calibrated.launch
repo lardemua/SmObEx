@@ -3,10 +3,15 @@
 <launch>
 
     <arg name="robot_ip" doc="IP of controller" />
+    <arg name="online" doc="Connection to the robot"/>
 
-    <include file="$(find smobex_calibration)/launch/robot_connect_params.launch">
+    <include if="$(arg online)" file="$(find smobex_calibration)/launch/robot_connect_params.launch">
         <arg name="robot_ip" value="$(arg robot_ip)" />
     </include>
+
+    <node unless="$(arg online)" pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+        <param name="~use_gui" value="true"/>
+    </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 

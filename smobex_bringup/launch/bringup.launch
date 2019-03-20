@@ -4,6 +4,8 @@
 
     <arg name="calibration" default="false" />
     <arg name="record" default="false"/>
+    <arg name="online" default="true"/>
+    
     <arg name="robot_ip" value="192.168.0.230"/>
 
     <!-- Initiating the OpenNI2 constelation -->
@@ -14,27 +16,28 @@
     <!-- Operating mode -->
     <group unless="$(arg calibration)">
 
+        <!-- Initializing robot and camera calibrated -->
+        <include file="$(find smobex_calibration)/launch/calibrated.launch">
+            <arg name="robot_ip" value="$(arg robot_ip)" />
+            <arg name="online" value="$(arg online)"/>
+        </include>
+
         <!-- Initializing OctoMap Server with the right params -->
         <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
             <remap from="cloud_in" to="camera/depth_registered/points" />
             <param name="~frame_id" value="base_link" />
+            <param name="publish_free_space" value="true"/>
         </node>
 
-        <!-- Initializing robot and camera calibrated -->
-        <include file="$(find smobex_calibration)/launch/calibrated.launch">
-            <arg name="robot_ip" value="$(arg robot_ip)" />
-        </include>
-
-        <group unless="$(arg record)">
-            <!-- Rviz for visualization -->
-            <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
-        </group>
+        <!-- Rviz for visualization -->
+        <node unless="$(arg record)" pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
 
         <!-- Record point cloud and OctoMap -->
-        <!-- <node if="$(arg record)" pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud2file" output="screen"> -->
-        <node if="$(arg record)" pkg="rustbot_accumulate_point_clouds" type="accumulatepointcloud" name="accumulatedpointcloud2file" output="screen">
+        <node if="$(arg record)" pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud2file" output="screen">
+            <!-- <node if="$(arg record)" pkg="rustbot_accumulate_point_clouds" type="accumulatepointcloud" name="accumulatedpointcloud2file" output="screen"> -->
             <remap from="input" to="camera/depth_registered/points"/>
-            <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/> <!-- file is saved in ~/.ros -->
+            <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/>
+            <!-- file is saved in ~/.ros -->
             <remap from="map" to="base_link"/>
         </node>
 

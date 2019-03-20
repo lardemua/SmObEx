@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="configure" default="false"/>
+
+    <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen" required="true">
+
+        <param name="point_cloud_in" value="/camera/depth_registered/points"/>
+        <param name="fixed_frame_id" value="/camera_link"/>
+
+        <param name="configure" value="$(arg configure)"/>
+        <param name="voxelize" value="true"/>
+        
+        <rosparam unless="$(arg configure)" file="$(find point_cloud_spatial_filter)/params/default_params.yaml" command="load" />    
+        
+          
+        <param name="x_voxel" value="0.3"/>
+        <param name="y_voxel" value="0.3"/>
+        <param name="z_voxel" value="0.3"/>
+<!-- If you want to overwrite the defaults
+        <param name="x_max" value="0.2"/>
+        <param name="y_max" value="0.2"/>
+        <param name="z_max" value="0.2"/>
+        <param name="x_min" value="-0.2"/>
+        <param name="y_min" value="-0.2"/>
+        <param name="z_min" value="-0.2"/> -->
+
+    </node>
+
+    <!-- point_cloud_spatial_filter.h   
+    
+            _p_priv_nh->param<double>("x_max", _x_max , 2.0);
+            _p_priv_nh->param<double>("x_min", _x_min , -2.0);
+            _p_priv_nh->param<double>("y_max", _y_max , 2.0);
+            _p_priv_nh->param<double>("y_min", _y_min , -2.0);
+            _p_priv_nh->param<double>("z_max", _z_max , 3.0);
+            _p_priv_nh->param<double>("z_min", _z_min , 0.0);
+            _p_priv_nh->param<bool>("voxelize", _voxelize , false);
+            _p_priv_nh->param<double>("x_voxel", _x_voxel , 0.01);
+            _p_priv_nh->param<double>("y_voxel", _y_voxel , 0.01);
+            _p_priv_nh->param<double>("z_voxel", _z_voxel , 0.01);
+            _p_priv_nh->param<bool>("configure", _flg_configure , false);
+            _p_priv_nh->param<std::string>("point_cloud_in", _point_cloud_in , "camera_default/depth_registered/points");
+            _p_priv_nh->param<std::string>("fixed_frame_id", _fixed_frame_id, "/camera_default_rgb_optical_frame");
+
+            CONFIGURE ALLOWS THE CREATION OF THE BOX WITHOUT USING SAVES VALUES???
+            HOW TO SAVED THEM????
+            VOXELIZE TRANSFORM INSIDE INTO VOXELS???
+
+
+     -->
+</launch>

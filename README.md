@@ -75,6 +75,7 @@ Week 11
 Week 12
 
 - [x] Accumulated Point Cloud to check calibration
+- [x] Added mode to record Point Cloud and OctoMap
 - [ ] Restrict the volume to generate the model
 - [x] Multiple view model of the world
 - [ ] Move using MoveIt
@@ -97,8 +98,7 @@ Week 12
    * [visp](https://github.com/lagadic/vision_visp)  
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
 - [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
-
-rustbot
+- [OctoMap tools](https://github.com/miguelriemoliveira/octomap_tools)
 
 # Installation guides
 
@@ -262,7 +262,7 @@ pcl_viewer auto_save.pcd
 octovis test.bt
 ```
 
-### Resultados
+### Results
 
 360 degree mapping of LAR files:
 
