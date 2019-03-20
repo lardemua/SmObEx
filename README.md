@@ -1,6 +1,6 @@
 # SmObEx: Smart Object Exploration
 
-My Mechanical Engineering Masters Thesis in the field of Robotis.
+My Mechanical Engineering Masters Thesis in the field of Robotics.
 
 ## Thesis title
 
@@ -45,8 +45,11 @@ Porto, Portugal
   * [Intrinsic Calibration](#intrinsic-calibration)
   * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
   * [Recording mode](#recording-mode)
-    + [Resultados](#resultados)
+    + [Results](#results)
   * [Operation mode](#operation-mode)
+    + [Offline (robot) Mode](#offline--robot--mode)
+    + [Define Space Mode](#define-space-mode)
+    + [Autonomous](#autonomous)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -54,7 +57,7 @@ Porto, Portugal
 
 Week 10
 
-- [x] Retrived Point Cloud from camera and visualized in Rviz
+- [x] Retrieved Point Cloud from camera and visualized in Rviz
 - [x] Single view OctoMap visualization in Rviz
 
 Week 11
@@ -70,13 +73,13 @@ Week 11
      - [x] Configure Rviz with Xtion + Robot
      - [x] Obtained the tf from the end effector to the camera
      - [x] Implemented the tf automatically
-     - [x] Get the best calibration possible (RGB intrinsic and camera extrisic)
+     - [x] Get the best calibration possible (RGB intrinsic and camera extrinsic)
 
 Week 12
 
 - [x] Accumulated Point Cloud to check calibration
 - [x] Added mode to record Point Cloud and OctoMap
-- [ ] Restrict the volume to generate the model
+- [x] Restrict the volume to generate the model
 - [x] Multiple view model of the world
 - [ ] Move using MoveIt
 
@@ -118,7 +121,7 @@ git clone -b indigo https://github.com/ros-industrial/fanuc.git
 rosdep install --from-paths src --ignore-src --rosdistro melodic
 ```
 
-If you try to compile now it won't work, what you need to do is to follow [this issues' intructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the ~/catkin_ws/src/fanuc directory run
+If you try to compile now it won't work, what you need to do is to follow [this issues' instructions](https://github.com/ros-industrial/fanuc/issues/241) and make changes on the ~/catkin_ws/src/fanuc directory run
 
 ```bash
 find . -type f -exec sed -i 's/boost\:\:shared_ptr/std\:\:shared_ptr/g' {} \;
@@ -254,7 +257,7 @@ If at any moment you desire to save the OctoMap run
 rosrun octomap_server octomap_saver -f test.ot
 ```
 
-To visualize the point cloud or the OctoMap run, respectivelly, 
+To visualize the point cloud or the OctoMap run, respectively, 
 
 ```bash
 pcl_viewer auto_save.pcd
@@ -275,6 +278,26 @@ octovis test.bt
 ![LAR_360_pointCloud](./files/LAR_360_pointCloud.png)
 
 ## Operation mode
+
+### Offline (robot) Mode
+
+```bash 
+roslaunch smobex_bringup bringup.launch online:=false
+```
+
+![offline mode](./files/offline_mode.png)
+
+### Define Space Mode
+
+```bash 
+roslaunch smobex_bringup bringup.launch config_space:=true
+```
+
+In the end don't forget to click on the grey sphere to save the configuration.
+
+![define space](./files/define_volume.png)
+
+### Autonomous
 
 1. run 
 

@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /m6iB/6S1
         - /TF1/Frames1
         - /TF1/Tree1
       Splitter Ratio: 0.5
@@ -82,14 +81,6 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
-    - Class: rviz/MarkerArray
-      Enabled: false
-      Marker Topic: /occupied_cells_vis_array
-      Name: OctoMap_OccupiedCells
-      Namespaces:
-        {}
-      Queue Size: 100
       Value: false
     - Class: rviz/Image
       Enabled: true
@@ -249,6 +240,61 @@ Visualization Manager:
                         {}
       Update Interval: 0
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Filtered PointCloud
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /point_cloud_filter/points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /point_cloud_filter/rviz/filter
+      Name: Filtered Volume
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: Define Volume
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /preprocessing_box/update
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /occupied_cells_vis_array
+      Name: OctoMap_OccupiedCells
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -274,25 +320,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.578427791595459
+      Distance: 4.718415260314941
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.139364093542099
-        Y: 0.2619918882846832
-        Z: 0.6445808410644531
+        X: 1.6527210474014282
+        Y: 0.034154657274484634
+        Z: 0.5046038031578064
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.12020225077867508
+      Pitch: 0.5697970390319824
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.1853814125061035
+      Yaw: 2.272186517715454
     Saved: ~
 Window Geometry:
   Camera_RGBimage:
