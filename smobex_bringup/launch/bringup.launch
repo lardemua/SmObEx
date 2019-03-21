@@ -24,7 +24,7 @@
         </include>
 
         <!-- Init point cloud spacial filter -->
-        <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" >
+        <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
 
             <param name="point_cloud_in" value="/camera/depth_registered/points"/>
             <param name="fixed_frame_id" value="/base_link"/>
@@ -33,18 +33,8 @@
             <param name="voxelize" value="false"/>
 
             <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
+            <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" />
 
-            <!-- If you want to overwrite the defaults          
-            <param name="x_voxel" value="0.3"/>
-            <param name="y_voxel" value="0.3"/>
-            <param name="z_voxel" value="0.3"/>
-
-            <param name="x_max" value="0.2"/>
-            <param name="y_max" value="0.2"/>
-            <param name="z_max" value="0.2"/> -->
-            <param name="x_min" value="0"/>
-            <param name="y_min" value="0"/>
-            <param name="z_min" value="0"/> 
 
             <param name="params_path" value="$(find smobex_bringup)"/>
 
@@ -52,10 +42,15 @@
 
         <!-- Initializing OctoMap Server with the right params -->
         <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
+            
             <!-- <remap from="cloud_in" to="camera/depth_registered/points" /> -->
             <remap from="cloud_in" to="point_cloud_filter/points" />
-            <param name="~frame_id" value="base_link" />
             <param name="publish_free_space" value="true"/>
+
+            <param name="~frame_id" value="base_link" />
+            <param name="~resolution" value="0.01"/>
+
+
         </node>
 
         <!-- Rviz for visualization -->
@@ -66,7 +61,6 @@
             <!-- <node if="$(arg record)" pkg="rustbot_accumulate_point_clouds" type="accumulatepointcloud" name="accumulatedpointcloud2file" output="screen"> -->
             <remap from="input" to="camera/depth_registered/points"/>
             <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/>
-            <!-- file is saved in ~/.ros -->
             <remap from="map" to="base_link"/>
         </node>
 
