@@ -113,7 +113,7 @@ sudo apt-get install ros-melodic-industrial-core
 sudo apt-get install ros-melodic-ros-canopen
 ```
 
-Ah this stage, ROS Industrial is installed. Now the FANUC part.
+At this stage, ROS Industrial is installed. Now the FANUC part.
 
 ```bash
 git clone -b indigo https://github.com/ros-industrial/fanuc.git
@@ -278,6 +278,20 @@ octovis test.bt
 ![LAR_360_pointCloud](./files/LAR_360_pointCloud.png)
 
 ## Operation mode
+
+### Simulating in Roboguide
+
+Connect both Linux and Windows machines by ethernet cable.
+
+In the Windows set the IPv4 as 192.168.0.233. In the Linux as 192.168.0.230.
+
+Start Roboguide and run the ROS TPE program.
+
+Then run
+
+```bash
+roslaunch fanuc_xtion_moveit_config moveit_planning_execution.launch robot_ip:=192.168.0.233 use_bswap:=false sim:=false
+```
 
 ### Offline (robot) Mode
 

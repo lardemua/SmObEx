@@ -32,10 +32,9 @@
             <param name="configure" value="$(arg config_space)"/>
             <param name="voxelize" value="false"/>
 
-            <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
-            <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" />
-
-
+            <!-- <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
+            <!-- <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" /> -->
+            <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> 
             <param name="params_path" value="$(find smobex_bringup)"/>
 
         </node>
