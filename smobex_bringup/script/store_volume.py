@@ -20,7 +20,7 @@ rospy.set_param("/pcl_filters/psy/filter_limit_min",y_min)
 rospy.set_param("/pcl_filters/psz/filter_limit_max",z_max)
 rospy.set_param("/pcl_filters/psz/filter_limit_min",z_min)
 
-_path=rospy.get_param("/params_path")
-cmd = "rosparam dump " + _path + "/params/" + "pcl_params.yaml /point_cloud_filter -v"
+_path=rospy.get_param("/point_cloud_filter/params_path")
+cmd = "rosparam dump " + _path + "/params/" + "pcl_params.yaml /pcl_filters -v"
 
 os.system(cmd)

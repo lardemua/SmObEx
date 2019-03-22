@@ -23,8 +23,8 @@
             <arg name="online" value="$(arg online)"/>
         </include>
 
-        <!-- Init point cloud spacial filter -->
-        <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+        <!-- Init point cloud spacial filter, config mode -->
+        <node if="$(arg config_space)" pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
 
             <param name="point_cloud_in" value="/camera/depth_registered/points"/>
             <param name="fixed_frame_id" value="/base_link"/>
@@ -35,15 +35,19 @@
             <!-- <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
             <!-- <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" /> -->
             <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> 
+            
             <param name="params_path" value="$(find smobex_bringup)"/>
 
         </node>
+
+        <include unless="$(arg config_space)" file="$(find smobex_bringup)/launch/pcl_filter.launch" />
 
         <!-- Initializing OctoMap Server with the right params -->
         <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
             
             <!-- <remap from="cloud_in" to="camera/depth_registered/points" /> -->
-            <remap from="cloud_in" to="point_cloud_filter/points" />
+            <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
+            <remap from="cloud_in" to="pcl_filters/pcl_filtered" />
             <param name="publish_free_space" value="true"/>
 
             <param name="~frame_id" value="base_link" />

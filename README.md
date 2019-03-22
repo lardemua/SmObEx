@@ -81,6 +81,7 @@ Week 12
 - [x] Added mode to record Point Cloud and OctoMap
 - [x] Restrict the volume to generate the model
 - [x] Multiple view model of the world
+- [x] Communicated with robot in Roboguide (other pc) 
 - [ ] Move using MoveIt
 
 # Built with
@@ -309,7 +310,11 @@ roslaunch smobex_bringup bringup.launch online:=false
 roslaunch smobex_bringup bringup.launch config_space:=true
 ```
 
-In the end don't forget to click on the grey sphere to save the configuration.
+In the end don't forget to click on the grey sphere to save the configuration and only then to run
+
+```bash
+rosrun smobex_bringup store_volume.py
+```
 
 ![define space](./files/define_volume.png)
 
