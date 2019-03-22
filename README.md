@@ -103,6 +103,7 @@ Week 12
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
 - [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
 - [OctoMap tools](https://github.com/miguelriemoliveira/octomap_tools)
+- [PCL ROS](http://wiki.ros.org/pcl)
 
 # Installation guides
 
@@ -247,7 +248,7 @@ rosrun smobex_calibration store_calibration.py
 To record the point cloud run 
 
 ```bash
-roslaunch smobex_bringup bringup.launch record:=true
+roslaunch smobex_bringup record.launch 
 ```
 
 (You must change the saving path in the launch file)

@@ -3,11 +3,10 @@
 <launch>
 
     <arg name="calibration" default="false" />
-    <arg name="record" default="false"/>
     <arg name="online" default="true"/>
     <arg name="config_space" default="false"/>
-
-    <arg name="robot_ip" value="192.168.0.230"/>
+    <arg name="octo_resolution" default="0.01"/>
+    <arg name="robot_ip" default="192.168.0.230"/>
 
     <!-- Initiating the OpenNI2 constelation -->
     <include file="$(find openni2_launch)/launch/openni2.launch">
@@ -22,6 +21,7 @@
             <arg name="robot_ip" value="$(arg robot_ip)" />
             <arg name="online" value="$(arg online)"/>
         </include>
+        <!--  -->
 
         <!-- Init point cloud spacial filter, config mode -->
         <node if="$(arg config_space)" pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
@@ -34,38 +34,30 @@
 
             <!-- <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
             <!-- <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" /> -->
-            <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> 
-            
+            <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
+
             <param name="params_path" value="$(find smobex_bringup)"/>
 
         </node>
 
         <include unless="$(arg config_space)" file="$(find smobex_bringup)/launch/pcl_filter.launch" />
+        <!--  -->
 
         <!-- Initializing OctoMap Server with the right params -->
         <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
-            
-            <!-- <remap from="cloud_in" to="camera/depth_registered/points" /> -->
+
             <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
             <remap from="cloud_in" to="pcl_filters/pcl_filtered" />
             <param name="publish_free_space" value="true"/>
 
             <param name="~frame_id" value="base_link" />
-            <param name="~resolution" value="0.01"/>
-
+            <param name="~resolution" value="$arg(octo_resolution)"/>
 
         </node>
+        <!--  -->
 
         <!-- Rviz for visualization -->
-        <node unless="$(arg record)" pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
-
-        <!-- Record point cloud and OctoMap -->
-        <node if="$(arg record)" pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud2file" output="screen">
-            <!-- <node if="$(arg record)" pkg="rustbot_accumulate_point_clouds" type="accumulatepointcloud" name="accumulatedpointcloud2file" output="screen"> -->
-            <remap from="input" to="camera/depth_registered/points"/>
-            <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/>
-            <remap from="map" to="base_link"/>
-        </node>
+        <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
 
     </group>
 
