@@ -40,6 +40,7 @@
 
         </node>
 
+        <!-- Init point cloud spacial filter, operation mode -->
         <include unless="$(arg config_space)" file="$(find smobex_bringup)/launch/pcl_filter.launch" />
         <!--  -->
 

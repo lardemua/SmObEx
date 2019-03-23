@@ -295,6 +295,13 @@ Then run
 roslaunch fanuc_xtion_moveit_config moveit_planning_execution.launch robot_ip:=192.168.0.233 use_bswap:=false sim:=false
 ```
 
+and set with rqt_reconfigure
+
+```xml
+<param name="move_group/trajectory_execution/allowed_execution_duration_scaling" value="4.0" />
+<param name="move_group/trajectory_execution/execution_duration_monitoring" value="false" />
+```
+
 ### Offline (robot) Mode
 
 ```bash 
