@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot_ip" doc="IP of the manipulator"/>
+    <arg name="online" doc="If robot is online or not"/>
+
+    <!-- Initializing robot and camera calibrated -->
+    <include file="$(find smobex_calibration)/launch/calibrated.launch">
+        <arg name="robot_ip" value="$(arg robot_ip)" />
+        <arg name="online" value="$(arg online)"/>
+    </include>
+
+    <!-- Init point cloud spacial filter, config mode -->
+    <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+
+        <param name="point_cloud_in" value="/camera/depth_registered/points"/>
+        <param name="fixed_frame_id" value="/base_link"/>
+
+        <param name="configure" value="true"/>
+        <param name="voxelize" value="false"/>
+
+        <!-- <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
+        <!-- <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" /> -->
+        <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
+
+        <param name="params_path" value="$(find smobex_bringup)"/>
+
+    </node>
+
+    <!-- Rviz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/defineVol_mode.rviz" required="true"/>
+
+</launch>

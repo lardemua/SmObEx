@@ -31,6 +31,10 @@ Porto, Portugal
 # Table of contents
 
 - [Completed tasks](#completed-tasks)
+  * [Week 10](#week-10)
+  * [Week 11](#week-11)
+  * [Week 12](#week-12)
+  * [Week 13](#week-13)
 - [Built with](#built-with)
   * [Hardware](#hardware)
   * [Software](#software)
@@ -47,6 +51,7 @@ Porto, Portugal
   * [Recording mode](#recording-mode)
     + [Results](#results)
   * [Operation mode](#operation-mode)
+    + [Simulating in Roboguide](#simulating-in-roboguide)
     + [Offline (robot) Mode](#offline--robot--mode)
     + [Define Space Mode](#define-space-mode)
     + [Autonomous](#autonomous)
@@ -55,12 +60,12 @@ Porto, Portugal
 
 # Completed tasks
 
-Week 10
+## Week 10
 
 - [x] Retrieved Point Cloud from camera and visualized in Rviz
 - [x] Single view OctoMap visualization in Rviz
 
-Week 11
+## Week 11
 
 - [x] Installed ROS Industrial on the Fanuc m6ib/6s
 - [x] Connected ROS to the Fanuc
@@ -75,13 +80,17 @@ Week 11
      - [x] Implemented the tf automatically
      - [x] Get the best calibration possible (RGB intrinsic and camera extrinsic)
 
-Week 12
+## Week 12
 
 - [x] Accumulated Point Cloud to check calibration
 - [x] Added mode to record Point Cloud and OctoMap
 - [x] Restrict the volume to generate the model
 - [x] Multiple view model of the world
 - [x] Communicated with robot in Roboguide (other pc) 
+
+## Week 13
+
+- [ ] Updated FANUC controller software
 - [ ] Move using MoveIt
 
 # Built with
@@ -189,14 +198,12 @@ roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.1
 
 ## Moving the robot with MoveIt
 
-*Not yet working*
-
-Start the ros TPE program inauto mode.
+Start the ros TPE program in auto mode.
 
 In the terminal run 
 
 ```bash
-roslaunch fanuc_m6ib6s_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230
+roslaunch fanuc_xtion_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230
 ```
 
 # Usage
@@ -224,10 +231,8 @@ For the calibration do the following steps:
 2. run 
 
 ```bash 
-roslaunch smobex_bringup bringup.launch calibration:=true
+roslaunch smobex_bringup bringup.launch config:=true calibration:=true
 ```
-
-If Rviz xtion Robot Description gives error state because of links from the robot, just press the Reset button. Don't know why this happens, but solves it...
 
 3. to store the calibration, open another terminal and run 
 
@@ -264,7 +269,7 @@ To visualize the point cloud or the OctoMap run, respectively,
 ```bash
 pcl_viewer auto_save.pcd
 
-octovis test.bt
+octovis test.ot
 ```
 
 ### Results
@@ -315,7 +320,7 @@ roslaunch smobex_bringup bringup.launch online:=false
 **_Video_**: [SmObEx - OctoMap mapping of selected volume of the world](https://youtu.be/pa0htI7LZPg)
 
 ```bash 
-roslaunch smobex_bringup bringup.launch config_space:=true
+roslaunch smobex_bringup bringup.launch config:=true define_vol:=true
 ```
 
 In the end don't forget to click on the grey sphere to save the configuration and only then to run

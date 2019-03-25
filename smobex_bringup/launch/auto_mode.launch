@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot_ip" doc="IP of the manipulator"/>
+    <arg name="online" doc="If robot is online or not"/>
+    <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
+
+    <!-- Initializing robot and camera calibrated -->
+    <include file="$(find smobex_calibration)/launch/calibrated.launch">
+        <arg name="robot_ip" value="$(arg robot_ip)" />
+        <arg name="online" value="$(arg online)"/>
+    </include>
+
+    <!-- Init point cloud spacial filter, operation mode -->
+    <include file="$(find smobex_bringup)/launch/pcl_filter.launch" />
+
+    <!-- OctoMap Server -->
+    <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
+
+        <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
+        <remap from="cloud_in" to="pcl_filters/pcl_filtered" />
+        <param name="publish_free_space" value="true"/>
+
+        <param name="~frame_id" value="base_link" />
+        <param name="~resolution" value="$arg(octo_resolution)"/>
+
+    </node>
+    <!--  -->
+
+    <!-- Rviz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
+
+</launch>

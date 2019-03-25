@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!-- -->
+<launch>
+
+    <!-- Modes -->
+
+    <arg name="calibration" default="false" />
+    <arg name="config_space" default="false"/>
+
+    <!-- Args -->
+    
+    <arg name="online" default="true"/>
+    <arg name="octo_resolution" default="0.01"/>
+    <arg name="robot_ip" default="192.168.0.230"/>
+
+    <!-- Initiating the OpenNI2 constelation -->
+    <include file="$(find openni2_launch)/launch/openni2.launch">
+        <arg name="publish_tf" value="false"/>
+    </include>
+
+    <!-- Operating mode -->
+    <group unless="$(arg calibration)">
+
+        <!-- Initializing robot and camera calibrated -->
+        <include file="$(find smobex_calibration)/launch/calibrated.launch">
+            <arg name="robot_ip" value="$(arg robot_ip)" />
+            <arg name="online" value="$(arg online)"/>
+        </include>
+        <!--  -->
+
+        <!-- Init point cloud spacial filter, config mode -->
+        <node if="$(arg config_space)" pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+
+            <param name="point_cloud_in" value="/camera/depth_registered/points"/>
+            <param name="fixed_frame_id" value="/base_link"/>
+
+            <param name="configure" value="$(arg config_space)"/>
+            <param name="voxelize" value="false"/>
+
+            <!-- <rosparam unless="$(arg config_space)" file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
+            <!-- <rosparam if="$(arg config_space)" file="$(find smobex_bringup)/params/config_params.yaml" command="load" /> -->
+            <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
+
+            <param name="params_path" value="$(find smobex_bringup)"/>
+
+        </node>
+
+        <!-- Init point cloud spacial filter, operation mode -->
+        <include unless="$(arg config_space)" file="$(find smobex_bringup)/launch/pcl_filter.launch" />
+        <!--  -->
+
+        <!-- Initializing OctoMap Server with the right params -->
+        <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
+
+            <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
+            <remap from="cloud_in" to="pcl_filters/pcl_filtered" />
+            <param name="publish_free_space" value="true"/>
+
+            <param name="~frame_id" value="base_link" />
+            <param name="~resolution" value="$arg(octo_resolution)"/>
+
+        </node>
+        <!--  -->
+
+        <!-- Rviz for visualization -->
+        <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
+
+    </group>
+
+    <!-- Calibration mode -->
+    <group if="$(arg calibration)">
+
+        <!-- Launch camera and fanuc as separate robots -->
+        <include file="$(find smobex_calibration)/launch/uncalibrated.launch">
+            <arg name="robot_ip" value="$(arg robot_ip)" />
+        </include>
+
+        <!-- Calibration launch file -->
+        <include file="$(find aruco_hand_eye)/launch/aruco_hand_eye.launch">
+
+            <!-- ArUco gigante -->
+            <arg name="markerid" value="617"/>
+            <arg name="markersize" value="0.621"/>
+
+            <!-- ArUco mini -->
+            <!-- <arg name="markerid" value="585"/>
+            <arg name="markersize" value="0.081"/> -->
+
+            <arg name="publish_tf" value="true"/>
+            <arg name="interactive" value="false"/>
+            <arg name="sample_rate" value="2" />
+
+            <arg name="marker_parent_frame" value="/base_link"/>
+            <arg name="camera_parent_frame" value="/flange"/>
+
+            <arg name="camera" value="/camera/rgb"/>
+            <arg name="reference_frame" value="/cam_flange"/>
+            <arg name="camera_frame" value="/camera_rgb_optical_frame"/>
+            <arg name="marker_frame" value="/hand_eye/camera/rgb/aruco_marker_frame"/>
+            <arg name="camera_info" value="/camera/rgb/camera_info"/>
+
+        </include>
+
+        <!-- Rviz for visualization -->
+        <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/calibration_mode.rviz" required="true"/>
+
+    </group>
+
+</launch>
