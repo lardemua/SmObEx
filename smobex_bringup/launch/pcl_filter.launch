@@ -11,7 +11,7 @@
             <remap from="~input" to="/camera/depth_registered/points" />
             <rosparam>
                 filter_field_name: x
-                                <!-- filter_limit_min: 0 -->
+                                                <!-- filter_limit_min: 0 -->
                 <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
@@ -22,7 +22,7 @@
             <remap from="~input" to="psx/output" />
             <rosparam>
                 filter_field_name: y
-                <!-- filter_limit_min: 0 -->
+                                <!-- filter_limit_min: 0 -->
                 <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
@@ -34,10 +34,24 @@
             <remap from="~output" to="pcl_filtered"/>
             <rosparam>
                 filter_field_name: z
-                <!-- filter_limit_min: 0 -->
+                                <!-- filter_limit_min: 0 -->
                 <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
         </node>
     </group>
+
+
+    <node pkg="smobex_bringup" type="show_volume" name="show_volume" output="screen">
+
+        <param name="~fixed_frame" value="/base_link"/>
+        <remap from="~x_max" to="/pcl_filters/psx/filter_limit_max"/>
+        <remap from="~x_min" to="/pcl_filters/psx/filter_limit_min"/>
+        <remap from="~y_max" to="/pcl_filters/psy/filter_limit_max"/>
+        <remap from="~y_min" to="/pcl_filters/psy/filter_limit_min"/>
+        <remap from="~z_max" to="/pcl_filters/psz/filter_limit_max"/>
+        <remap from="~z_min" to="/pcl_filters/psz/filter_limit_min"/>
+
+    </node>
+    
 </launch>

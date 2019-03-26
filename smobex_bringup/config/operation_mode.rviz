@@ -159,7 +159,15 @@ Visualization Manager:
       Marker Topic: /occupied_cells_vis_array
       Name: OctoMap_Occupied
       Namespaces:
-        map: true
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pose_array
+      Name: BoundingBox
+      Namespaces:
+        wireframe: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -187,7 +195,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.1936421394348145
+      Distance: 7.569913864135742
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -202,10 +210,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5097972750663757
+      Pitch: 0.859797477722168
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.868566632270813
+      Yaw: 1.9385713338851929
     Saved: ~
 Window Geometry:
   Displays:
