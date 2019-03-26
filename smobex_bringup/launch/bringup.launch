@@ -2,13 +2,16 @@
 <launch>
 
     <!-- Options -->
-    <arg name="config" default="false"/>
-
+    <arg name="config" default="false" doc="Enter configurations mode"/>
     <arg name="online" default="true"/>
-    <arg name="octo_resolution" default="0.01"/>
+    <arg name="octo_resolution" default="0.005"/>
     <arg name="robot_ip" default="192.168.0.230"/>
+    <arg name="filtered_record" default="true" doc="If in capture mode, the point cloud in filteres or not"/>
 
-    <arg name="filtered_record" default="false"/>
+    <!-- Modes -->
+    <arg name="calibration" default="false"/>
+    <arg name="capture" default="false"/>
+    <arg name="define_vol" default="false"/>
 
     <!-- OpenNI2 -->
     <include file="$(find openni2_launch)/launch/openni2.launch">
@@ -28,10 +31,6 @@
 
     <!-- Configs mode -->
     <group if="$(arg config)">
-
-        <arg name="calibration" default="false"/>
-        <arg name="capture" default="false"/>
-        <arg name="define_vol" default="false"/>
 
         <!-- Calibration -->
         <include if="$(arg calibration)" file="$(find smobex_bringup)/launch/calib_mode.launch">

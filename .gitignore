@@ -49,6 +49,7 @@ qtcreator-*
 
 # vscode
 *.json
+.vscode
 
 # Catkin custom files
 CATKIN_IGNORE

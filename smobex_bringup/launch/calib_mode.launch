@@ -21,7 +21,7 @@
 
         <arg name="publish_tf" value="true"/>
         <arg name="interactive" value="false"/>
-        <arg name="sample_rate" value="2" />
+        <arg name="sample_rate" value="1" />
 
         <arg name="marker_parent_frame" value="/base_link"/>
         <arg name="camera_parent_frame" value="/flange"/>

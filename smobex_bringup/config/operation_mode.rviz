@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Fanuc_Xtion1/Status1
       Splitter Ratio: 0.3758542239665985
     Tree Height: 506
   - Class: rviz/Selection
@@ -141,20 +140,20 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Style: Points
       Topic: /pcl_filters/pcl_filtered
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /free_cells_vis_array
       Name: OctoMap_Free
       Namespaces:
-        map: true
+        {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /occupied_cells_vis_array
@@ -188,25 +187,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.013160228729248
+      Distance: 3.1936421394348145
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.9271891117095947
-        Y: 1.2850875854492188
-        Z: 1.407591462135315
+        X: 0.9451901316642761
+        Y: 0.8726882934570312
+        Z: 1.1691555976867676
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8347970247268677
+      Pitch: 0.5097972750663757
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.3685665130615234
+      Yaw: 1.868566632270813
     Saved: ~
 Window Geometry:
   Displays:

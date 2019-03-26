@@ -4,8 +4,7 @@
     <arg name="robot_ip" doc="IP of the manipulator"/>
     <arg name="online" doc="If robot is online or not"/>
     <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
-
-    <arg name="filtered" default="false"/>
+    <arg name="filtered" doc="Use or not filtered point cloud"/>
 
     <!-- Initializing robot and camera calibrated -->
     <include file="$(find smobex_calibration)/launch/calibrated.launch">
@@ -26,22 +25,25 @@
         <param name="publish_free_space" value="true"/>
 
         <param name="~frame_id" value="base_link" />
-        <param name="~resolution" value="$arg(octo_resolution)"/>
+        <param name="~resolution" value="$(arg octo_resolution)"/>
 
     </node>
     <!--  -->
 
     <!-- Accumulated Cloud -->
-    <node pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud2file" output="screen">
+    <node pkg="world_model_consistency_check" type="accumulatepointcloud2file" name="accumulatedpointcloud" output="screen">
 
         <remap unless="$(arg filtered)" from="input" to="camera/depth_registered/points"/>
         <remap if="$(arg filtered)" from="input" to="pcl_filters/pcl_filtered"/>
+
         <param name="~filename" value="/home/joao/auto_save.pcd" type="str"/>
+        <param name="~voxel_size" value="$(arg octo_resolution)"/>
+
         <remap from="map" to="base_link"/>
 
     </node>
 
     <!-- Rviz for visualization -->
-    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/capture_mode.rviz" required="true"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/capture_mode.rviz" />
 
 </launch>

@@ -261,6 +261,8 @@ roslaunch smobex_bringup record.launch
 If at any moment you desire to save the OctoMap run 
 
 ```bash
+rosnode kill /accumulatedpointcloud
+
 rosrun octomap_server octomap_saver -f test.ot
 ```
 
