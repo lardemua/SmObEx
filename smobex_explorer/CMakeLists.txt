@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  octomap REQUIRED
 )
 
 ## System dependencies are found with CMake's conventions
@@ -118,6 +119,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${OCTOMAP_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -135,6 +137,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
 add_executable(pose_generator src/pose_generator.cpp)
+add_executable(pose_evaluator src/pose_evaluator.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -152,6 +155,11 @@ add_executable(pose_generator src/pose_generator.cpp)
 # )
 target_link_libraries(pose_generator 
     ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pose_evaluator 
+    ${catkin_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
 )
 
 #############
