@@ -27,6 +27,22 @@
             <arg name="octo_resolution" default="$(arg octo_resolution)"/>
         </include>
 
+        <node pkg="smobex_explorer" type="pose_generator" name="pose_generator" output="screen">
+
+            <param name="~n_poses" value="200"/>
+            <param name="~scale" value="3"/>
+
+            <remap from="~x_max" to="/pcl_filters/psx/filter_limit_max"/>
+            <remap from="~x_min" to="/pcl_filters/psx/filter_limit_min"/>
+
+            <remap from="~y_max" to="/pcl_filters/psy/filter_limit_max"/>
+            <remap from="~y_min" to="/pcl_filters/psy/filter_limit_min"/>
+
+            <remap from="~z_max" to="/pcl_filters/psz/filter_limit_max"/>
+            <remap from="~z_min" to="/pcl_filters/psz/filter_limit_min"/>
+            
+        </node>
+
     </group>
 
     <!-- Configs mode -->
