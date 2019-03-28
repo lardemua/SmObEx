@@ -4,9 +4,10 @@
     <!-- Options -->
     <arg name="config" default="false" doc="Enter configurations mode"/>
     <arg name="online" default="true"/>
-    <arg name="octo_resolution" default="0.01"/>
+    <arg name="octo_resolution" default="0.05"/>
     <arg name="robot_ip" default="192.168.0.230"/>
     <arg name="filtered_record" default="true" doc="If in capture mode, the point cloud in filteres or not"/>
+    <arg name="use_openni" default="true"/>
 
     <!-- Modes -->
     <arg name="calibration" default="false"/>
@@ -14,7 +15,7 @@
     <arg name="define_vol" default="false"/>
 
     <!-- OpenNI2 -->
-    <include file="$(find openni2_launch)/launch/openni2.launch">
+    <include if="$(arg use_openni)" file="$(find openni2_launch)/launch/openni2.launch">
         <arg name="publish_tf" value="false"/>
     </include>
 
@@ -26,22 +27,6 @@
             <arg name="online" value="$(arg online)"/>
             <arg name="octo_resolution" default="$(arg octo_resolution)"/>
         </include>
-
-        <node pkg="smobex_explorer" type="pose_generator" name="pose_generator" output="screen">
-
-            <param name="~n_poses" value="200"/>
-            <param name="~scale" value="3"/>
-
-            <remap from="~x_max" to="/pcl_filters/psx/filter_limit_max"/>
-            <remap from="~x_min" to="/pcl_filters/psx/filter_limit_min"/>
-
-            <remap from="~y_max" to="/pcl_filters/psy/filter_limit_max"/>
-            <remap from="~y_min" to="/pcl_filters/psy/filter_limit_min"/>
-
-            <remap from="~z_max" to="/pcl_filters/psz/filter_limit_max"/>
-            <remap from="~z_min" to="/pcl_filters/psz/filter_limit_min"/>
-            
-        </node>
 
     </group>
 

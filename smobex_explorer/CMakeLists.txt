@@ -136,8 +136,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
-add_executable(pose_generator src/pose_generator.cpp)
-add_executable(pose_evaluator src/pose_evaluator.cpp)
+add_executable(pose_generator_node src/pose_generator_node.cpp)
+add_executable(pose_evaluator_node src/pose_evaluator_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,11 +153,11 @@ add_executable(pose_evaluator src/pose_evaluator.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(pose_generator 
+target_link_libraries(pose_generator_node 
     ${catkin_LIBRARIES}
 )
 
-target_link_libraries(pose_evaluator 
+target_link_libraries(pose_evaluator_node 
     ${catkin_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
 )
