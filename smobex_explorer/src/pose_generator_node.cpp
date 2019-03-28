@@ -43,15 +43,19 @@ tf::Pose genPose(float r_min, float r_max, tf::Point observation_center)
 
   z_direction.normalize();
 
+  // random vector just to find one that's perpendicular to z_direction
   rand_vector.setX((double)rand() / RAND_MAX);
   rand_vector.setY((double)rand() / RAND_MAX);
   rand_vector.setZ((double)rand() / RAND_MAX);
-
   rand_vector.normalize();
 
+  // TODO: y needs to point down
+
   y_direction = z_direction.cross(rand_vector);
+  y_direction.normalize();
 
   x_direction = z_direction.cross(y_direction);
+  x_direction.normalize();
 
   rotation_matrix.setValue(x_direction.getX(), x_direction.getY(), x_direction.getZ(), y_direction.getX(),
                            y_direction.getY(), y_direction.getZ(), z_direction.getX(), z_direction.getY(),
@@ -212,10 +216,7 @@ int main(int argc, char **argv)
     tf::poseTFToMsg(one_pose, pose_to_push);
 
     all_poses.poses.push_back(pose_to_push);
-
   }
-
-  cout << all_poses;
 
   while (ros::ok())
   {
