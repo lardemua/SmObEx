@@ -44,137 +44,72 @@ tf::Pose genPose(float r_min, float r_max, tf::Point observation_center)
   z_direction.normalize();
 
   // random vector just to find one that's perpendicular to z_direction
-  rand_vector.setX((double)rand() / RAND_MAX);
-  rand_vector.setY((double)rand() / RAND_MAX);
-  rand_vector.setZ((double)rand() / RAND_MAX);
+  //   rand_vector.setX((double)rand() / RAND_MAX);
+  //   rand_vector.setY((double)rand() / RAND_MAX);
+  //   rand_vector.setZ((double)rand() / RAND_MAX);
+
+  rand_vector.setX(1);
+  rand_vector.setY(0);
+  rand_vector.setZ(0);
   rand_vector.normalize();
 
-  // TODO: y needs to point down
-
   y_direction = z_direction.cross(rand_vector);
+  y_direction.setZ(-1 * abs(y_direction.getZ()));
   y_direction.normalize();
 
-  x_direction = z_direction.cross(y_direction);
+  x_direction = y_direction.cross(z_direction);
   x_direction.normalize();
 
-  rotation_matrix.setValue(x_direction.getX(), x_direction.getY(), x_direction.getZ(), y_direction.getX(),
-                           y_direction.getY(), y_direction.getZ(), z_direction.getX(), z_direction.getY(),
+  //   rotation_matrix.setValue(x_direction.getX(), x_direction.getY(), x_direction.getZ(), y_direction.getX(),
+  //                            y_direction.getY(), y_direction.getZ(), z_direction.getX(), z_direction.getY(),
+  //                            z_direction.getZ());
+
+  rotation_matrix.setValue(x_direction.getX(), y_direction.getX(), z_direction.getX(), x_direction.getY(),
+                           y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
                            z_direction.getZ());
 
   rotation_matrix.getRotation(view_orientation);
+  view_orientation.normalize();
 
   view_pose.setOrigin(view_origin);
   view_pose.setRotation(view_orientation);
 
+#if 0
+
+  geometry_msgs::Point x, y, z, randv, view_oriin;
+  geometry_msgs::Quaternion quat;
+  geometry_msgs::Vector3 x_line, y_line, z_line;
+  tf::pointTFToMsg(rand_vector, randv);
+  tf::pointTFToMsg(z_direction, z);
+  tf::pointTFToMsg(y_direction, y);
+  tf::pointTFToMsg(x_direction, x);
+  tf::pointTFToMsg(view_origin, view_oriin);
+  tf::quaternionTFToMsg(view_orientation, quat);
+  tf::vector3TFToMsg(rotation_matrix.getRow(0), x_line);
+  tf::vector3TFToMsg(rotation_matrix.getRow(1), y_line);
+  tf::vector3TFToMsg(rotation_matrix.getRow(2), z_line);
+
+  cout << "VIEW ORIGIN" << endl << view_oriin << endl;
+  cout << "RAND" << endl << randv << endl;
+  cout << "Z" << endl << z << endl;
+  cout << "Y" << endl << y << endl;
+  cout << "X" << endl << x << endl;
+  cout << "QUAT" << endl << quat << endl;
+  cout << "LINE X" << endl << x_line << endl;
+  cout << "LINE Y" << endl << y_line << endl;
+  cout << "LINE Z" << endl << z_line << endl;
+
+  tf::Vector3 test_z;
+  geometry_msgs::Point zz;
+
+  test_z = x_direction.cross(y_direction);
+  tf::pointTFToMsg(test_z, zz);
+  cout << "IS THIS Z?" << endl << zz << endl;
+
+#endif
+
   return view_pose;
 }
-
-// geometry_msgs::PoseArray genPoses(int num_poses, float scale)
-// {
-//   float x_max = 1, x_min = 0;
-//   float y_max = 1, y_min = 0;
-//   float z_max = 1, z_min = 0;
-
-//   // float x_range, y_range, z_range;
-//   float x_center, y_center, z_center;
-//   float x_side, y_side, z_side;
-
-//   ros::param::get("~x_max", x_max);
-//   ros::param::get("~x_min", x_min);
-
-//   ros::param::get("~y_max", y_max);
-//   ros::param::get("~y_min", y_min);
-
-//   ros::param::get("~z_max", z_max);
-//   ros::param::get("~z_min", z_min);
-
-//   // x_range = x_max - x_min;
-//   // y_range = y_max - y_min;
-//   // z_range = z_max - z_min;
-
-//   x_center = (x_max + x_min) / 2;
-//   y_center = (y_max + y_min) / 2;
-//   z_center = (z_max + z_min) / 2;
-
-//   x_side = sqrt((x_min - x_max) * (x_min - x_max)) * scale;
-//   y_side = sqrt((y_min - y_max) * (y_min - y_max)) * scale;
-//   z_side = sqrt((z_min - z_max) * (z_min - z_max)) * scale;
-
-//   float x_coords[num_poses];
-//   float y_coords[num_poses];
-//   float z_coords[num_poses];
-
-//   float R_orient[num_poses];
-//   float P_orient[num_poses];
-//   float Y_orient[num_poses];
-
-//   float rand_x, rand_y, rand_z;
-//   float rand_R, rand_P, rand_Y;
-//   float roll, pitch, yaw;
-
-//   srand(time(NULL));
-
-//   for (int i = 0; i < num_poses; i++)
-//   {
-//     // rand_x = ((double)rand() / RAND_MAX) * x_range + x_min;
-//     // rand_y = ((double)rand() / RAND_MAX) * y_range + y_min;
-//     // rand_z = ((double)rand() / RAND_MAX) * z_range + z_min;
-
-//     rand_x = ((double)rand() / RAND_MAX) * x_side + (x_center - (x_side / 2));
-//     rand_y = ((double)rand() / RAND_MAX) * y_side + (y_center - (y_side / 2));
-//     rand_z = ((double)rand() / RAND_MAX) * z_side + (z_center - (z_side / 2));
-
-//     // std::cout << rand_x << " " << rand_y << " " << rand_z << std::endl;
-
-//     rand_R = ((double)rand() / RAND_MAX) * (2 * M_PI) - M_PI;
-//     rand_P = ((double)rand() / RAND_MAX) * (2 * M_PI) - M_PI;
-//     rand_Y = ((double)rand() / RAND_MAX) * (2 * M_PI) - M_PI;
-
-//     // rand_x *= scale;
-//     // rand_y *= scale;
-//     // rand_z *= scale;
-
-//     x_coords[i] = rand_x;
-//     y_coords[i] = rand_y;
-//     z_coords[i] = rand_z;
-
-//     R_orient[i] = rand_R;
-//     P_orient[i] = rand_P;
-//     Y_orient[i] = rand_Y;
-//   }
-
-//   geometry_msgs::PoseArray all_poses;
-//   tf::Quaternion Q_tf;
-//   geometry_msgs::Quaternion Q_orient;
-
-//   all_poses.header.frame_id = "/base_link";
-//   all_poses.header.stamp = ros::Time::now();
-
-//   for (int i = 0; i < num_poses; i++)
-//   {
-//     geometry_msgs::Pose one_pose;
-
-//     one_pose.position.x = x_coords[i];
-//     one_pose.position.y = y_coords[i];
-//     one_pose.position.z = z_coords[i];
-
-//     roll = R_orient[i];
-//     pitch = P_orient[i];
-//     yaw = Y_orient[i];
-
-//     Q_tf.setRPY(roll, pitch, yaw);
-//     tf::quaternionTFToMsg(Q_tf, Q_orient);
-
-//     one_pose.orientation.x = Q_orient.x;
-//     one_pose.orientation.y = Q_orient.y;
-//     one_pose.orientation.z = Q_orient.z;
-//     one_pose.orientation.w = Q_orient.w;
-
-//     all_poses.poses.push_back(one_pose);
-//   }
-
-//   return all_poses;
-// }
 
 int main(int argc, char **argv)
 {
@@ -202,9 +137,10 @@ int main(int argc, char **argv)
   ros::param::get("~r_max", r_max);
   ros::param::get("~fixed_frame", fixed_frame);
 
-  origin.setX(0);
-  origin.setY(0);
-  origin.setZ(0);
+  //   origin.setX(0);
+  //   origin.setY(0);
+  //   origin.setZ(0);
+  origin.setZero();
 
   all_poses.header.frame_id = fixed_frame;
   all_poses.header.stamp = ros::Time::now();
