@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <launch>
+
+    <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load"/>
+
     <group ns="/pcl_filters">
         <rosparam file="$(find smobex_bringup)/params/pcl_params.yaml" command="load" />
 
@@ -11,8 +14,6 @@
             <remap from="~input" to="/camera/depth_registered/points" />
             <rosparam>
                 filter_field_name: x
-                                                <!-- filter_limit_min: 0 -->
-                <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
         </node>
@@ -22,8 +23,6 @@
             <remap from="~input" to="psx/output" />
             <rosparam>
                 filter_field_name: y
-                                <!-- filter_limit_min: 0 -->
-                <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
         </node>
@@ -34,8 +33,6 @@
             <remap from="~output" to="pcl_filtered"/>
             <rosparam>
                 filter_field_name: z
-                                <!-- filter_limit_min: 0 -->
-                <!-- filter_limit_max: 5 -->
                 input_frame: base_link
             </rosparam>
         </node>
@@ -45,13 +42,13 @@
     <node pkg="smobex_bringup" type="show_volume" name="show_volume" output="screen">
 
         <param name="~fixed_frame" value="/base_link"/>
-        <remap from="~x_max" to="/pcl_filters/psx/filter_limit_max"/>
-        <remap from="~x_min" to="/pcl_filters/psx/filter_limit_min"/>
-        <remap from="~y_max" to="/pcl_filters/psy/filter_limit_max"/>
-        <remap from="~y_min" to="/pcl_filters/psy/filter_limit_min"/>
-        <remap from="~z_max" to="/pcl_filters/psz/filter_limit_max"/>
-        <remap from="~z_min" to="/pcl_filters/psz/filter_limit_min"/>
+        <remap from="~max_x" to="/pcl_filters/psx/filter_limit_max"/>
+        <remap from="~min_x" to="/pcl_filters/psx/filter_limit_min"/>
+        <remap from="~max_y" to="/pcl_filters/psy/filter_limit_max"/>
+        <remap from="~min_y" to="/pcl_filters/psy/filter_limit_min"/>
+        <remap from="~max_z" to="/pcl_filters/psz/filter_limit_max"/>
+        <remap from="~min_z" to="/pcl_filters/psz/filter_limit_min"/>
 
     </node>
-    
+
 </launch>

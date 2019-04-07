@@ -11,6 +11,7 @@
 
     <node unless="$(arg online)" pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
         <param name="~use_gui" value="true"/>
+        <param name="rate" value="100"/>
     </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />

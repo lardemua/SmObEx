@@ -35,6 +35,8 @@ Porto, Portugal
   * [Week 11](#week-11)
   * [Week 12](#week-12)
   * [Week 13](#week-13)
+  * [Week 14](#week-14)
+  * [Week 15](#week-15)
 - [Built with](#built-with)
   * [Hardware](#hardware)
   * [Software](#software)
@@ -90,8 +92,18 @@ Porto, Portugal
 
 ## Week 13
 
-- [ ] Updated FANUC controller software
-- [ ] Move using MoveIt
+- [x] Created node to generate multi view poses 
+
+## Week 14
+
+- [x] Updated FANUC controller software
+- [x] Move using MoveIt
+
+## Week 15
+
+- [ ] Visualization of the unknown space
+- [ ] Integrated the *test unknown space* node
+- [ ] Evaluate each pose 
 
 # Built with
 

@@ -1,3 +1,3 @@
-psx: {filter_limit_max: 1.9221415519714355, filter_limit_min: 0.5910757780075073}
+psx: {filter_limit_max: 2.976376533508301, filter_limit_min: 1.2884225845336914}
 psy: {filter_limit_max: 1.2042051553726196, filter_limit_min: -1.263205647468567}
-psz: {filter_limit_max: 0.5573102235794067, filter_limit_min: -0.7326816320419312}
+psz: {filter_limit_max: 1.874700903892517, filter_limit_min: -0.17862164974212646}

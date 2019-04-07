@@ -18,6 +18,7 @@
     <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
 
         <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
+        <!-- <remap from="cloud_in" to="camera/depth_registered/points"/> -->
         <remap from="cloud_in" to="pcl_filters/pcl_filtered" />
         <param name="publish_free_space" value="true"/>
 
@@ -30,9 +31,17 @@
     <node pkg="smobex_explorer" type="pose_generator_node" name="pose_generator_node" output="screen">
 
         <param name="~fixed_frame" value="/base_link"/>
-        <param name="~n_poses" value="500"/>
+        <param name="~n_poses" value="50"/>
         <param name="~r_min" value="0.8"/>
-        <param name="~r_max" value="1.1"/>
+        <param name="~r_max" value="1.2"/>
+
+    </node>
+
+    <!-- Unknown space show -->
+    <node pkg="world_model_consistency_check" type="test_unknown_space" name="test_unknown_space" output="screen">
+
+        <param name="~resolution" value="$(arg octo_resolution)"/>
+        <param name="~fixed_frame" value="/base_link"/>
 
     </node>
 
