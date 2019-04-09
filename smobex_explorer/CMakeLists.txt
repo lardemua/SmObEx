@@ -12,7 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   octomap REQUIRED
+  pcl_ros
 )
+
+find_package(PCL REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -136,7 +142,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
-add_executable(pose_generator_node src/pose_generator_node.cpp)
+add_executable(explorer_node src/explorer_node.cpp)
 add_executable(pose_evaluator_node src/pose_evaluator_node.cpp)
 
 ## Rename C++ executable without prefix
@@ -153,8 +159,10 @@ add_executable(pose_evaluator_node src/pose_evaluator_node.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(pose_generator_node 
+target_link_libraries(explorer_node 
     ${catkin_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
 )
 
 target_link_libraries(pose_evaluator_node 

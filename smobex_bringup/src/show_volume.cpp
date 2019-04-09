@@ -21,9 +21,9 @@ int main(int argc, char **argv)
 
     std::string _fixed_frame_id = "/world";
 
-    float _x_min, _x_max;
-    float _y_min, _y_max;
-    float _z_min, _z_max;
+    float _x_min = 0, _x_max = 1;
+    float _y_min = 0, _y_max = 1;
+    float _z_min = 0, _z_max = 1;
 
     ros::param::get("~x_max", _x_max);
     ros::param::get("~x_min", _x_min);
