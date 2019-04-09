@@ -126,6 +126,7 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${OCTOMAP_INCLUDE_DIRS}
+  include
 )
 
 ## Declare a C++ library
@@ -143,7 +144,6 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
 add_executable(explorer_node src/explorer_node.cpp)
-add_executable(pose_evaluator_node src/pose_evaluator_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -165,10 +165,6 @@ target_link_libraries(explorer_node
     ${OCTOMAP_LIBRARIES}
 )
 
-target_link_libraries(pose_evaluator_node 
-    ${catkin_LIBRARIES}
-    ${OCTOMAP_LIBRARIES}
-)
 
 #############
 ## Install ##

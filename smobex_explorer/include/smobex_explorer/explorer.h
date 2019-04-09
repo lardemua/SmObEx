@@ -15,6 +15,7 @@
 
 #include <octomap/octomap.h>
 #include <octomap/OccupancyOcTreeBase.h>
+#include <octomap/OcTreeBaseImpl.h>
 #include <octomap/math/Pose6D.h>
 #include <octomap/math/Utils.h>
 #include <octomap/math/Vector3.h>
@@ -22,14 +23,15 @@
 #include <octomap_ros/conversions.h>
 #include <octomap_msgs/conversions.h>
 
-class explorePose
+class generatePose
 {
-  private:
-    /* data */
   public:
-    tf::Pose genPose(float r_min, float r_max, tf::Point observation_center)
+    tf::Pose view_pose;
+
+    // tf::Pose genPose(float r_min, float r_max, tf::Point observation_center)
+    void genPose(float r_min, float r_max, tf::Point observation_center)
     {
-        tf::Pose view_pose;
+        // tf::Pose view_pose;
         tf::Point view_origin;
         tf::Vector3 z_direction, y_direction, x_direction, rand_vector;
         tf::Matrix3x3 rotation_matrix;
@@ -97,6 +99,86 @@ class explorePose
         view_pose.setOrigin(view_origin);
         view_pose.setRotation(view_orientation);
 
-        return view_pose;
+        // return view_pose;
+    }
+};
+
+class evaluatePose : public generatePose
+{
+  public:
+    octomap::OcTree *octree = NULL;
+
+    void writeOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    {
+        using namespace octomap;
+
+        ROS_INFO("I'm inside the callback");
+
+        AbstractOcTree *tree = NULL;
+
+        if (octree != NULL)
+        {
+            // ROS_INFO("DEBUG: Going to DEL OCTREE");
+            delete (octree);
+            // ROS_INFO("DEBUG: Octree DEL");
+        }
+
+        tree = msgToMap(*map);
+        octree = dynamic_cast<OcTree *>(tree);
+    }
+
+    void evalPose()
+    {
+        using namespace octomap;
+        using namespace octomath;
+
+        int n_unknown = 0;
+
+        Vector3 start_point, direction, end_point;
+        KeyRay ray_keys;
+
+        ros::NodeHandle n;
+
+        ros::Subscriber octomap_sub = n.subscribe("/octomap_full", 100, &evaluatePose::writeOctomapCallback, this);
+
+        while (octree == NULL)
+        {
+
+            ros::spinOnce();
+
+            ros::Duration(0.1).sleep();
+        }
+
+        Pose6D octo_pose = poseTfToOctomap(view_pose);
+
+        start_point.x() = octo_pose.x();
+        start_point.y() = octo_pose.y();
+        start_point.z() = octo_pose.z();
+
+        direction.x() = octo_pose.roll();
+        direction.y() = octo_pose.pitch();
+        direction.z() = octo_pose.yaw();
+
+        if (octree != NULL)
+        {
+            octree->castRay(start_point, direction, end_point, true, -1.0);
+            octree->computeRayKeys(start_point, end_point, ray_keys);
+
+            for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
+            {
+                if (!octree->search(*it))
+                {
+                    n_unknown++;
+                }
+            }
+
+            ROS_INFO("n_unknow = %d", n_unknown);
+        }
+        else
+        {
+            ROS_INFO("No OcTree.");
+        }
+
+        //delete (octree);
     }
 };
