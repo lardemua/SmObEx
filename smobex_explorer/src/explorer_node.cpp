@@ -141,7 +141,6 @@ int main(int argc, char **argv)
 
             // tf_pose = genPose(r_min, r_max, tf_point);
             poses[k].genPose(r_min, r_max, tf_point);
-            poses[k].evalPose();
 
             tf_pose = poses[k].view_pose;
 
@@ -149,20 +148,30 @@ int main(int argc, char **argv)
 
             point_poses.poses.push_back(one_pose);
 
-            octomap::point3d_list ray_points = poses[k].ray_points_list;
-
-            for (octomap::point3d_list::iterator it = ray_points.begin(); it != ray_points.end(); it++)
-            {
-                geometry_msgs::Point point;
-                point.x = it->octomath::Vector3::x();
-                point.y = it->octomath::Vector3::y();
-                point.z = it->octomath::Vector3::z();
-
-                line_vis.points.push_back(point);
-            }
-
             k++;
             // ROS_INFO("Pose published: %d", n);
+        }
+
+        k = 0;
+        for (int i = 0; i < num_of_points; i++)
+        {
+            for (int n = 0; n < n_poses; n++)
+            {
+                poses[k].evalPose();
+
+                octomap::point3d_list ray_points = poses[k].ray_points_list;
+
+                for (octomap::point3d_list::iterator it = ray_points.begin(); it != ray_points.end(); it++)
+                {
+                    geometry_msgs::Point point;
+                    point.x = it->octomath::Vector3::x();
+                    point.y = it->octomath::Vector3::y();
+                    point.z = it->octomath::Vector3::z();
+
+                    line_vis.points.push_back(point);
+                }
+                k++;
+            }
         }
     }
 

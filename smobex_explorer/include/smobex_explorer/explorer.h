@@ -12,6 +12,7 @@
 #include <tf/transform_datatypes.h>
 
 #include <pcl_ros/point_cloud.h>
+#include <pcl_ros/transforms.h>
 #include <pcl/point_types.h>
 
 #include <octomap/octomap.h>
@@ -154,9 +155,7 @@ class evaluatePose : public generatePose
         using namespace octomap;
         using namespace octomath;
 
-        int n_unknown = 0;
-
-        Vector3 start_point, direction, end_point;
+        Vector3 origin, start_point, direction, end_point;
         KeyRay ray_keys;
 
         ros::NodeHandle n;
@@ -168,53 +167,107 @@ class evaluatePose : public generatePose
         {
             ros::spinOnce();
 
-            ros::Duration(0.1).sleep();
+            ros::Duration(0.01).sleep();
         }
 
         Pose6D octo_pose = poseTfToOctomap(view_pose);
 
-        start_point.x() = octo_pose.x();
-        start_point.y() = octo_pose.y();
-        start_point.z() = octo_pose.z();
+        origin.x() = octo_pose.x();
+        origin.y() = octo_pose.y();
+        origin.z() = octo_pose.z();
 
         // direction.x() = octo_pose.roll();
         // direction.y() = octo_pose.pitch();
         // direction.z() = octo_pose.yaw();
 
-        tf::Quaternion quat_rot = view_pose.getRotation();
-        tf::Matrix3x3 matrix_rot;
-        tf::Vector3 z_vect;
-        matrix_rot.setRotation(quat_rot);
+        // tf::Quaternion quat_rot = view_pose.getRotation();
+        // tf::Matrix3x3 matrix_rot;
+        // tf::Vector3 z_vect;
+        // matrix_rot.setRotation(quat_rot);
 
-        z_vect = matrix_rot.getColumn(2);
+        // z_vect = matrix_rot.getColumn(2);
 
-        direction.x() = z_vect.getX();
-        direction.y() = z_vect.getY();
-        direction.z() = z_vect.getZ();
+        // direction.x() = z_vect.getX();
+        // direction.y() = z_vect.getY();
+        // direction.z() = z_vect.getZ();
+
+        int pix_width = 640;
+        int pix_height = 480;
+
+        float min_FOV = 0.8;
+        float width_FOV = 58 * M_PI / 180;  //radians
+        float height_FOV = 45 * M_PI / 180; //radian
+
+        float delta_rad_w = width_FOV / pix_width;
+        float delta_rad_h = height_FOV / pix_height;
+
+        float corner_rad_w = width_FOV / 2;
+        float corner_rad_h = height_FOV / 2;
+
+        pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
+
+        float rad_h = -corner_rad_h;
+
+        for (int row_pix = 0; row_pix < pix_height; row_pix++)
+        {
+            float rad_w = -corner_rad_w;
+
+            for (int col_pix = 0; col_pix < pix_width; col_pix++)
+            {
+                float x = min_FOV * sin(rad_w) * cos(rad_h);
+                float y = min_FOV * sin(rad_w) * sin(rad_h);
+                float z = min_FOV * cos(rad_w);
+
+                rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
+
+                rad_w += delta_rad_w;
+            }
+            rad_h += delta_rad_h;
+        }
+        // rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
+        // rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
+        pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
+
+        int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
+        int n_unknown = 0;
 
         if (octree != NULL && unknown_octree != NULL)
         {
-            pcl::PointCloud<pcl::PointXYZ> pcl_ray_points_cloud;
-
-            octree->castRay(start_point, direction, end_point, true, -1.0);
-            unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
-
-            for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
+            for (size_t i = 0; i < n_start_points; i++)
             {
-                if (unknown_octree->search(*it))
+
+                pcl::PointXYZ point = rays_point_cloud.at(i);
+
+                start_point.x() = point.x;
+                start_point.y() = point.y;
+                start_point.z() = point.z;
+
+                direction = start_point - origin;
+                //}
+
+                // if (octree != NULL && unknown_octree != NULL)
+                // {
+
+                octree->castRay(start_point, direction, end_point, true, -1.0);
+                unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
+
+                for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
                 {
-                    n_unknown++;
+                    if (unknown_octree->search(*it))
+                    {
+                        n_unknown++;
+                    }
                 }
+
+                ROS_INFO("Ray number %lu", i);
+
+                ray_points_list.push_back(start_point);
+                ray_points_list.push_back(end_point);
+
+                // ROS_INFO("Points pushed");
             }
-
-            ROS_INFO("n_unknow = %d", n_unknown);
-
-            ray_points_list.push_back(start_point);
-            ray_points_list.push_back(end_point);
-
-            // ROS_INFO("Points pushed");
-
             //TODO delete (octree);
+            ROS_INFO("n_unknow = %d", n_unknown);
         }
         else
         {
