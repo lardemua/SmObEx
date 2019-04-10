@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 
 #include <tf/LinearMath/Quaternion.h>
+#include <tf/LinearMath/Vector3.h>
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
 
@@ -107,12 +108,13 @@ class evaluatePose : public generatePose
 {
   public:
     octomap::OcTree *octree = NULL;
+    octomap::point3d_list ray_points_list;
 
     void writeOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
     {
         using namespace octomap;
 
-        ROS_INFO("I'm inside the callback");
+        // ROS_INFO("I'm inside the callback");
 
         AbstractOcTree *tree = NULL;
 
@@ -143,7 +145,6 @@ class evaluatePose : public generatePose
 
         while (octree == NULL)
         {
-
             ros::spinOnce();
 
             ros::Duration(0.1).sleep();
@@ -155,12 +156,25 @@ class evaluatePose : public generatePose
         start_point.y() = octo_pose.y();
         start_point.z() = octo_pose.z();
 
-        direction.x() = octo_pose.roll();
-        direction.y() = octo_pose.pitch();
-        direction.z() = octo_pose.yaw();
+        // direction.x() = octo_pose.roll();
+        // direction.y() = octo_pose.pitch();
+        // direction.z() = octo_pose.yaw();
+
+        tf::Quaternion quat_rot = view_pose.getRotation();
+        tf::Matrix3x3 matrix_rot;
+        tf::Vector3 z_vect;
+        matrix_rot.setRotation(quat_rot);
+
+        z_vect = matrix_rot.getColumn(2);
+
+        direction.x() = z_vect.getX();
+        direction.y() = z_vect.getY();
+        direction.z() = z_vect.getZ();
 
         if (octree != NULL)
         {
+            pcl::PointCloud<pcl::PointXYZ> pcl_ray_points_cloud;
+
             octree->castRay(start_point, direction, end_point, true, -1.0);
             octree->computeRayKeys(start_point, end_point, ray_keys);
 
@@ -173,12 +187,15 @@ class evaluatePose : public generatePose
             }
 
             ROS_INFO("n_unknow = %d", n_unknown);
+
+            ray_points_list.push_back(start_point);
+            ray_points_list.push_back(end_point);
+
+            // delete (octree);
         }
         else
         {
             ROS_INFO("No OcTree.");
         }
-
-        //delete (octree);
     }
 };
