@@ -14,8 +14,8 @@
             <remap from="~input" to="/camera/depth_registered/points" />
             <rosparam>
                 filter_field_name: x
-                filter_limit_min: -3
-                filter_limit_max: 3 
+                filter_limit_min: -5
+                filter_limit_max: 5 
                 input_frame: base_link
             </rosparam>
         </node>
@@ -25,8 +25,8 @@
             <remap from="~input" to="psx/output" />
             <rosparam>
                 filter_field_name: y
-                filter_limit_min: -3
-                filter_limit_max: 3 
+                filter_limit_min: -5
+                filter_limit_max: 5 
                 input_frame: base_link
             </rosparam>
         </node>
@@ -37,8 +37,8 @@
             <remap from="~output" to="pcl_filtered"/>
             <rosparam>
                 filter_field_name: z
-                filter_limit_min: -3
-                filter_limit_max: 3 
+                filter_limit_min: -5
+                filter_limit_max: 5 
                 input_frame: base_link
             </rosparam>
         </node>
@@ -54,13 +54,13 @@
         <remap from="~min_y" to="/pcl_filters/psy/filter_limit_min"/>
         <remap from="~max_z" to="/pcl_filters/psz/filter_limit_max"/>
         <remap from="~min_z" to="/pcl_filters/psz/filter_limit_min"/> -->
-        <param name="~x_min" value="-3"/>
-        <param name="~y_min" value="-3"/>
-        <param name="~z_min" value="-3"/>
+        <param name="~x_min" value="-5"/>
+        <param name="~y_min" value="-5"/>
+        <param name="~z_min" value="-5"/>
 
-        <param name="~x_max" value="3"/>
-        <param name="~y_max" value="3"/>
-        <param name="~z_max" value="3"/>
+        <param name="~x_max" value="5"/>
+        <param name="~y_max" value="5"/>
+        <param name="~z_max" value="5"/>
 
     </node>
 

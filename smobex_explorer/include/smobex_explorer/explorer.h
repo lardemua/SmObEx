@@ -108,9 +108,10 @@ class evaluatePose : public generatePose
 {
   public:
     octomap::OcTree *octree = NULL;
+    octomap::OcTree *unknown_octree = NULL;
     octomap::point3d_list ray_points_list;
 
-    void writeOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
     {
         using namespace octomap;
 
@@ -129,6 +130,25 @@ class evaluatePose : public generatePose
         octree = dynamic_cast<OcTree *>(tree);
     }
 
+    void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    {
+        using namespace octomap;
+
+        // ROS_INFO("I'm inside the callback");
+
+        AbstractOcTree *tree = NULL;
+
+        if (unknown_octree != NULL)
+        {
+            // ROS_INFO("DEBUG: Going to DEL OCTREE");
+            delete (unknown_octree);
+            // ROS_INFO("DEBUG: Octree DEL");
+        }
+
+        tree = msgToMap(*map);
+        unknown_octree = dynamic_cast<OcTree *>(tree);
+    }
+
     void evalPose()
     {
         using namespace octomap;
@@ -141,9 +161,10 @@ class evaluatePose : public generatePose
 
         ros::NodeHandle n;
 
-        ros::Subscriber octomap_sub = n.subscribe("/octomap_full", 100, &evaluatePose::writeOctomapCallback, this);
+        ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
+        ros::Subscriber unknownFullMap_sub = n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
 
-        while (octree == NULL)
+        while (octree == NULL || unknown_octree == NULL)
         {
             ros::spinOnce();
 
@@ -171,16 +192,16 @@ class evaluatePose : public generatePose
         direction.y() = z_vect.getY();
         direction.z() = z_vect.getZ();
 
-        if (octree != NULL)
+        if (octree != NULL && unknown_octree != NULL)
         {
             pcl::PointCloud<pcl::PointXYZ> pcl_ray_points_cloud;
 
             octree->castRay(start_point, direction, end_point, true, -1.0);
-            octree->computeRayKeys(start_point, end_point, ray_keys);
+            unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
 
             for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
             {
-                if (!octree->search(*it))
+                if (unknown_octree->search(*it))
                 {
                     n_unknown++;
                 }
@@ -191,7 +212,9 @@ class evaluatePose : public generatePose
             ray_points_list.push_back(start_point);
             ray_points_list.push_back(end_point);
 
-            // delete (octree);
+            // ROS_INFO("Points pushed");
+
+            //TODO delete (octree);
         }
         else
         {

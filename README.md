@@ -101,9 +101,11 @@ Porto, Portugal
 
 ## Week 15
 
-- [ ] Visualization of the unknown space
-- [ ] Integrated the *test unknown space* node
-- [ ] Evaluate each pose 
+- [x] Visualization of the unknown space
+- [x] Integrated the *octomap_bounding_box* node
+- [ ] Evaluate each pose
+      - [x] Evaluated one ray
+      - [ ] Generated all camera rays for given pose
 
 # Built with
 
