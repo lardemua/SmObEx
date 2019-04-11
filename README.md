@@ -104,8 +104,10 @@ Porto, Portugal
 - [x] Visualization of the unknown space
 - [x] Integrated the *octomap_bounding_box* node
 - [ ] Evaluate each pose
-      - [x] Evaluated one ray
-      - [ ] Generated all camera rays for given pose
+     - [x] Evaluated one ray
+     - [x] Generated all camera rays for given pose
+     - [x] Evaluate all rays
+     - [ ] Store the score
 
 # Built with
 
