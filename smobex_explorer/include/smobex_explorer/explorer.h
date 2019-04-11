@@ -1,6 +1,7 @@
 #include <geometry_msgs/PoseArray.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/CameraInfo.h>
 
 #include <cmath>
 #include <math.h>
@@ -10,6 +11,7 @@
 #include <tf/LinearMath/Vector3.h>
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
+#include <tf_conversions/tf_eigen.h>
 
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/transforms.h>
@@ -24,6 +26,9 @@
 #include <octomap/math/Quaternion.h>
 #include <octomap_ros/conversions.h>
 #include <octomap_msgs/conversions.h>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 class generatePose
 {
@@ -111,6 +116,7 @@ class evaluatePose : public generatePose
     octomap::OcTree *octree = NULL;
     octomap::OcTree *unknown_octree = NULL;
     octomap::point3d_list ray_points_list;
+    octomap::KeySet single_keys;
 
     void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
     {
@@ -159,6 +165,12 @@ class evaluatePose : public generatePose
         KeyRay ray_keys;
 
         ros::NodeHandle n;
+        sensor_msgs::CameraInfoConstPtr CamInfo;
+
+        int pix_width = 640;
+        int pix_height = 480;
+
+        CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n, ros::Duration(10));
 
         ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
         ros::Subscriber unknownFullMap_sub = n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
@@ -176,27 +188,13 @@ class evaluatePose : public generatePose
         origin.y() = octo_pose.y();
         origin.z() = octo_pose.z();
 
-        // direction.x() = octo_pose.roll();
-        // direction.y() = octo_pose.pitch();
-        // direction.z() = octo_pose.yaw();
-
-        // tf::Quaternion quat_rot = view_pose.getRotation();
-        // tf::Matrix3x3 matrix_rot;
-        // tf::Vector3 z_vect;
-        // matrix_rot.setRotation(quat_rot);
-
-        // z_vect = matrix_rot.getColumn(2);
-
-        // direction.x() = z_vect.getX();
-        // direction.y() = z_vect.getY();
-        // direction.z() = z_vect.getZ();
-
-        int pix_width = 640;
-        int pix_height = 480;
+        pix_width = CamInfo->width;
+        pix_height = CamInfo->height;
+        int step = 20;
 
         float min_FOV = 0.8;
         float width_FOV = 58 * M_PI / 180;  //radians
-        float height_FOV = 45 * M_PI / 180; //radian
+        float height_FOV = 45 * M_PI / 180; //radians
 
         float delta_rad_w = width_FOV / pix_width;
         float delta_rad_h = height_FOV / pix_height;
@@ -208,22 +206,23 @@ class evaluatePose : public generatePose
 
         float rad_h = -corner_rad_h;
 
-        for (int row_pix = 0; row_pix < pix_height; row_pix++)
+        for (int row_pix = 0; row_pix < pix_height; row_pix += step)
         {
             float rad_w = -corner_rad_w;
 
-            for (int col_pix = 0; col_pix < pix_width; col_pix++)
+            for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             {
-                float x = min_FOV * sin(rad_w) * cos(rad_h);
-                float y = min_FOV * sin(rad_w) * sin(rad_h);
-                float z = min_FOV * cos(rad_w);
+                float x = 1 * sin(rad_w) * cos(rad_h);
+                float y = 1 * sin(rad_w) * sin(rad_h);
+                float z = 1 * cos(rad_w);
 
                 rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
 
-                rad_w += delta_rad_w;
+                rad_w += delta_rad_w * step;
             }
-            rad_h += delta_rad_h;
+            rad_h += delta_rad_h * step;
         }
+
         // rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
         // rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
         pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
@@ -243,31 +242,36 @@ class evaluatePose : public generatePose
                 start_point.z() = point.z;
 
                 direction = start_point - origin;
-                //}
 
-                // if (octree != NULL && unknown_octree != NULL)
-                // {
+                // octree->castRay(start_point, direction, end_point, true, -1.0);
+                octree->castRay(origin, direction, end_point, true, 10);
 
-                octree->castRay(start_point, direction, end_point, true, -1.0);
-                unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
+                start_point = origin + direction.normalized() * min_FOV;
 
-                for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
+                if (origin.distance(start_point) < origin.distance(end_point))
                 {
-                    if (unknown_octree->search(*it))
+
+                    unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
+
+                    for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
                     {
-                        n_unknown++;
+                        if (unknown_octree->search(*it))
+                        {
+                            single_keys.insert(*it);
+                            n_unknown++;
+                        }
                     }
+
+                    // ROS_INFO("Ray number %lu", i);
+
+                    ray_points_list.push_back(start_point);
+                    ray_points_list.push_back(end_point);
                 }
-
-                ROS_INFO("Ray number %lu", i);
-
-                ray_points_list.push_back(start_point);
-                ray_points_list.push_back(end_point);
-
                 // ROS_INFO("Points pushed");
             }
             //TODO delete (octree);
             ROS_INFO("n_unknow = %d", n_unknown);
+            ROS_INFO("single keys = %lu", single_keys.size());
         }
         else
         {

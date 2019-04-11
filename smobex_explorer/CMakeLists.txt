@@ -145,6 +145,8 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
 add_executable(explorer_node src/explorer_node.cpp)
 
+add_executable(point_cloud_volume_def src/point_cloud_volume_def.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -163,6 +165,11 @@ target_link_libraries(explorer_node
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
+)
+
+target_link_libraries(point_cloud_volume_def 
+    ${catkin_LIBRARIES}
+    ${PCL_LIBRARIES}
 )
 
 

@@ -109,16 +109,16 @@ int main(int argc, char **argv)
 
     line_vis.header.frame_id = fixed_frame;
     line_vis.header.stamp = t;
-    line_vis.ns = "rays";
+    // line_vis.ns = "rays";
     line_vis.action = visualization_msgs::Marker::ADD;
     line_vis.pose.orientation.w = 1.0;
     line_vis.id = 0;
     line_vis.type = visualization_msgs::Marker::LINE_LIST;
-    line_vis.scale.x = 0.005;
+    line_vis.scale.x = 0.001;
 
-    line_vis.color.r = 1.0;
-    line_vis.color.g = 0.0;
-    line_vis.color.b = 0.0;
+    line_vis.color.r = 0.5;
+    line_vis.color.g = 0.5;
+    line_vis.color.b = 0.5;
     line_vis.color.a = 1.0;
 
     int num_of_points = center_points.size();
@@ -155,6 +155,8 @@ int main(int argc, char **argv)
         k = 0;
         for (int i = 0; i < num_of_points; i++)
         {
+            line_vis.ns = "rays " + std::to_string(i);
+
             for (int n = 0; n < n_poses; n++)
             {
                 poses[k].evalPose();

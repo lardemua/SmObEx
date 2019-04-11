@@ -13,6 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+find_package(PCL REQUIRED)
+include_directories(BEFORE ${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+if (NOT PCL_FOUND)
+    MESSAGE("PCL not found.\n")
+endif (NOT PCL_FOUND)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -150,7 +158,7 @@ add_executable(show_volume src/show_volume.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(show_volume ${catkin_LIBRARIES})
+target_link_libraries(show_volume ${catkin_LIBRARIES}  ${PCL_LIBRARIES})
 
 #############
 ## Install ##
