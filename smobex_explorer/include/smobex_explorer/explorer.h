@@ -20,6 +20,7 @@
 #include <octomap/octomap.h>
 #include <octomap/OccupancyOcTreeBase.h>
 #include <octomap/OcTreeBaseImpl.h>
+#include <octomap/OcTreeKey.h>
 #include <octomap/math/Pose6D.h>
 #include <octomap/math/Utils.h>
 #include <octomap/math/Vector3.h>
@@ -27,8 +28,8 @@
 #include <octomap_ros/conversions.h>
 #include <octomap_msgs/conversions.h>
 
-#include "Eigen/Core"
-#include "Eigen/Geometry"
+// #include "Eigen/Core"
+// #include "Eigen/Geometry"
 
 class generatePose
 {
@@ -117,6 +118,7 @@ class evaluatePose : public generatePose
     octomap::OcTree *unknown_octree = NULL;
     octomap::point3d_list ray_points_list;
     octomap::KeySet single_keys;
+    // std::set<octomap::OcTreeKey> single_keys;
 
     void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
     {
@@ -190,6 +192,7 @@ class evaluatePose : public generatePose
 
         pix_width = CamInfo->width;
         pix_height = CamInfo->height;
+
         int step = 20;
 
         float min_FOV = 0.8;
@@ -250,7 +253,6 @@ class evaluatePose : public generatePose
 
                 if (origin.distance(start_point) < origin.distance(end_point))
                 {
-
                     unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
 
                     for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
@@ -277,5 +279,83 @@ class evaluatePose : public generatePose
         {
             ROS_INFO("No OcTree.");
         }
+    }
+
+    octomap::point3d_collection getDiscoveredCenters()
+    {
+        using namespace octomap;
+
+        point3d_collection discovered_centers;
+
+        for (KeySet::iterator it = single_keys.begin(); it != single_keys.end(); it++)
+        {
+            discovered_centers.push_back(unknown_octree->keyToCoord(*it));
+        }
+
+        return discovered_centers;
+    }
+
+    visualization_msgs::MarkerArray discoveredBoxes(std::string frame_id)
+    {
+        using namespace octomap;
+
+        visualization_msgs::MarkerArray discovered_boxes;
+        double unknown_octree_depth = unknown_octree->getTreeDepth();
+        discovered_boxes.markers.resize(unknown_octree_depth + 1);
+        std_msgs::ColorRGBA blue;
+        ros::Time t = ros::Time::now();
+
+        blue.r = 0.0;
+        blue.g = 0.0;
+        blue.b = 1.0;
+        blue.a = 1.0;
+
+        for (OcTree::iterator it = unknown_octree->begin(unknown_octree_depth), end = unknown_octree->end(); it != end; ++it)
+        {
+            OcTreeKey node_key = it.getKey();
+
+            if (single_keys.find(node_key) != single_keys.end())
+            {
+                double size = it.getSize();
+                double x = it.getX();
+                double y = it.getY();
+                double z = it.getZ();
+
+                unsigned idx = it.getDepth();
+                assert(idx < discovered_boxes.markers.size());
+
+                geometry_msgs::Point cubeCenter;
+                cubeCenter.x = x;
+                cubeCenter.y = y;
+                cubeCenter.z = z;
+
+                discovered_boxes.markers[idx].points.push_back(cubeCenter);
+            }
+        }
+
+        for (unsigned i = 0; i < discovered_boxes.markers.size(); i++)
+        {
+            double size = unknown_octree->getNodeSize(i);
+
+            discovered_boxes.markers[i].header.frame_id = frame_id;
+            discovered_boxes.markers[i].header.stamp = t;
+            discovered_boxes.markers[i].ns = "found_boxes";
+            discovered_boxes.markers[i].id = i;
+            discovered_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
+            discovered_boxes.markers[i].scale.x = size;
+            discovered_boxes.markers[i].scale.y = size;
+            discovered_boxes.markers[i].scale.z = size;
+            discovered_boxes.markers[i].color = blue;
+
+            if (discovered_boxes.markers[i].points.size() > 0)
+            {
+                discovered_boxes.markers[i].action = visualization_msgs::Marker::ADD;
+            }
+            else
+            {
+                discovered_boxes.markers[i].action = visualization_msgs::Marker::DELETE;
+            }
+        }
+        return discovered_boxes;
     }
 };

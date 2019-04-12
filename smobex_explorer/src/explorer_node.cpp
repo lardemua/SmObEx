@@ -12,59 +12,6 @@
 
 using namespace std;
 
-// geometry_msgs::PoseArray genMultiPose(pcl::PointCloud<pcl::PointXYZ> center_points)
-// {
-//     std::string fixed_frame = "/map";
-//     float r_min = 0, r_max = 1;
-//     int n_poses = 20;
-
-//     ros::param::get("~fixed_frame", fixed_frame);
-//     ros::param::get("~r_min", r_min);
-//     ros::param::get("~r_max", r_max);
-//     ros::param::get("~n_poses", n_poses);
-
-//     geometry_msgs::PoseArray point_poses;
-
-//     point_poses.header.frame_id = fixed_frame;
-//     point_poses.header.stamp = ros::Time::now();
-
-//     int num_of_points = center_points.size();
-
-//     evaluatePose poses[num_of_points];
-
-//     // ROS_INFO("Num of points: %d", num_of_points);
-//     // ROS_INFO("Num of poses: %d", n_poses);
-
-//     for (int i = 0; i < num_of_points; i++)
-//     {
-//         for (int n = 0; n < n_poses; n++)
-//         {
-//             pcl::PointXYZ pcl_point = center_points.at(i);
-//             tf::Point tf_point;
-//             tf::Pose tf_pose;
-//             geometry_msgs::Pose one_pose;
-
-//             tf_point.setX(pcl_point.x);
-//             tf_point.setY(pcl_point.y);
-//             tf_point.setZ(pcl_point.z);
-
-//             // tf_pose = genPose(r_min, r_max, tf_point);
-//             poses[i].genPose(r_min, r_max, tf_point);
-//             poses[i].evalPose();
-
-//             tf_pose = poses[i].view_pose;
-
-//             tf::poseTFToMsg(tf_pose, one_pose);
-
-//             point_poses.poses.push_back(one_pose);
-
-//             // ROS_INFO("Pose published: %d", n);
-//         }
-//     }
-
-//     return point_poses;
-// }
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "explorer_node");
@@ -73,6 +20,8 @@ int main(int argc, char **argv)
 
     ros::Publisher pub_poseArray = n.advertise<geometry_msgs::PoseArray>("/pose_array", 10);
     ros::Publisher pub_lines = n.advertise<visualization_msgs::Marker>("/ray_cast_lines", 10);
+
+    ros::Publisher pub_blue = n.advertise<visualization_msgs::MarkerArray>("/discovered_space", 10);
 
     // ros::Subscriber sub = n.subscribe("/octomap_full", 1, octomapCallback);
 
@@ -126,6 +75,7 @@ int main(int argc, char **argv)
     evaluatePose poses[n_poses];
 
     int k = 0;
+    visualization_msgs::MarkerArray test;
     for (int i = 0; i < num_of_points; i++)
     {
         for (int n = 0; n < n_poses; n++)
@@ -155,8 +105,6 @@ int main(int argc, char **argv)
         k = 0;
         for (int i = 0; i < num_of_points; i++)
         {
-            line_vis.ns = "rays " + std::to_string(i);
-
             for (int n = 0; n < n_poses; n++)
             {
                 poses[k].evalPose();
@@ -175,12 +123,15 @@ int main(int argc, char **argv)
                 k++;
             }
         }
+
+        test = poses[0].discoveredBoxes(fixed_frame);
     }
 
     while (ros::ok())
     {
         pub_poseArray.publish(point_poses);
         pub_lines.publish(line_vis);
+        pub_blue.publish(test);
 
         ros::spinOnce();
 

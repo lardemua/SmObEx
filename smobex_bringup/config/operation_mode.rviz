@@ -4,9 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
-        - /SearchSpace1
         - /SearchSpace1/Namespaces1
       Splitter Ratio: 0.537401556968689
     Tree Height: 746
@@ -205,7 +202,15 @@ Visualization Manager:
       Marker Topic: /ray_cast_lines
       Name: Rays
       Namespaces:
-        rays 0: true
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /discovered_space
+      Name: DiscoveredSpace
+      Namespaces:
+        found_boxes: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -236,7 +241,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.022928237915039
+      Distance: 7.319285869598389
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -251,10 +256,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.31020188331604004
+      Pitch: 0.19520187377929688
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.135325908660889
+      Yaw: 3.8903276920318604
     Saved: ~
 Window Geometry:
   Displays:
