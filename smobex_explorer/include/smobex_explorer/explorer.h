@@ -1,11 +1,11 @@
 #include <geometry_msgs/PoseArray.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <visualization_msgs/MarkerArray.h>
 
-#include <cmath>
 #include <math.h>
 #include <ros/ros.h>
+#include <cmath>
 
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Vector3.h>
@@ -13,20 +13,20 @@
 #include <tf/transform_datatypes.h>
 #include <tf_conversions/tf_eigen.h>
 
+#include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/transforms.h>
-#include <pcl/point_types.h>
 
-#include <octomap/octomap.h>
-#include <octomap/OccupancyOcTreeBase.h>
 #include <octomap/OcTreeBaseImpl.h>
 #include <octomap/OcTreeKey.h>
+#include <octomap/OccupancyOcTreeBase.h>
 #include <octomap/math/Pose6D.h>
+#include <octomap/math/Quaternion.h>
 #include <octomap/math/Utils.h>
 #include <octomap/math/Vector3.h>
-#include <octomap/math/Quaternion.h>
-#include <octomap_ros/conversions.h>
+#include <octomap/octomap.h>
 #include <octomap_msgs/conversions.h>
+#include <octomap_ros/conversions.h>
 
 // #include "Eigen/Core"
 // #include "Eigen/Geometry"
@@ -77,14 +77,14 @@ class generatePose
         z_direction.normalize();
 
         // random vector just to find one that's perpendicular to z_direction
-        //   rand_vector.setX((double)rand() / RAND_MAX);
-        //   rand_vector.setY((double)rand() / RAND_MAX);
-        //   rand_vector.setZ((double)rand() / RAND_MAX);
+        rand_vector.setX((double)rand() / RAND_MAX);
+        rand_vector.setY((double)rand() / RAND_MAX);
+        rand_vector.setZ((double)rand() / RAND_MAX);
 
-        rand_vector.setX(1);
-        rand_vector.setY(0);
-        rand_vector.setZ(0);
-        rand_vector.normalize();
+        // rand_vector.setX(1);
+        // rand_vector.setY(0);
+        // rand_vector.setZ(0);
+        // rand_vector.normalize();
 
         y_direction = z_direction.cross(rand_vector);
         y_direction.setZ(-1 * abs(y_direction.getZ()));
@@ -114,11 +114,24 @@ class generatePose
 class evaluatePose : public generatePose
 {
   public:
+    int score = 0;
+    int step;
+    float min_FOV;
+    float width_FOV;
+    float height_FOV;
     octomap::OcTree *octree = NULL;
     octomap::OcTree *unknown_octree = NULL;
     octomap::point3d_list ray_points_list;
-    octomap::KeySet single_keys;
-    // std::set<octomap::OcTreeKey> single_keys;
+    octomap::KeySet first_keys;
+    octomap::KeySet posterior_keys;
+
+    evaluatePose(int _step, float _min_FOV, float _width_FOV, float _height_FOV)
+    {
+        step = _step;
+        min_FOV = _min_FOV;
+        width_FOV = _width_FOV;
+        height_FOV = _height_FOV;
+    }
 
     void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
     {
@@ -172,10 +185,12 @@ class evaluatePose : public generatePose
         int pix_width = 640;
         int pix_height = 480;
 
-        CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n, ros::Duration(10));
+        CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n,
+                                                                      ros::Duration(10));
 
         ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
-        ros::Subscriber unknownFullMap_sub = n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
+        ros::Subscriber unknownFullMap_sub =
+            n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
 
         while (octree == NULL || unknown_octree == NULL)
         {
@@ -192,12 +207,6 @@ class evaluatePose : public generatePose
 
         pix_width = CamInfo->width;
         pix_height = CamInfo->height;
-
-        int step = 20;
-
-        float min_FOV = 0.8;
-        float width_FOV = 58 * M_PI / 180;  //radians
-        float height_FOV = 45 * M_PI / 180; //radians
 
         float delta_rad_w = width_FOV / pix_width;
         float delta_rad_h = height_FOV / pix_height;
@@ -231,13 +240,11 @@ class evaluatePose : public generatePose
         pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
 
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
-        int n_unknown = 0;
-
+        KeySet oool;
         if (octree != NULL && unknown_octree != NULL)
         {
             for (size_t i = 0; i < n_start_points; i++)
             {
-
                 pcl::PointXYZ point = rays_point_cloud.at(i);
 
                 start_point.x() = point.x;
@@ -255,30 +262,52 @@ class evaluatePose : public generatePose
                 {
                     unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
 
+                    // first_keys.insert(*ray_keys.begin());
+                    bool first = true;
                     for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
                     {
                         if (unknown_octree->search(*it))
                         {
-                            single_keys.insert(*it);
-                            n_unknown++;
+                            if (first)
+                            {
+                                first_keys.insert(*it);
+                                first = false;
+                            }
+                            else
+                            {
+                                posterior_keys.insert(*it);
+                            }
+                            oool.insert(*it);
                         }
                     }
-
-                    // ROS_INFO("Ray number %lu", i);
-
                     ray_points_list.push_back(start_point);
                     ray_points_list.push_back(end_point);
                 }
-                // ROS_INFO("Points pushed");
             }
-            //TODO delete (octree);
-            ROS_INFO("n_unknow = %d", n_unknown);
-            ROS_INFO("single keys = %lu", single_keys.size());
+
+            for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
+            {
+                if (first_keys.find(*it) != first_keys.end())
+                {
+                    posterior_keys.erase(*it);
+                }
+            }
+
+            ROS_INFO("first_keys: %lu", first_keys.size());
+            ROS_INFO("posterior_keys: %lu", posterior_keys.size());
+
+            ROS_INFO("total_keys: %lu", oool.size());
         }
         else
         {
             ROS_INFO("No OcTree.");
         }
+    }
+
+    void getScore()
+    {
+        score = first_keys.size() + posterior_keys.size();
+        ROS_INFO("Pose score: %d", score);
     }
 
     octomap::point3d_collection getDiscoveredCenters()
@@ -287,7 +316,7 @@ class evaluatePose : public generatePose
 
         point3d_collection discovered_centers;
 
-        for (KeySet::iterator it = single_keys.begin(); it != single_keys.end(); it++)
+        for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
         {
             discovered_centers.push_back(unknown_octree->keyToCoord(*it));
         }
@@ -299,10 +328,10 @@ class evaluatePose : public generatePose
     {
         using namespace octomap;
 
-        visualization_msgs::MarkerArray discovered_boxes;
+        visualization_msgs::MarkerArray all_boxes;
         double unknown_octree_depth = unknown_octree->getTreeDepth();
-        discovered_boxes.markers.resize(unknown_octree_depth + 1);
-        std_msgs::ColorRGBA blue;
+        all_boxes.markers.resize(unknown_octree_depth + 1);
+        std_msgs::ColorRGBA blue, light_blue;
         ros::Time t = ros::Time::now();
 
         blue.r = 0.0;
@@ -310,11 +339,17 @@ class evaluatePose : public generatePose
         blue.b = 1.0;
         blue.a = 1.0;
 
-        for (OcTree::iterator it = unknown_octree->begin(unknown_octree_depth), end = unknown_octree->end(); it != end; ++it)
+        light_blue.r = 0.0;
+        light_blue.g = 0.7;
+        light_blue.b = 1.0;
+        light_blue.a = 1.0;
+
+        for (OcTree::iterator it = unknown_octree->begin(), end = unknown_octree->end(); it != end;
+             ++it)
         {
             OcTreeKey node_key = it.getKey();
 
-            if (single_keys.find(node_key) != single_keys.end())
+            if (first_keys.find(node_key) != first_keys.end())
             {
                 double size = it.getSize();
                 double x = it.getX();
@@ -322,40 +357,64 @@ class evaluatePose : public generatePose
                 double z = it.getZ();
 
                 unsigned idx = it.getDepth();
-                assert(idx < discovered_boxes.markers.size());
+                assert(idx < all_boxes.markers.size());
 
                 geometry_msgs::Point cubeCenter;
                 cubeCenter.x = x;
                 cubeCenter.y = y;
                 cubeCenter.z = z;
 
-                discovered_boxes.markers[idx].points.push_back(cubeCenter);
+                all_boxes.markers[idx].points.push_back(cubeCenter);
+                // all_boxes.markers[idx].color = blue;
+                all_boxes.markers[idx].colors.push_back(blue);
+                all_boxes.markers[idx].ns = "first_boxes";
+            }
+            else if (posterior_keys.find(node_key) != posterior_keys.end())
+            {
+                double size = it.getSize();
+                double x = it.getX();
+                double y = it.getY();
+                double z = it.getZ();
+
+                unsigned idx = it.getDepth();
+                assert(idx < all_boxes.markers.size());
+
+                geometry_msgs::Point cubeCenter;
+                cubeCenter.x = x;
+                cubeCenter.y = y;
+                cubeCenter.z = z;
+
+                all_boxes.markers[idx].points.push_back(cubeCenter);
+                // all_boxes.markers[idx].color = light_blue;
+                all_boxes.markers[idx].colors.push_back(light_blue);
+                all_boxes.markers[idx].ns = "posterior_boxes";
             }
         }
 
-        for (unsigned i = 0; i < discovered_boxes.markers.size(); i++)
+        for (unsigned i = 0; i < all_boxes.markers.size(); i++)
         {
             double size = unknown_octree->getNodeSize(i);
 
-            discovered_boxes.markers[i].header.frame_id = frame_id;
-            discovered_boxes.markers[i].header.stamp = t;
-            discovered_boxes.markers[i].ns = "found_boxes";
-            discovered_boxes.markers[i].id = i;
-            discovered_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
-            discovered_boxes.markers[i].scale.x = size;
-            discovered_boxes.markers[i].scale.y = size;
-            discovered_boxes.markers[i].scale.z = size;
-            discovered_boxes.markers[i].color = blue;
+            all_boxes.markers[i].header.frame_id = frame_id;
+            all_boxes.markers[i].header.stamp = t;
+            // all_boxes.markers[i].ns = "found_boxes";
+            all_boxes.markers[i].id = i;
+            all_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
+            all_boxes.markers[i].scale.x = size;
+            all_boxes.markers[i].scale.y = size;
+            all_boxes.markers[i].scale.z = size;
+            // all_boxes.markers[i].color = blue;
 
-            if (discovered_boxes.markers[i].points.size() > 0)
+            if (all_boxes.markers[i].points.size() > 0)
             {
-                discovered_boxes.markers[i].action = visualization_msgs::Marker::ADD;
+                all_boxes.markers[i].action = visualization_msgs::Marker::ADD;
             }
             else
             {
-                discovered_boxes.markers[i].action = visualization_msgs::Marker::DELETE;
+                all_boxes.markers[i].action = visualization_msgs::Marker::DELETE;
             }
         }
-        return discovered_boxes;
+
+        return all_boxes;
     }
 };

@@ -36,9 +36,6 @@ int main(int argc, char **argv)
 
     center_points.push_back(pcl::PointXYZ(1.5, 0, 0.5));
 
-    // geometry_msgs::PoseArray all_poses;
-    // all_poses = genMultiPose(test);
-
     std::string fixed_frame = "/map";
     float r_min = 0, r_max = 1;
     int n_poses = 20;
@@ -72,10 +69,11 @@ int main(int argc, char **argv)
 
     int num_of_points = center_points.size();
 
-    evaluatePose poses[n_poses];
+    // evaluatePose poses[n_poses];
+    std::vector<evaluatePose> poses(n_poses, evaluatePose(20, 0.8, 58 * M_PI / 180, 45 * M_PI / 180));
 
     int k = 0;
-    visualization_msgs::MarkerArray test;
+    visualization_msgs::MarkerArray found_space;
     for (int i = 0; i < num_of_points; i++)
     {
         for (int n = 0; n < n_poses; n++)
@@ -124,14 +122,14 @@ int main(int argc, char **argv)
             }
         }
 
-        test = poses[0].discoveredBoxes(fixed_frame);
+        found_space = poses[0].discoveredBoxes(fixed_frame);
     }
 
     while (ros::ok())
     {
         pub_poseArray.publish(point_poses);
         pub_lines.publish(line_vis);
-        pub_blue.publish(test);
+        pub_blue.publish(found_space);
 
         ros::spinOnce();
 

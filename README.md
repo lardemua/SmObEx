@@ -103,11 +103,15 @@ Porto, Portugal
 
 - [x] Visualization of the unknown space
 - [x] Integrated the *octomap_bounding_box* node
-- [ ] Evaluate each pose
+- [x] Evaluate each pose
      - [x] Evaluated one ray
      - [x] Generated all camera rays for given pose
      - [x] Evaluate all rays
-     - [ ] Store the score
+     - [x] Store the score
+
+## Week 14
+
+-[ ] Find the center of the unknown clusters
 
 # Built with
 
