@@ -240,7 +240,6 @@ class evaluatePose : public generatePose
         pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
 
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
-        KeySet oool;
         if (octree != NULL && unknown_octree != NULL)
         {
             for (size_t i = 0; i < n_start_points; i++)
@@ -277,7 +276,6 @@ class evaluatePose : public generatePose
                             {
                                 posterior_keys.insert(*it);
                             }
-                            oool.insert(*it);
                         }
                     }
                     ray_points_list.push_back(start_point);
@@ -296,7 +294,6 @@ class evaluatePose : public generatePose
             ROS_INFO("first_keys: %lu", first_keys.size());
             ROS_INFO("posterior_keys: %lu", posterior_keys.size());
 
-            ROS_INFO("total_keys: %lu", oool.size());
         }
         else
         {
@@ -331,18 +328,20 @@ class evaluatePose : public generatePose
         visualization_msgs::MarkerArray all_boxes;
         double unknown_octree_depth = unknown_octree->getTreeDepth();
         all_boxes.markers.resize(unknown_octree_depth + 1);
-        std_msgs::ColorRGBA blue, light_blue;
+        
         ros::Time t = ros::Time::now();
 
+        std_msgs::ColorRGBA blue;
         blue.r = 0.0;
         blue.g = 0.0;
         blue.b = 1.0;
         blue.a = 1.0;
 
-        light_blue.r = 0.0;
-        light_blue.g = 0.7;
-        light_blue.b = 1.0;
-        light_blue.a = 1.0;
+        // std_msgs::ColorRGBA light_blue;;
+        // light_blue.r = 0.0;
+        // light_blue.g = 0.7;
+        // light_blue.b = 1.0;
+        // light_blue.a = 1.0;
 
         for (OcTree::iterator it = unknown_octree->begin(), end = unknown_octree->end(); it != end;
              ++it)
@@ -366,8 +365,8 @@ class evaluatePose : public generatePose
 
                 all_boxes.markers[idx].points.push_back(cubeCenter);
                 // all_boxes.markers[idx].color = blue;
-                all_boxes.markers[idx].colors.push_back(blue);
-                all_boxes.markers[idx].ns = "first_boxes";
+                // all_boxes.markers[idx].colors.push_back(blue);
+                // all_boxes.markers[idx].ns = "first_boxes";
             }
             else if (posterior_keys.find(node_key) != posterior_keys.end())
             {
@@ -386,8 +385,8 @@ class evaluatePose : public generatePose
 
                 all_boxes.markers[idx].points.push_back(cubeCenter);
                 // all_boxes.markers[idx].color = light_blue;
-                all_boxes.markers[idx].colors.push_back(light_blue);
-                all_boxes.markers[idx].ns = "posterior_boxes";
+                // all_boxes.markers[idx].colors.push_back(light_blue);
+                // all_boxes.markers[idx].ns = "posterior_boxes";
             }
         }
 
@@ -397,13 +396,13 @@ class evaluatePose : public generatePose
 
             all_boxes.markers[i].header.frame_id = frame_id;
             all_boxes.markers[i].header.stamp = t;
-            // all_boxes.markers[i].ns = "found_boxes";
+            all_boxes.markers[i].ns = "found_boxes";
             all_boxes.markers[i].id = i;
             all_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
             all_boxes.markers[i].scale.x = size;
             all_boxes.markers[i].scale.y = size;
             all_boxes.markers[i].scale.z = size;
-            // all_boxes.markers[i].color = blue;
+            all_boxes.markers[i].color = blue;
 
             if (all_boxes.markers[i].points.size() > 0)
             {
