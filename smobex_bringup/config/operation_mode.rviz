@@ -4,9 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /SearchSpace1
         - /SearchSpace1/Namespaces1
-        - /DiscoveredSpace1
         - /DiscoveredSpace1/Namespaces1
       Splitter Ratio: 0.537401556968689
     Tree Height: 506
@@ -172,8 +170,8 @@ Visualization Manager:
       Name: SearchSpace
       Namespaces:
         free_boxes: true
-        occupied_boxes: false
-        unknown_boxes: true
+        occupied_boxes: true
+        unknown_boxes: false
       Queue Size: 10
       Value: true
     - Class: rviz/MarkerArray
@@ -213,8 +211,16 @@ Visualization Manager:
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        posterior_boxes: true
+        found_boxes: true
       Queue Size: 10
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pose_text
+      Name: PoseDescription
+      Namespaces:
+        "": true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -244,25 +250,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.070927381515503
+      Distance: 3.493043899536133
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.6185686588287354
-        Y: -0.2803419828414917
-        Z: 0.3190566897392273
+        X: 1.3650109767913818
+        Y: -0.31711530685424805
+        Z: 0.7149376273155212
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.14520204067230225
+      Pitch: 0.4252026081085205
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.278517246246338
+      Yaw: 2.0117082595825195
     Saved: ~
 Window Geometry:
   Displays:

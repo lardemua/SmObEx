@@ -362,3 +362,5 @@ roslaunch smobex_bringup bringup.launch
 ```
 
 ![running mode](./files/running.png)
+
+![pose evaluated](./files/pose_evaluated_text.png)

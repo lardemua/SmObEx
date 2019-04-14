@@ -291,9 +291,8 @@ class evaluatePose : public generatePose
                 }
             }
 
-            ROS_INFO("first_keys: %lu", first_keys.size());
-            ROS_INFO("posterior_keys: %lu", posterior_keys.size());
-
+            // ROS_INFO("first_keys: %lu", first_keys.size());
+            // ROS_INFO("posterior_keys: %lu", posterior_keys.size());
         }
         else
         {
@@ -301,10 +300,17 @@ class evaluatePose : public generatePose
         }
     }
 
-    void getScore()
+    int getScore()
     {
-        score = first_keys.size() + posterior_keys.size();
+        if (first_keys.size() == 0 && posterior_keys.size() == 0)
+        {
+            this->evalPose();
+        }
+
+        score = first_keys.size() + posterior_keys.size() * 0.1;
         ROS_INFO("Pose score: %d", score);
+
+        return score;
     }
 
     octomap::point3d_collection getDiscoveredCenters()
@@ -321,14 +327,14 @@ class evaluatePose : public generatePose
         return discovered_centers;
     }
 
-    visualization_msgs::MarkerArray discoveredBoxes(std::string frame_id)
+    visualization_msgs::MarkerArray discoveredBoxesVis(std::string frame_id)
     {
         using namespace octomap;
 
         visualization_msgs::MarkerArray all_boxes;
         double unknown_octree_depth = unknown_octree->getTreeDepth();
         all_boxes.markers.resize(unknown_octree_depth + 1);
-        
+
         ros::Time t = ros::Time::now();
 
         std_msgs::ColorRGBA blue;
@@ -415,5 +421,41 @@ class evaluatePose : public generatePose
         }
 
         return all_boxes;
+    }
+
+    visualization_msgs::Marker rayLinesVis(std::string frame_id)
+    {
+        if (ray_points_list.size() <= 0)
+        {
+            this->evalPose();
+        }
+
+        visualization_msgs::Marker line_vis;
+
+        line_vis.header.frame_id = frame_id;
+        line_vis.header.stamp = ros::Time::now();
+        // line_vis.ns = "rays";
+        line_vis.action = visualization_msgs::Marker::ADD;
+        line_vis.pose.orientation.w = 1.0;
+        line_vis.id = 0;
+        line_vis.type = visualization_msgs::Marker::LINE_LIST;
+        line_vis.scale.x = 0.001;
+
+        line_vis.color.r = 0.5;
+        line_vis.color.g = 0.5;
+        line_vis.color.b = 0.5;
+        line_vis.color.a = 1.0;
+
+        for (octomap::point3d_list::iterator it = ray_points_list.begin(); it != ray_points_list.end(); it++)
+        {
+            geometry_msgs::Point point;
+            point.x = it->octomath::Vector3::x();
+            point.y = it->octomath::Vector3::y();
+            point.z = it->octomath::Vector3::z();
+
+            line_vis.points.push_back(point);
+        }
+
+        return line_vis;
     }
 };

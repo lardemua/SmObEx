@@ -22,6 +22,7 @@ int main(int argc, char **argv)
     ros::Publisher pub_lines = n.advertise<visualization_msgs::Marker>("/ray_cast_lines", 10);
 
     ros::Publisher pub_blue = n.advertise<visualization_msgs::MarkerArray>("/discovered_space", 10);
+    ros::Publisher pub_text = n.advertise<visualization_msgs::MarkerArray>("/pose_text", 10);
 
     // ros::Subscriber sub = n.subscribe("/octomap_full", 1, octomapCallback);
 
@@ -53,27 +54,16 @@ int main(int argc, char **argv)
     point_poses.header.frame_id = fixed_frame;
     point_poses.header.stamp = t;
 
-    line_vis.header.frame_id = fixed_frame;
-    line_vis.header.stamp = t;
-    // line_vis.ns = "rays";
-    line_vis.action = visualization_msgs::Marker::ADD;
-    line_vis.pose.orientation.w = 1.0;
-    line_vis.id = 0;
-    line_vis.type = visualization_msgs::Marker::LINE_LIST;
-    line_vis.scale.x = 0.001;
-
-    line_vis.color.r = 0.5;
-    line_vis.color.g = 0.5;
-    line_vis.color.b = 0.5;
-    line_vis.color.a = 1.0;
-
     int num_of_points = center_points.size();
 
-    // evaluatePose poses[n_poses];
     std::vector<evaluatePose> poses(n_poses, evaluatePose(20, 0.8, 58 * M_PI / 180, 45 * M_PI / 180));
 
     int k = 0;
     visualization_msgs::MarkerArray found_space;
+
+    visualization_msgs::Marker text;
+    visualization_msgs::MarkerArray text_pose;
+
     for (int i = 0; i < num_of_points; i++)
     {
         for (int n = 0; n < n_poses; n++)
@@ -96,40 +86,46 @@ int main(int argc, char **argv)
 
             point_poses.poses.push_back(one_pose);
 
+            int score = poses[k].getScore();
+
+            text.header.frame_id = fixed_frame;
+            text.header.stamp = t;
+
+            text.id = k;
+            text.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+            text.action = visualization_msgs::Marker::ADD;
+
+            text.scale.z = 0.05;
+            text.color.r = 0.0;
+            text.color.g = 0.0;
+            text.color.b = 0.0;
+            text.color.a = 1.0;
+            text.pose.position.x = one_pose.position.x - 0.1;
+            text.pose.position.y = one_pose.position.y - 0.1;
+            text.pose.position.z = one_pose.position.z - 0.1;
+            text.pose.orientation.x = 0.0;
+            text.pose.orientation.y = 0.0;
+            text.pose.orientation.z = 0.0;
+            text.pose.orientation.w = 1.0;
+
+            text.text = "Point: " + to_string(i) + "\n" + "Pose: " + to_string(k) + "\n" + "Score: " + to_string(score);
+
+            text_pose.markers.push_back(text);
+
             k++;
             // ROS_INFO("Pose published: %d", n);
         }
-
-        k = 0;
-        for (int i = 0; i < num_of_points; i++)
-        {
-            for (int n = 0; n < n_poses; n++)
-            {
-                poses[k].evalPose();
-
-                octomap::point3d_list ray_points = poses[k].ray_points_list;
-
-                for (octomap::point3d_list::iterator it = ray_points.begin(); it != ray_points.end(); it++)
-                {
-                    geometry_msgs::Point point;
-                    point.x = it->octomath::Vector3::x();
-                    point.y = it->octomath::Vector3::y();
-                    point.z = it->octomath::Vector3::z();
-
-                    line_vis.points.push_back(point);
-                }
-                k++;
-            }
-        }
-
-        found_space = poses[0].discoveredBoxes(fixed_frame);
     }
+
+    line_vis = poses[0].rayLinesVis(fixed_frame);
+    found_space = poses[0].discoveredBoxesVis(fixed_frame);
 
     while (ros::ok())
     {
         pub_poseArray.publish(point_poses);
         pub_lines.publish(line_vis);
         pub_blue.publish(found_space);
+        pub_text.publish(text_pose);
 
         ros::spinOnce();
 
