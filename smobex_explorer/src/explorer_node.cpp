@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     ros::Publisher pub_poseArray = n.advertise<geometry_msgs::PoseArray>("/pose_array", 10);
-    ros::Publisher pub_lines = n.advertise<visualization_msgs::Marker>("/ray_cast_lines", 10);
+    ros::Publisher pub_lines = n.advertise<visualization_msgs::MarkerArray>("/ray_cast_lines", 10);
 
     ros::Publisher pub_blue = n.advertise<visualization_msgs::MarkerArray>("/discovered_space", 10);
     ros::Publisher pub_text = n.advertise<visualization_msgs::MarkerArray>("/pose_text", 10);
@@ -46,10 +46,9 @@ int main(int argc, char **argv)
     ros::param::get("~r_max", r_max);
     ros::param::get("~n_poses", n_poses);
 
-    geometry_msgs::PoseArray point_poses;
-    visualization_msgs::Marker line_vis;
-
     ros::Time t = ros::Time::now();
+
+    geometry_msgs::PoseArray point_poses;
 
     point_poses.header.frame_id = fixed_frame;
     point_poses.header.stamp = t;
@@ -59,10 +58,9 @@ int main(int argc, char **argv)
     std::vector<evaluatePose> poses(n_poses, evaluatePose(20, 0.8, 58 * M_PI / 180, 45 * M_PI / 180));
 
     int k = 0;
-    visualization_msgs::MarkerArray found_space;
 
     visualization_msgs::Marker text;
-    visualization_msgs::MarkerArray text_pose;
+    visualization_msgs::MarkerArray found_space, text_pose, line_vis;
 
     for (int i = 0; i < num_of_points; i++)
     {
@@ -109,16 +107,22 @@ int main(int argc, char **argv)
             text.pose.orientation.w = 1.0;
 
             text.text = "Point: " + to_string(i) + "\n" + "Pose: " + to_string(k) + "\n" + "Score: " + to_string(score);
+            // text.ns = ns;
 
             text_pose.markers.push_back(text);
+
+            visualization_msgs::Marker line;
+            line = poses[k].rayLinesVis(fixed_frame, k);
+
+            line_vis.markers.push_back(line);
 
             k++;
             // ROS_INFO("Pose published: %d", n);
         }
     }
 
-    line_vis = poses[0].rayLinesVis(fixed_frame);
-    found_space = poses[0].discoveredBoxesVis(fixed_frame);
+    // line_vis = poses[0].rayLinesVis(fixed_frame);
+    found_space = poses[0].discoveredBoxesVis(fixed_frame, 0);
 
     while (ros::ok())
     {

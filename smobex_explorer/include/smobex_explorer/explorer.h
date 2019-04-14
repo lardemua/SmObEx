@@ -256,6 +256,7 @@ class evaluatePose : public generatePose
                 octree->castRay(origin, direction, end_point, true, 10);
 
                 start_point = origin + direction.normalized() * min_FOV;
+                octree->getRayIntersection(origin,direction,end_point,end_point);
 
                 if (origin.distance(start_point) < origin.distance(end_point))
                 {
@@ -327,8 +328,9 @@ class evaluatePose : public generatePose
         return discovered_centers;
     }
 
-    visualization_msgs::MarkerArray discoveredBoxesVis(std::string frame_id)
+    visualization_msgs::MarkerArray discoveredBoxesVis(std::string frame_id, int pose_number)
     {
+        using namespace std;
         using namespace octomap;
 
         visualization_msgs::MarkerArray all_boxes;
@@ -402,7 +404,7 @@ class evaluatePose : public generatePose
 
             all_boxes.markers[i].header.frame_id = frame_id;
             all_boxes.markers[i].header.stamp = t;
-            all_boxes.markers[i].ns = "found_boxes";
+            all_boxes.markers[i].ns = "Pose " + to_string(pose_number);
             all_boxes.markers[i].id = i;
             all_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
             all_boxes.markers[i].scale.x = size;
@@ -423,8 +425,10 @@ class evaluatePose : public generatePose
         return all_boxes;
     }
 
-    visualization_msgs::Marker rayLinesVis(std::string frame_id)
+    visualization_msgs::Marker rayLinesVis(std::string frame_id, int pose_number)
     {
+        using namespace std;
+
         if (ray_points_list.size() <= 0)
         {
             this->evalPose();
@@ -434,7 +438,7 @@ class evaluatePose : public generatePose
 
         line_vis.header.frame_id = frame_id;
         line_vis.header.stamp = ros::Time::now();
-        // line_vis.ns = "rays";
+        line_vis.ns = "Pose " + to_string(pose_number);
         line_vis.action = visualization_msgs::Marker::ADD;
         line_vis.pose.orientation.w = 1.0;
         line_vis.id = 0;
@@ -459,3 +463,5 @@ class evaluatePose : public generatePose
         return line_vis;
     }
 };
+
+

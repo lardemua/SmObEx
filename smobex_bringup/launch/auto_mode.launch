@@ -51,7 +51,7 @@
     <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
 
         <param name="~fixed_frame" value="/base_link"/>
-        <param name="~n_poses" value="1"/>
+        <param name="~n_poses" value="5"/>
         <param name="~r_min" value="0.8"/>
         <param name="~r_max" value="1.2"/>
 
