@@ -116,13 +116,21 @@ int main(int argc, char **argv)
 
             line_vis.markers.push_back(line);
 
+            visualization_msgs::MarkerArray single_view_boxes;
+            single_view_boxes = poses[k].discoveredBoxesVis(fixed_frame, k);
+
+            for (size_t i = 0; i < single_view_boxes.markers.size(); i++)
+            {
+                found_space.markers.push_back(single_view_boxes.markers[i]);
+            }
+
             k++;
             // ROS_INFO("Pose published: %d", n);
         }
     }
 
     // line_vis = poses[0].rayLinesVis(fixed_frame);
-    found_space = poses[0].discoveredBoxesVis(fixed_frame, 0);
+    // found_space = poses[0].discoveredBoxesVis(fixed_frame, 0);
 
     while (ros::ok())
     {

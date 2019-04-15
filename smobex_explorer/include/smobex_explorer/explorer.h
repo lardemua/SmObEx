@@ -256,7 +256,7 @@ class evaluatePose : public generatePose
                 octree->castRay(origin, direction, end_point, true, 10);
 
                 start_point = origin + direction.normalized() * min_FOV;
-                octree->getRayIntersection(origin,direction,end_point,end_point);
+                octree->getRayIntersection(origin, direction, end_point, end_point);
 
                 if (origin.distance(start_point) < origin.distance(end_point))
                 {
@@ -309,7 +309,7 @@ class evaluatePose : public generatePose
         }
 
         score = first_keys.size() + posterior_keys.size() * 0.1;
-        ROS_INFO("Pose score: %d", score);
+        // ROS_INFO("Pose score: %d", score);
 
         return score;
     }
@@ -463,5 +463,3 @@ class evaluatePose : public generatePose
         return line_vis;
     }
 };
-
-
