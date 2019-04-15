@@ -10,6 +10,7 @@ Panels:
         - /DiscoveredSpace1/Namespaces1
         - /Rays1
         - /Rays1/Namespaces1
+        - /PoseMarkers1
       Splitter Ratio: 0.537401556968689
     Tree Height: 746
   - Class: rviz/Selection
@@ -242,6 +243,15 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: PoseMarkers
+      Show Axes: true
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /basic_controls/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -270,25 +280,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 9.008856773376465
+      Distance: 5.31036901473999
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.3650109767913818
-        Y: -0.31711530685424805
-        Z: 0.7149376273155212
+        X: 1.5713826417922974
+        Y: -1.112448811531067
+        Z: 0.2181578129529953
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.2852025330066681
+      Pitch: 0.3352024555206299
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.2480647563934326
+      Yaw: 0.3980637788772583
     Saved: ~
 Window Geometry:
   Displays:

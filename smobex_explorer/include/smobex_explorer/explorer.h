@@ -1,5 +1,5 @@
-#include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/Point.h>
+#include <geometry_msgs/PoseArray.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -115,7 +115,7 @@ class generatePose
 class evaluatePose : public generatePose
 {
   public:
-    int score = 0;
+    float score = 0;
     int step;
     float min_FOV;
     float max_FOV;
@@ -274,7 +274,6 @@ class evaluatePose : public generatePose
                             if (first)
                             {
                                 first_keys.insert(*it);
-                                // unknown_octree->getNodeSize(*it);
                                 first = false;
                             }
                             else
@@ -309,12 +308,30 @@ class evaluatePose : public generatePose
 
     void getScore()
     {
-        if (first_keys.size() == 0 && posterior_keys.size() == 0)
+        // if (first_keys.size() == 0 && posterior_keys.size() == 0)
+        // {
+        //     this->evalPose();
+        // }
+
+        float resolution = octree->getResolution();
+        float one_volume = resolution * resolution * resolution;
+
+        float found_volume = (first_keys.size() + posterior_keys.size() * 0.1) * one_volume;
+        float total_volume = 0;
+
+        for (octomap::OcTree::iterator it = unknown_octree->begin(); it != unknown_octree->end(); it++)
         {
-            this->evalPose();
+            octomap::OcTreeKey key = it.getKey();
+            if (unknown_octree->search(key))
+            {
+                float size = it.getSize();
+                float volume = size * size * size;
+
+                total_volume += volume;
+            }
         }
 
-        score = first_keys.size() + posterior_keys.size() * 0.1;
+        score = found_volume / total_volume;
         // ROS_INFO("Pose score: %d", score);
     }
 
@@ -355,8 +372,7 @@ class evaluatePose : public generatePose
         // light_blue.b = 1.0;
         // light_blue.a = 1.0;
 
-        for (OcTree::iterator it = unknown_octree->begin(), end = unknown_octree->end(); it != end;
-             ++it)
+        for (OcTree::iterator it = unknown_octree->begin(), end = unknown_octree->end(); it != end; ++it)
         {
             OcTreeKey node_key = it.getKey();
 
@@ -433,10 +449,10 @@ class evaluatePose : public generatePose
     {
         using namespace std;
 
-        if (ray_points_list.size() <= 0)
-        {
-            this->evalPose();
-        }
+        // if (ray_points_list.size() <= 0)
+        // {
+        //     this->evalPose();
+        // }
 
         visualization_msgs::Marker line_vis;
 
@@ -471,10 +487,10 @@ class evaluatePose : public generatePose
     {
         using namespace std;
 
-        if (ray_points_list.size() <= 0)
-        {
-            this->evalPose();
-        }
+        // if (ray_points_list.size() <= 0)
+        // {
+        //     this->evalPose();
+        // }
 
         visualization_msgs::Marker line_vis;
 
@@ -504,7 +520,6 @@ class evaluatePose : public generatePose
             // for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             for (int n = 0; n < 2; n++)
             {
-
                 float x1 = min_FOV * sin(rad_w) * cos(rad_h);
                 float z1 = min_FOV * sin(rad_w) * sin(rad_h);
                 float y1 = min_FOV * cos(rad_w);
@@ -551,10 +566,10 @@ class evaluatePose : public generatePose
     {
         using namespace std;
 
-        if (ray_points_list.size() <= 0)
-        {
-            this->evalPose();
-        }
+        // if (ray_points_list.size() <= 0)
+        // {
+        //     this->evalPose();
+        // }
 
         visualization_msgs::Marker text;
 
