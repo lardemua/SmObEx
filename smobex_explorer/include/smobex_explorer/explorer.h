@@ -1,4 +1,5 @@
 #include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/Point.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -117,6 +118,7 @@ class evaluatePose : public generatePose
     int score = 0;
     int step;
     float min_FOV;
+    float max_FOV;
     float width_FOV;
     float height_FOV;
     octomap::OcTree *octree = NULL;
@@ -125,10 +127,11 @@ class evaluatePose : public generatePose
     octomap::KeySet first_keys;
     octomap::KeySet posterior_keys;
 
-    evaluatePose(int _step, float _min_FOV, float _width_FOV, float _height_FOV)
+    evaluatePose(int _step, float _min_FOV, float _max_FOV, float _width_FOV, float _height_FOV)
     {
         step = _step;
         min_FOV = _min_FOV;
+        max_FOV = _max_FOV;
         width_FOV = _width_FOV;
         height_FOV = _height_FOV;
     }
@@ -216,17 +219,17 @@ class evaluatePose : public generatePose
 
         pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
 
-        float rad_h = -corner_rad_h;
+        float rad_h = (M_PI - height_FOV) / 2;
 
         for (int row_pix = 0; row_pix < pix_height; row_pix += step)
         {
-            float rad_w = -corner_rad_w;
+            float rad_w = (M_PI - width_FOV) / 2;
 
             for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             {
                 float x = 1 * sin(rad_w) * cos(rad_h);
-                float y = 1 * sin(rad_w) * sin(rad_h);
-                float z = 1 * cos(rad_w);
+                float z = 1 * sin(rad_w) * sin(rad_h);
+                float y = 1 * cos(rad_w);
 
                 rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
 
@@ -253,7 +256,7 @@ class evaluatePose : public generatePose
                 direction = start_point - origin;
 
                 // octree->castRay(start_point, direction, end_point, true, -1.0);
-                octree->castRay(origin, direction, end_point, true, 10);
+                octree->castRay(origin, direction, end_point, true, max_FOV);
 
                 start_point = origin + direction.normalized() * min_FOV;
                 octree->getRayIntersection(origin, direction, end_point, end_point);
@@ -271,6 +274,7 @@ class evaluatePose : public generatePose
                             if (first)
                             {
                                 first_keys.insert(*it);
+                                // unknown_octree->getNodeSize(*it);
                                 first = false;
                             }
                             else
@@ -292,6 +296,8 @@ class evaluatePose : public generatePose
                 }
             }
 
+            getScore();
+
             // ROS_INFO("first_keys: %lu", first_keys.size());
             // ROS_INFO("posterior_keys: %lu", posterior_keys.size());
         }
@@ -301,7 +307,7 @@ class evaluatePose : public generatePose
         }
     }
 
-    int getScore()
+    void getScore()
     {
         if (first_keys.size() == 0 && posterior_keys.size() == 0)
         {
@@ -310,8 +316,6 @@ class evaluatePose : public generatePose
 
         score = first_keys.size() + posterior_keys.size() * 0.1;
         // ROS_INFO("Pose score: %d", score);
-
-        return score;
     }
 
     octomap::point3d_collection getDiscoveredCenters()
@@ -461,5 +465,123 @@ class evaluatePose : public generatePose
         }
 
         return line_vis;
+    }
+
+    visualization_msgs::Marker frustumLinesVis(std::string frame_id, int pose_number)
+    {
+        using namespace std;
+
+        if (ray_points_list.size() <= 0)
+        {
+            this->evalPose();
+        }
+
+        visualization_msgs::Marker line_vis;
+
+        line_vis.header.frame_id = frame_id;
+        line_vis.header.stamp = ros::Time::now();
+        line_vis.ns = "Frustum " + to_string(pose_number);
+        line_vis.action = visualization_msgs::Marker::ADD;
+        line_vis.pose.orientation.w = 1.0;
+        line_vis.id = 0;
+        line_vis.type = visualization_msgs::Marker::LINE_LIST;
+        line_vis.scale.x = 0.01;
+
+        line_vis.color.r = 0.5;
+        line_vis.color.g = 0.5;
+        line_vis.color.b = 0.5;
+        line_vis.color.a = 1.0;
+
+        pcl::PointCloud<pcl::PointXYZ> frustum_cloud_start, frustum_cloud_end;
+
+        float rad_h = (M_PI - height_FOV) / 2;
+
+        // for (int row_pix = 0; row_pix < pix_height; row_pix += step)
+        for (int i = 0; i < 2; i++)
+        {
+            float rad_w = (M_PI - width_FOV) / 2;
+
+            // for (int col_pix = 0; col_pix < pix_width; col_pix += step)
+            for (int n = 0; n < 2; n++)
+            {
+
+                float x1 = min_FOV * sin(rad_w) * cos(rad_h);
+                float z1 = min_FOV * sin(rad_w) * sin(rad_h);
+                float y1 = min_FOV * cos(rad_w);
+
+                float x2 = max_FOV * sin(rad_w) * cos(rad_h);
+                float z2 = max_FOV * sin(rad_w) * sin(rad_h);
+                float y2 = max_FOV * cos(rad_w);
+
+                frustum_cloud_start.push_back(pcl::PointXYZ(x1, y1, z1));
+                frustum_cloud_end.push_back(pcl::PointXYZ(x2, y2, z2));
+
+                rad_w += width_FOV;
+            }
+            rad_h += height_FOV;
+        }
+
+        pcl_ros::transformPointCloud(frustum_cloud_start, frustum_cloud_start, view_pose);
+        pcl_ros::transformPointCloud(frustum_cloud_end, frustum_cloud_end, view_pose);
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            geometry_msgs::Point p1, p2;
+            pcl::PointXYZ start, end;
+
+            start = frustum_cloud_start.at(i);
+            end = frustum_cloud_end.at(i);
+
+            p1.x = start.x;
+            p1.y = start.y;
+            p1.z = start.z;
+
+            p2.x = end.x;
+            p2.y = end.y;
+            p2.z = end.z;
+
+            line_vis.points.push_back(p1);
+            line_vis.points.push_back(p2);
+        }
+
+        return line_vis;
+    }
+
+    visualization_msgs::Marker textVis(std::string frame_id)
+    {
+        using namespace std;
+
+        if (ray_points_list.size() <= 0)
+        {
+            this->evalPose();
+        }
+
+        visualization_msgs::Marker text;
+
+        text.header.frame_id = frame_id;
+        text.header.stamp = ros::Time::now();
+
+        text.id = 0;
+        text.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+        text.action = visualization_msgs::Marker::ADD;
+
+        tf::Vector3 origin = view_pose.getOrigin();
+
+        text.scale.z = 0.05;
+        text.color.r = 0.0;
+        text.color.g = 0.0;
+        text.color.b = 0.0;
+        text.color.a = 1.0;
+        text.pose.position.x = origin.getX() - 0.1;
+        text.pose.position.y = origin.getY() - 0.1;
+        text.pose.position.z = origin.getZ() - 0.1;
+        text.pose.orientation.x = 0.0;
+        text.pose.orientation.y = 0.0;
+        text.pose.orientation.z = 0.0;
+        text.pose.orientation.w = 1.0;
+
+        text.text = "Score: " + to_string(score);
+
+        return text;
     }
 };

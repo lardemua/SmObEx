@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /SearchSpace1/Namespaces1
+        - /PoseDescription1
         - /DiscoveredSpace1
         - /DiscoveredSpace1/Namespaces1
         - /Rays1
@@ -202,36 +203,44 @@ Visualization Manager:
       Unreliable: false
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /pose_text
       Name: PoseDescription
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        Pose 0: true
-        Pose 1: false
-        Pose 2: false
-        Pose 3: false
-        Pose 4: false
+        {}
       Queue Size: 10
       Value: true
     - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /ray_cast_lines
+      Name: Rays
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /pose_text
+      Name: PoseDescription
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
       Enabled: true
       Marker Topic: /ray_cast_lines
       Name: Rays
       Namespaces:
-        Pose 0: true
-        Pose 1: false
-        Pose 2: false
-        Pose 3: false
-        Pose 4: false
-      Queue Size: 10
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -261,7 +270,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.0751495361328125
+      Distance: 9.008856773376465
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

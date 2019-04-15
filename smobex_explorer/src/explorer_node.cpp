@@ -55,11 +55,11 @@ int main(int argc, char **argv)
 
     int num_of_points = center_points.size();
 
-    std::vector<evaluatePose> poses(n_poses, evaluatePose(20, 0.8, 58 * M_PI / 180, 45 * M_PI / 180));
+    std::vector<evaluatePose> poses(n_poses, evaluatePose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180));
 
     int k = 0;
 
-    visualization_msgs::Marker text;
+    // visualization_msgs::Marker text;
     visualization_msgs::MarkerArray found_space, text_pose, line_vis;
 
     for (int i = 0; i < num_of_points; i++)
@@ -84,35 +84,11 @@ int main(int argc, char **argv)
 
             point_poses.poses.push_back(one_pose);
 
-            int score = poses[k].getScore();
-
-            text.header.frame_id = fixed_frame;
-            text.header.stamp = t;
-
-            text.id = k;
-            text.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-            text.action = visualization_msgs::Marker::ADD;
-
-            text.scale.z = 0.05;
-            text.color.r = 0.0;
-            text.color.g = 0.0;
-            text.color.b = 0.0;
-            text.color.a = 1.0;
-            text.pose.position.x = one_pose.position.x - 0.1;
-            text.pose.position.y = one_pose.position.y - 0.1;
-            text.pose.position.z = one_pose.position.z - 0.1;
-            text.pose.orientation.x = 0.0;
-            text.pose.orientation.y = 0.0;
-            text.pose.orientation.z = 0.0;
-            text.pose.orientation.w = 1.0;
-
-            text.text = "Point: " + to_string(i) + "\n" + "Pose: " + to_string(k) + "\n" + "Score: " + to_string(score);
-            // text.ns = ns;
-
-            text_pose.markers.push_back(text);
+            text_pose.markers.push_back(poses[k].textVis(fixed_frame));
 
             visualization_msgs::Marker line;
-            line = poses[k].rayLinesVis(fixed_frame, k);
+            // line = poses[k].rayLinesVis(fixed_frame, k);
+            line = poses[k].frustumLinesVis(fixed_frame, k);
 
             line_vis.markers.push_back(line);
 

@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   octomap REQUIRED
   pcl_ros
+  rviz
 )
 
 find_package(PCL REQUIRED)
@@ -147,6 +148,8 @@ add_executable(explorer_node src/explorer_node.cpp)
 
 add_executable(point_cloud_volume_def src/point_cloud_volume_def.cpp)
 
+add_executable(interactive_marker src/interactive_marker.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -170,6 +173,12 @@ target_link_libraries(explorer_node
 target_link_libraries(point_cloud_volume_def 
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
+)
+
+target_link_libraries(interactive_marker
+    ${catkin_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
 )
 
 

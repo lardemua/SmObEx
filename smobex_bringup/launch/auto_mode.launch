@@ -48,14 +48,14 @@
 
 
     <!-- Pose Generator -->
-    <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
+    <!-- <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
 
         <param name="~fixed_frame" value="/base_link"/>
         <param name="~n_poses" value="5"/>
         <param name="~r_min" value="0.8"/>
         <param name="~r_max" value="1.2"/>
 
-    </node>
+    </node> -->
 
     <!-- Rviz for visualization -->
     <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
