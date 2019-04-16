@@ -116,11 +116,14 @@ class evaluatePose : public generatePose
 {
   public:
     float score = 0;
+
     int step;
-    float min_FOV;
-    float max_FOV;
+    float min_range;
+    float max_range;
     float width_FOV;
     float height_FOV;
+    int pix_width;
+    int pix_height;
 
     octomap::OcTree *octree = NULL;
     octomap::OcTree *unknown_octree = NULL;
@@ -128,13 +131,54 @@ class evaluatePose : public generatePose
     octomap::KeySet first_keys;
     octomap::KeySet posterior_keys;
 
-    evaluatePose(int _step, float _min_FOV, float _max_FOV, float _width_FOV, float _height_FOV)
+    pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
+
+    evaluatePose(int _step, float _min_range, float _max_range, float _width_FOV, float _height_FOV)
     {
         step = _step;
-        min_FOV = _min_FOV;
-        max_FOV = _max_FOV;
+        min_range = _min_range;
+        max_range = _max_range;
         width_FOV = _width_FOV;
         height_FOV = _height_FOV;
+
+        ros::NodeHandle n;
+        sensor_msgs::CameraInfoConstPtr CamInfo; //TODO STATIC
+
+        CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n,
+                                                                      ros::Duration(10));
+
+        pix_width = CamInfo->width;
+        pix_height = CamInfo->height;
+
+        float delta_rad_w = width_FOV / pix_width;
+        float delta_rad_h = height_FOV / pix_height;
+
+        float corner_rad_w = width_FOV / 2;
+        float corner_rad_h = height_FOV / 2;
+
+        //TODO in constructor
+        float rad_h = (M_PI - height_FOV) / 2;
+
+        for (int row_pix = 0; row_pix < pix_height; row_pix += step)
+        {
+            float rad_w = (M_PI - width_FOV) / 2;
+
+            for (int col_pix = 0; col_pix < pix_width; col_pix += step)
+            {
+                float x = 1 * sin(rad_h) * cos(rad_w);
+                float z = 1 * sin(rad_h) * sin(rad_w);
+                float y = 1 * cos(rad_h);
+
+                rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
+
+                rad_w += delta_rad_w * step;
+            }
+            rad_h += delta_rad_h * step;
+        }
+
+        // rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
+        // rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
+        // pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
     }
 
     void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
@@ -184,13 +228,6 @@ class evaluatePose : public generatePose
         KeyRay ray_keys;
 
         ros::NodeHandle n;
-        sensor_msgs::CameraInfoConstPtr CamInfo; //TODO STATIC
-
-        int pix_width = 640;
-        int pix_height = 480;
-
-        CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n,
-                                                                      ros::Duration(10));
 
         //TODO wait for message
         ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
@@ -210,46 +247,13 @@ class evaluatePose : public generatePose
         origin.y() = octo_pose.y();
         origin.z() = octo_pose.z();
 
-        pix_width = CamInfo->width;
-        pix_height = CamInfo->height;
-
-        float delta_rad_w = width_FOV / pix_width;
-        float delta_rad_h = height_FOV / pix_height;
-
-        float corner_rad_w = width_FOV / 2;
-        float corner_rad_h = height_FOV / 2;
-
-        pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
-
-        //TODO in constructor
-        float rad_h = (M_PI - height_FOV) / 2;
-
-        for (int row_pix = 0; row_pix < pix_height; row_pix += step)
-        {
-            float rad_w = (M_PI - width_FOV) / 2;
-
-            for (int col_pix = 0; col_pix < pix_width; col_pix += step)
-            {
-                float x = 1 * sin(rad_h) * cos(rad_w);
-                float z = 1 * sin(rad_h) * sin(rad_w);
-                float y = 1 * cos(rad_h);
-
-                rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
-
-                rad_w += delta_rad_w * step;
-            }
-            rad_h += delta_rad_h * step;
-        }
-
-        // rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
-        // rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
         pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
 
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
             //TODO
-            // #pragma omp parallel for
+            #pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
             {
                 pcl::PointXYZ point = rays_point_cloud.at(i);
@@ -261,9 +265,9 @@ class evaluatePose : public generatePose
                 direction = start_point - origin;
 
                 // octree->castRay(start_point, direction, end_point, true, -1.0);
-                octree->castRay(origin, direction, end_point, true, max_FOV); //TODO not fov but range
+                octree->castRay(origin, direction, end_point, true, max_range); 
 
-                start_point = origin + direction.normalized() * min_FOV;
+                start_point = origin + direction.normalized() * min_range;
                 octree->getRayIntersection(origin, direction, end_point, end_point);
 
                 if (origin.distance(start_point) < origin.distance(end_point))
@@ -525,12 +529,12 @@ class evaluatePose : public generatePose
             // for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             for (int n = 0; n < 2; n++)
             {
-                float x1 = min_FOV * sin(rad_h) * cos(rad_w);
-                float z1 = min_FOV * sin(rad_h) * sin(rad_w);
-                float y1 = min_FOV * cos(rad_h);
-                float x2 = max_FOV * sin(rad_h) * cos(rad_w);
-                float z2 = max_FOV * sin(rad_h) * sin(rad_w);
-                float y2 = max_FOV * cos(rad_h);
+                float x1 = min_range * sin(rad_h) * cos(rad_w);
+                float z1 = min_range * sin(rad_h) * sin(rad_w);
+                float y1 = min_range * cos(rad_h);
+                float x2 = max_range * sin(rad_h) * cos(rad_w);
+                float z2 = max_range * sin(rad_h) * sin(rad_w);
+                float y2 = max_range * cos(rad_h);
 
                 frustum_cloud_start.push_back(pcl::PointXYZ(x1, y1, z1));
                 frustum_cloud_end.push_back(pcl::PointXYZ(x2, y2, z2));

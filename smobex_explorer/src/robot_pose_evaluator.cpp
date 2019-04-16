@@ -32,6 +32,13 @@ ros::Publisher pub_text;
 visualization_msgs::Marker line, text, frustum_lines;
 visualization_msgs::MarkerArray single_view_boxes;
 
+int step = 1;
+float min_range = 0;
+float max_range = 1;
+float width_FOV = M_PI;
+float height_FOV = M_PI;
+std::string frame_id = "/world";
+
 void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
     ROS_INFO_STREAM("Evaluating pose...");
@@ -44,16 +51,17 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
     ROS_INFO_STREAM("Pose received...");
 
-    evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+    // evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+    evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
     // pose.view_pose = transform;
     tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
     pose.evalPose();
 
-    line = pose.rayLinesVis("base_link");
-    frustum_lines = pose.frustumLinesVis("base_link");
-    text = pose.textVis("base_link");
-    single_view_boxes = pose.discoveredBoxesVis("base_link");
+    line = pose.rayLinesVis(frame_id);
+    frustum_lines = pose.frustumLinesVis(frame_id);
+    text = pose.textVis(frame_id);
+    single_view_boxes = pose.discoveredBoxesVis(frame_id);
 
     pub_lines.publish(line);
     pub_lines.publish(frustum_lines);
@@ -62,7 +70,7 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
     ros::spinOnce();
 
-    ROS_INFO_STREAM("Evaluating pose...");
+    ROS_INFO_STREAM("Done.");
 }
 
 Marker makeBox(InteractiveMarker &msg)
@@ -94,7 +102,7 @@ InteractiveMarkerControl &makeBoxControl(InteractiveMarker &msg)
 InteractiveMarker makeEmptyMarker(bool dummyBox = true)
 {
     InteractiveMarker int_marker;
-    int_marker.header.frame_id = "base_link";
+    int_marker.header.frame_id = frame_id;
     int_marker.pose.position.y = -3.0 * marker_pos++;
     ;
     int_marker.scale = 0.5;
@@ -133,6 +141,13 @@ int main(int argc, char **argv)
 
     // tf::TransformListener lr(ros::Duration(10));
     // listener = &lr;
+
+    ros::param::get("~step", step);
+    ros::param::get("~min_range", min_range);
+    ros::param::get("~max_range", max_range);
+    ros::param::get("~width_FOV", width_FOV);
+    ros::param::get("~height_FOV", height_FOV);
+    ros::param::get("~frame_id", frame_id);
 
     pub_lines = n.advertise<visualization_msgs::Marker>("/ray_cast_lines", 10);
     pub_space = n.advertise<visualization_msgs::MarkerArray>("/discovered_space", 10);
