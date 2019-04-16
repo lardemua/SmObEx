@@ -29,6 +29,8 @@
 #include <octomap_msgs/conversions.h>
 #include <octomap_ros/conversions.h>
 
+#include <colormap/colormap.h>
+
 // #include "Eigen/Core"
 // #include "Eigen/Geometry"
 
@@ -252,8 +254,8 @@ class evaluatePose : public generatePose
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
-            //TODO
-            #pragma omp parallel for
+//TODO
+#pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
             {
                 pcl::PointXYZ point = rays_point_cloud.at(i);
@@ -265,7 +267,7 @@ class evaluatePose : public generatePose
                 direction = start_point - origin;
 
                 // octree->castRay(start_point, direction, end_point, true, -1.0);
-                octree->castRay(origin, direction, end_point, true, max_range); 
+                octree->castRay(origin, direction, end_point, true, max_range);
 
                 start_point = origin + direction.normalized() * min_range;
                 octree->getRayIntersection(origin, direction, end_point, end_point);
@@ -512,10 +514,14 @@ class evaluatePose : public generatePose
         line_vis.type = visualization_msgs::Marker::LINE_LIST;
         line_vis.scale.x = 0.01;
 
-        line_vis.color.r = 0.2;
-        line_vis.color.g = 0.2;
-        line_vis.color.b = 0.2;
-        line_vis.color.a = 1.0;
+        // line_vis.color.r = 0.2;
+        // line_vis.color.g = 0.2;
+        // line_vis.color.b = 0.2;
+        // line_vis.color.a = 1.0;
+
+        class_colormap frustum_color("jet", 0.02, 1, true);
+
+        line_vis.color = frustum_color.color(score);
 
         pcl::PointCloud<pcl::PointXYZ> frustum_cloud_start, frustum_cloud_end;
 

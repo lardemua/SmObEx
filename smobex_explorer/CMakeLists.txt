@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   octomap REQUIRED
   pcl_ros
   rviz
+  colormap
 )
 
 find_package(PCL REQUIRED)
@@ -127,6 +128,7 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${OCTOMAP_INCLUDE_DIRS}
+  ${colormap_INCLUDE_DIRS}
   include
 )
 

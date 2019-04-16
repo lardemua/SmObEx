@@ -77,13 +77,14 @@ Marker makeBox(InteractiveMarker &msg)
 {
     Marker marker;
 
-    marker.type = Marker::CUBE;
+    // marker.type = Marker::CUBE;
+    marker.type = Marker::SPHERE;
     marker.scale.x = msg.scale * 0.45;
     marker.scale.y = msg.scale * 0.45;
     marker.scale.z = msg.scale * 0.45;
-    marker.color.r = 0.8;
-    marker.color.g = 0.8;
-    marker.color.b = 0.8;
+    marker.color.r = 0.55;
+    marker.color.g = 0.05;
+    marker.color.b = 0.47;
     marker.color.a = 1.0;
 
     return marker;
