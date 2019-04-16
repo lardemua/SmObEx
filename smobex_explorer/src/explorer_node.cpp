@@ -87,13 +87,13 @@ int main(int argc, char **argv)
             text_pose.markers.push_back(poses[k].textVis(fixed_frame));
 
             visualization_msgs::Marker line;
-            // line = poses[k].rayLinesVis(fixed_frame, k);
-            line = poses[k].frustumLinesVis(fixed_frame, k);
+            line = poses[k].rayLinesVis(fixed_frame);
+            // line = poses[k].frustumLinesVis(fixed_frame, k);
 
             line_vis.markers.push_back(line);
 
             visualization_msgs::MarkerArray single_view_boxes;
-            single_view_boxes = poses[k].discoveredBoxesVis(fixed_frame, k);
+            single_view_boxes = poses[k].discoveredBoxesVis(fixed_frame);
 
             for (size_t i = 0; i < single_view_boxes.markers.size(); i++)
             {

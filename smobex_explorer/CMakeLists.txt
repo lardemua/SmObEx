@@ -150,6 +150,8 @@ add_executable(point_cloud_volume_def src/point_cloud_volume_def.cpp)
 
 add_executable(interactive_marker src/interactive_marker.cpp)
 
+add_executable(robot_pose_evaluator src/robot_pose_evaluator.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -176,6 +178,12 @@ target_link_libraries(point_cloud_volume_def
 )
 
 target_link_libraries(interactive_marker
+    ${catkin_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
+)
+
+target_link_libraries(robot_pose_evaluator
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}

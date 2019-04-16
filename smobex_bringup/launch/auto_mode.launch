@@ -6,9 +6,14 @@
     <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
 
     <!-- Initializing robot and camera calibrated -->
-    <include file="$(find smobex_calibration)/launch/calibrated.launch">
+    <!-- <include file="$(find smobex_calibration)/launch/calibrated.launch">
         <arg name="robot_ip" value="$(arg robot_ip)" />
         <arg name="online" value="$(arg online)"/>
+    </include> -->
+
+    <include file="$(find smobex_bringup)/launch/test.launch">
+        <arg if="$(arg online)" name="sim" value="false"/>
+        <arg name="robot_ip" value="$(arg robot_ip)"/>
     </include>
 
     <!-- Init point cloud spacial filter, operation mode -->

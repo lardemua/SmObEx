@@ -121,6 +121,7 @@ class evaluatePose : public generatePose
     float max_FOV;
     float width_FOV;
     float height_FOV;
+
     octomap::OcTree *octree = NULL;
     octomap::OcTree *unknown_octree = NULL;
     octomap::point3d_list ray_points_list;
@@ -183,7 +184,7 @@ class evaluatePose : public generatePose
         KeyRay ray_keys;
 
         ros::NodeHandle n;
-        sensor_msgs::CameraInfoConstPtr CamInfo;
+        sensor_msgs::CameraInfoConstPtr CamInfo; //TODO STATIC
 
         int pix_width = 640;
         int pix_height = 480;
@@ -191,6 +192,7 @@ class evaluatePose : public generatePose
         CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/depth_registered/camera_info", n,
                                                                       ros::Duration(10));
 
+        //TODO wait for message
         ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
         ros::Subscriber unknownFullMap_sub =
             n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
@@ -219,6 +221,7 @@ class evaluatePose : public generatePose
 
         pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
 
+        //TODO in constructor
         float rad_h = (M_PI - height_FOV) / 2;
 
         for (int row_pix = 0; row_pix < pix_height; row_pix += step)
@@ -227,9 +230,9 @@ class evaluatePose : public generatePose
 
             for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             {
-                float x = 1 * sin(rad_w) * cos(rad_h);
-                float z = 1 * sin(rad_w) * sin(rad_h);
-                float y = 1 * cos(rad_w);
+                float x = 1 * sin(rad_h) * cos(rad_w);
+                float z = 1 * sin(rad_h) * sin(rad_w);
+                float y = 1 * cos(rad_h);
 
                 rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
 
@@ -245,6 +248,8 @@ class evaluatePose : public generatePose
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
+            //TODO
+            // #pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
             {
                 pcl::PointXYZ point = rays_point_cloud.at(i);
@@ -256,7 +261,7 @@ class evaluatePose : public generatePose
                 direction = start_point - origin;
 
                 // octree->castRay(start_point, direction, end_point, true, -1.0);
-                octree->castRay(origin, direction, end_point, true, max_FOV);
+                octree->castRay(origin, direction, end_point, true, max_FOV); //TODO not fov but range
 
                 start_point = origin + direction.normalized() * min_FOV;
                 octree->getRayIntersection(origin, direction, end_point, end_point);
@@ -349,7 +354,7 @@ class evaluatePose : public generatePose
         return discovered_centers;
     }
 
-    visualization_msgs::MarkerArray discoveredBoxesVis(std::string frame_id, int pose_number)
+    visualization_msgs::MarkerArray discoveredBoxesVis(std::string frame_id)
     {
         using namespace std;
         using namespace octomap;
@@ -424,7 +429,7 @@ class evaluatePose : public generatePose
 
             all_boxes.markers[i].header.frame_id = frame_id;
             all_boxes.markers[i].header.stamp = t;
-            all_boxes.markers[i].ns = "Pose " + to_string(pose_number);
+            all_boxes.markers[i].ns = "Pose";
             all_boxes.markers[i].id = i;
             all_boxes.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
             all_boxes.markers[i].scale.x = size;
@@ -445,7 +450,7 @@ class evaluatePose : public generatePose
         return all_boxes;
     }
 
-    visualization_msgs::Marker rayLinesVis(std::string frame_id, int pose_number)
+    visualization_msgs::Marker rayLinesVis(std::string frame_id)
     {
         using namespace std;
 
@@ -458,7 +463,7 @@ class evaluatePose : public generatePose
 
         line_vis.header.frame_id = frame_id;
         line_vis.header.stamp = ros::Time::now();
-        line_vis.ns = "Pose " + to_string(pose_number);
+        line_vis.ns = "Pose rays";
         line_vis.action = visualization_msgs::Marker::ADD;
         line_vis.pose.orientation.w = 1.0;
         line_vis.id = 0;
@@ -483,7 +488,7 @@ class evaluatePose : public generatePose
         return line_vis;
     }
 
-    visualization_msgs::Marker frustumLinesVis(std::string frame_id, int pose_number)
+    visualization_msgs::Marker frustumLinesVis(std::string frame_id)
     {
         using namespace std;
 
@@ -496,16 +501,16 @@ class evaluatePose : public generatePose
 
         line_vis.header.frame_id = frame_id;
         line_vis.header.stamp = ros::Time::now();
-        line_vis.ns = "Frustum " + to_string(pose_number);
+        line_vis.ns = "Frustum";
         line_vis.action = visualization_msgs::Marker::ADD;
         line_vis.pose.orientation.w = 1.0;
         line_vis.id = 0;
         line_vis.type = visualization_msgs::Marker::LINE_LIST;
         line_vis.scale.x = 0.01;
 
-        line_vis.color.r = 0.5;
-        line_vis.color.g = 0.5;
-        line_vis.color.b = 0.5;
+        line_vis.color.r = 0.2;
+        line_vis.color.g = 0.2;
+        line_vis.color.b = 0.2;
         line_vis.color.a = 1.0;
 
         pcl::PointCloud<pcl::PointXYZ> frustum_cloud_start, frustum_cloud_end;
@@ -520,13 +525,12 @@ class evaluatePose : public generatePose
             // for (int col_pix = 0; col_pix < pix_width; col_pix += step)
             for (int n = 0; n < 2; n++)
             {
-                float x1 = min_FOV * sin(rad_w) * cos(rad_h);
-                float z1 = min_FOV * sin(rad_w) * sin(rad_h);
-                float y1 = min_FOV * cos(rad_w);
-
-                float x2 = max_FOV * sin(rad_w) * cos(rad_h);
-                float z2 = max_FOV * sin(rad_w) * sin(rad_h);
-                float y2 = max_FOV * cos(rad_w);
+                float x1 = min_FOV * sin(rad_h) * cos(rad_w);
+                float z1 = min_FOV * sin(rad_h) * sin(rad_w);
+                float y1 = min_FOV * cos(rad_h);
+                float x2 = max_FOV * sin(rad_h) * cos(rad_w);
+                float z2 = max_FOV * sin(rad_h) * sin(rad_w);
+                float y2 = max_FOV * cos(rad_h);
 
                 frustum_cloud_start.push_back(pcl::PointXYZ(x1, y1, z1));
                 frustum_cloud_end.push_back(pcl::PointXYZ(x2, y2, z2));

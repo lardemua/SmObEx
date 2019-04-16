@@ -63,9 +63,9 @@ void genAndEvalPose(geometry_msgs::Pose marker_pose)
 
     pose.evalPose();
 
-    line = pose.rayLinesVis("base_link", 0);
+    line = pose.rayLinesVis("base_link");
     text = pose.textVis("base_link");
-    single_view_boxes = pose.discoveredBoxesVis("base_link", 0);
+    single_view_boxes = pose.discoveredBoxesVis("base_link");
 
     publish = true;
 }
