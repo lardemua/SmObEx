@@ -32,25 +32,9 @@ ros::Publisher pub_text;
 visualization_msgs::Marker line, text, frustum_lines;
 visualization_msgs::MarkerArray single_view_boxes;
 
-// tf::TransformListener *listener;
-
 void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
     ROS_INFO_STREAM("Evaluating pose...");
-
-    // tf::StampedTransform transform;
-
-    // try
-    // {
-    //     listener->lookupTransform("/base_link", "/camera_depth_optical_frame",
-    //                               ros::Time(0), transform);
-    // }
-    // catch (tf::TransformException ex)
-    // {
-    //     ROS_ERROR("%s", ex.what());
-    //     // ros::Duration(1.0).sleep();
-    //     return;
-    // }
 
     ros::NodeHandle n;
 
@@ -89,9 +73,9 @@ Marker makeBox(InteractiveMarker &msg)
     marker.scale.x = msg.scale * 0.45;
     marker.scale.y = msg.scale * 0.45;
     marker.scale.z = msg.scale * 0.45;
-    marker.color.r = 0.5;
-    marker.color.g = 0.5;
-    marker.color.b = 0.5;
+    marker.color.r = 0.8;
+    marker.color.g = 0.8;
+    marker.color.b = 0.8;
     marker.color.a = 1.0;
 
     return marker;
@@ -113,7 +97,7 @@ InteractiveMarker makeEmptyMarker(bool dummyBox = true)
     int_marker.header.frame_id = "base_link";
     int_marker.pose.position.y = -3.0 * marker_pos++;
     ;
-    int_marker.scale = 1;
+    int_marker.scale = 0.5;
 
     return int_marker;
 }
@@ -122,6 +106,8 @@ void makeMenuMarker(std::string name)
 {
     InteractiveMarker int_marker = makeEmptyMarker();
     int_marker.name = name;
+
+    int_marker.pose.position.z = -0.5;
 
     InteractiveMarkerControl control;
 

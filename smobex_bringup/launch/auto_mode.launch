@@ -10,8 +10,7 @@
         <arg name="robot_ip" value="$(arg robot_ip)" />
         <arg name="online" value="$(arg online)"/>
     </include> -->
-
-    <include file="$(find smobex_bringup)/launch/test.launch">
+    <include file="$(find smobex_bringup)/launch/moveit_robot.launch">
         <arg if="$(arg online)" name="sim" value="false"/>
         <arg name="robot_ip" value="$(arg robot_ip)"/>
     </include>
@@ -51,6 +50,8 @@
 
     </node>
 
+    <!-- Pose Evaluator -->
+    <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" />
 
     <!-- Pose Generator -->
     <!-- <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
@@ -61,6 +62,7 @@
         <param name="~r_max" value="1.2"/>
 
     </node> -->
+    
 
     <!-- Rviz for visualization -->
     <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
