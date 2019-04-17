@@ -319,28 +319,64 @@ class evaluatePose : public generatePose
 
     void getScore()
     {
-        // if (first_keys.size() == 0 && posterior_keys.size() == 0)
-        // {
-        //     this->evalPose();
-        // }
-
+        using namespace octomap;
         float resolution = octree->getResolution();
         float one_volume = resolution * resolution * resolution;
 
-        float found_volume = (first_keys.size() + posterior_keys.size() * 0.1) * one_volume;
-        float total_volume = 0;
+        float alpha = 0.5;
 
+        float found_volume = (first_keys.size() + posterior_keys.size() * alpha) * one_volume;
+        float total_volume = 0;
+        float outside_volume=0, inside_volume=0;
+
+//TODO
+#pragma omp parallel for
         for (octomap::OcTree::iterator it = unknown_octree->begin(); it != unknown_octree->end(); it++)
         {
             octomap::OcTreeKey key = it.getKey();
             if (unknown_octree->search(key))
             {
+//first formula
+#if 0
                 float size = it.getSize();
                 float volume = size * size * size;
 
                 total_volume += volume;
+
+//second formula
+#else
+                float size = it.getSize();
+                float volume = size * size * size;
+
+                float delta = resolution * 2;
+
+                point3d coord = unknown_octree->keyToCoord(key);
+                point3d x_incrm(delta, 0, 0);          
+                point3d y_incrm(0, delta, 0);              
+                point3d z_incrm(0, 0, delta);
+               
+
+                OcTreeNode *x_pos, *x_neg, *y_pos, *y_neg, *z_pos, *z_neg;
+                x_pos = unknown_octree->search(coord + x_incrm);
+                x_neg = unknown_octree->search(coord - x_incrm);
+                y_pos = unknown_octree->search(coord + y_incrm);
+                y_neg = unknown_octree->search(coord - y_incrm);
+                z_pos = unknown_octree->search(coord + z_incrm);
+                z_neg = unknown_octree->search(coord - z_incrm);
+
+                if (x_pos && x_neg && y_pos && y_neg && z_pos && z_neg) {
+                    inside_volume+=volume;
+                }
+                else
+                {
+                    outside_volume+=volume;
+                }                
+
+#endif
             }
         }
+
+        total_volume = outside_volume + inside_volume * alpha;
 
         score = found_volume / total_volume;
         // ROS_INFO("Pose score: %d", score);
@@ -519,9 +555,9 @@ class evaluatePose : public generatePose
         // line_vis.color.b = 0.2;
         // line_vis.color.a = 1.0;
 
-        class_colormap frustum_color("jet", 0.02, 1, true);
+        class_colormap frustum_color("winter", 64, 1, true);
 
-        line_vis.color = frustum_color.color(score);
+        line_vis.color = frustum_color.color(score * 64);
 
         pcl::PointCloud<pcl::PointXYZ> frustum_cloud_start, frustum_cloud_end;
 

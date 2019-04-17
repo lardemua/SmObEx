@@ -56,7 +56,11 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
     // pose.view_pose = transform;
     tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
+    ros::Time t= ros::Time::now();
+
     pose.evalPose();
+
+    ros::Duration d = (ros::Time::now() - t);
 
     line = pose.rayLinesVis(frame_id);
     frustum_lines = pose.frustumLinesVis(frame_id);
@@ -70,7 +74,12 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
     ros::spinOnce();
 
-    ROS_INFO_STREAM("Done.");
+    ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
+}
+
+void autoModeCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
+{
+    ROS_INFO_STREAM("Auto mode not yet implemented.");
 }
 
 Marker makeBox(InteractiveMarker &msg)
@@ -132,6 +141,8 @@ void makeMenuMarker(std::string name)
 void initMenu()
 {
     h_first_entry = menu_handler.insert("Evaluate Pose", &clickCB);
+    h_first_entry = menu_handler.insert("Auto Mode", &autoModeCB);
+
 }
 
 int main(int argc, char **argv)
@@ -143,12 +154,12 @@ int main(int argc, char **argv)
     // tf::TransformListener lr(ros::Duration(10));
     // listener = &lr;
 
-    ros::param::get("~step", step);
-    ros::param::get("~min_range", min_range);
-    ros::param::get("~max_range", max_range);
-    ros::param::get("~width_FOV", width_FOV);
-    ros::param::get("~height_FOV", height_FOV);
-    ros::param::get("~frame_id", frame_id);
+    ros::param::get("~" + ros::names::remap("step"), step);
+    ros::param::get("~" + ros::names::remap("min_range"), min_range);
+    ros::param::get("~" + ros::names::remap("max_range"), max_range);
+    ros::param::get("~" + ros::names::remap("width_FOV"), width_FOV);
+    ros::param::get("~" + ros::names::remap("height_FOV"), height_FOV);
+    ros::param::get("~" + ros::names::remap("frame_id"), frame_id);
 
     pub_lines = n.advertise<visualization_msgs::Marker>("/ray_cast_lines", 10);
     pub_space = n.advertise<visualization_msgs::MarkerArray>("/discovered_space", 10);
