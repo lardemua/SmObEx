@@ -357,6 +357,10 @@ rosrun smobex_bringup store_volume.py
 
 ![define space](./files/define_volume.png)
 
+### Manual Pose Evaluation
+
+**_Video_**: [SmObEx - Manual mode exploration of a volume](https://youtu.be/ltMPFWkhAAE)
+
 ### Autonomous
 
 1. run 

@@ -609,6 +609,30 @@ class evaluatePose : public generatePose
             line_vis.points.push_back(p2);
         }
 
+        line_vis.points.push_back(line_vis.points[0]);
+        line_vis.points.push_back(line_vis.points[2]);
+
+        line_vis.points.push_back(line_vis.points[2]);
+        line_vis.points.push_back(line_vis.points[6]);
+
+        line_vis.points.push_back(line_vis.points[4]);
+        line_vis.points.push_back(line_vis.points[6]);
+
+        line_vis.points.push_back(line_vis.points[0]);
+        line_vis.points.push_back(line_vis.points[4]);
+
+        line_vis.points.push_back(line_vis.points[1]);
+        line_vis.points.push_back(line_vis.points[3]);
+
+        line_vis.points.push_back(line_vis.points[3]);
+        line_vis.points.push_back(line_vis.points[7]);
+
+        line_vis.points.push_back(line_vis.points[5]);
+        line_vis.points.push_back(line_vis.points[7]);
+
+        line_vis.points.push_back(line_vis.points[1]);
+        line_vis.points.push_back(line_vis.points[5]);        
+
         return line_vis;
     }
 
