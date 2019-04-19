@@ -15,6 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   rviz
   colormap
+  moveit_core
+  moveit_visual_tools
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_ros_perception
 )
 
 find_package(PCL REQUIRED)
