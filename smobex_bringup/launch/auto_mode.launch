@@ -5,6 +5,8 @@
     <arg name="online" doc="If robot is online or not"/>
     <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
 
+    <arg name="scale" default="3" />
+
     <!-- Initializing robot and camera calibrated -->
     <!-- <include file="$(find smobex_calibration)/launch/calibrated.launch">
         <arg name="robot_ip" value="$(arg robot_ip)" />
@@ -16,7 +18,22 @@
     </include>
 
     <!-- Init point cloud spacial filter, operation mode -->
-    <include file="$(find smobex_bringup)/launch/pcl_filter.launch" />
+    <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+
+        <param name="point_cloud_in" value="/camera/depth_registered/points"/>
+        <param name="fixed_frame_id" value="/base_link"/>
+        <param name="wireframe" value="true"/>
+        <param name="scale" value="$(arg scale)"/>
+
+
+        <param name="configure" value="false"/>
+        <param name="voxelize" value="false"/>
+
+        <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" />
+
+        <param name="params_path" value="$(find smobex_bringup)"/>
+
+    </node>
 
     <!-- OctoMap Server -->
     <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
@@ -31,7 +48,7 @@
 
     </node>
 
-    <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" ns="calibration"/>
+    <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load"/>
 
     <!-- Unknown space show -->
     <node pkg="world_model_consistency_check" type="octomap_bounding_box" name="octomap_bounding_box" output="screen">
@@ -40,25 +57,25 @@
         <param name="~fixed_frame" value="/base_link"/>
         <param name="~rate" value="25"/>
 
-        <remap from="~min_x" to="calibration/x_min"/>
-        <remap from="~min_y" to="calibration/y_min"/>
-        <remap from="~min_z" to="calibration/z_min"/>
+        <remap from="~min_x" to="x_min"/>
+        <remap from="~min_y" to="y_min"/>
+        <remap from="~min_z" to="z_min"/>
 
-        <remap from="~max_x" to="calibration/x_max"/>
-        <remap from="~max_y" to="calibration/y_max"/>
-        <remap from="~max_z" to="calibration/z_max"/>
+        <remap from="~max_x" to="x_max"/>
+        <remap from="~max_y" to="y_max"/>
+        <remap from="~max_z" to="z_max"/>
 
     </node>
 
     <!-- Pose Evaluator -->
-    <!-- <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" output="screen" >
+    <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" output="screen">
         <param name="~step" value="10"/>
         <param name="~min_range" value="0.8"/>
         <param name="~max_range" value="10"/>
         <param name="~width_FOV" value="1.01229"/>
         <param name="~height_FOV" value="0.785398"/>
         <param name="~frame_id" value="/base_link"/>
-    </node> -->
+    </node>
 
     <!-- Pose Generator -->
     <!-- <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
@@ -69,7 +86,7 @@
         <param name="~r_max" value="1.2"/>
 
     </node> -->
-    
+
 
     <!-- Rviz for visualization -->
     <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>

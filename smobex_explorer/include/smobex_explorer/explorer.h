@@ -158,7 +158,7 @@ class evaluatePose : public generatePose
         float corner_rad_w = width_FOV / 2;
         float corner_rad_h = height_FOV / 2;
 
-        //TODO in constructor
+        //generate the points of the camera rays
         float rad_h = (M_PI - height_FOV) / 2;
 
         for (int row_pix = 0; row_pix < pix_height; row_pix += step)
@@ -323,12 +323,26 @@ class evaluatePose : public generatePose
         float resolution = octree->getResolution();
         float one_volume = resolution * resolution * resolution;
 
+        point3d min, max;
+
+        ros::param::get("x_max", max.x());
+        ros::param::get("y_max", max.y());
+        ros::param::get("z_max", max.z());
+
+        ros::param::get("x_min", min.x());
+        ros::param::get("y_min", min.y());
+        ros::param::get("z_min", min.z());
+
+        // ROS_INFO("max: %f %f %f", max.x(), max.y(), max.z());
+        // ROS_INFO("min: %f %f %f", min.x(), min.y(), min.z());
+
         float alpha = 0.5;
 
         float found_volume = (first_keys.size() + posterior_keys.size() * alpha) * one_volume;
-        float total_volume = 0;
-        float outside_volume=0, inside_volume=0;
+        // float total_volume = 0;
+        // float outside_volume = 0, inside_volume = 0;
 
+/*
 //TODO
 #pragma omp parallel for
         for (octomap::OcTree::iterator it = unknown_octree->begin(); it != unknown_octree->end(); it++)
@@ -344,17 +358,16 @@ class evaluatePose : public generatePose
                 total_volume += volume;
 
 //second formula
-#else
+#elif 0
                 float size = it.getSize();
                 float volume = size * size * size;
 
                 float delta = resolution * 2;
 
                 point3d coord = unknown_octree->keyToCoord(key);
-                point3d x_incrm(delta, 0, 0);          
-                point3d y_incrm(0, delta, 0);              
+                point3d x_incrm(delta, 0, 0);
+                point3d y_incrm(0, delta, 0);
                 point3d z_incrm(0, 0, delta);
-               
 
                 OcTreeNode *x_pos, *x_neg, *y_pos, *y_neg, *z_pos, *z_neg;
                 x_pos = unknown_octree->search(coord + x_incrm);
@@ -364,22 +377,32 @@ class evaluatePose : public generatePose
                 z_pos = unknown_octree->search(coord + z_incrm);
                 z_neg = unknown_octree->search(coord - z_incrm);
 
-                if (x_pos && x_neg && y_pos && y_neg && z_pos && z_neg) {
-                    inside_volume+=volume;
+                if (x_pos && x_neg && y_pos && y_neg && z_pos && z_neg)
+                {
+                    inside_volume += volume;
                 }
                 else
                 {
-                    outside_volume+=volume;
-                }                
-
+                    outside_volume += volume;
+                }
 #endif
             }
         }
+        
+        // total_volume = outside_volume + inside_volume * alpha;
+*/
+        //third formula
 
-        total_volume = outside_volume + inside_volume * alpha;
+        point3d deltas = max - min;
 
-        score = found_volume / total_volume;
-        // ROS_INFO("Pose score: %d", score);
+        float total_volume = deltas.x() * deltas.y() * deltas.z();
+        float inner_volume = (deltas.x() - resolution * 2) * (deltas.y() - resolution * 2) * (deltas.z() - resolution * 2);
+        float outter_volume = total_volume - inner_volume;
+
+        float score_volume = outter_volume + inner_volume * alpha;
+
+
+        score = found_volume / score_volume;
     }
 
     octomap::point3d_collection getDiscoveredCenters()
@@ -631,7 +654,7 @@ class evaluatePose : public generatePose
         line_vis.points.push_back(line_vis.points[7]);
 
         line_vis.points.push_back(line_vis.points[1]);
-        line_vis.points.push_back(line_vis.points[5]);        
+        line_vis.points.push_back(line_vis.points[5]);
 
         return line_vis;
     }
