@@ -115,6 +115,10 @@ Porto, Portugal
 - [x] Implemented MoveIt! controls to test pose moving the robot 
 - [x] Frustum color changes accordingly to pose score
 - [x] Update the score formula
+
+## Week 15
+
+- [ ] Use MoveIt! to generate reachable poses
 - [ ] Find the center of the unknown clusters
 
 # Built with
