@@ -56,7 +56,7 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
     // pose.view_pose = transform;
     tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
-    ros::Time t= ros::Time::now();
+    ros::Time t = ros::Time::now();
 
     pose.evalPose();
 
@@ -142,7 +142,6 @@ void initMenu()
 {
     h_first_entry = menu_handler.insert("Evaluate Pose", &clickCB);
     h_first_entry = menu_handler.insert("Auto Mode", &autoModeCB);
-
 }
 
 int main(int argc, char **argv)

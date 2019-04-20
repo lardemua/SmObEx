@@ -109,14 +109,14 @@ Porto, Portugal
      - [x] Evaluate all rays
      - [x] Store the score
 
-## Week 14
+## Week 16
 
 - [x] Use interactive markers to evaluate a pose
 - [x] Implemented MoveIt! controls to test pose moving the robot 
 - [x] Frustum color changes accordingly to pose score
 - [x] Update the score formula
 
-## Week 15
+## Week 17
 
 - [ ] Use MoveIt! to generate reachable poses
 - [ ] Find the center of the unknown clusters

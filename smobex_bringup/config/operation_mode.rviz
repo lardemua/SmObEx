@@ -6,9 +6,8 @@ Panels:
       Expanded:
         - /SearchSpace1/Namespaces1
         - /DiscoveredSpace1/Namespaces1
-        - /Rays1
-        - /Rays1/Namespaces1
-        - /Menu1
+        - /DepthRays1
+        - /DepthRays1/Namespaces1
       Splitter Ratio: 0.537401556968689
     Tree Height: 156
   - Class: rviz/Selection
@@ -172,8 +171,6 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
-        free_boxes: true
-        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -206,7 +203,7 @@ Visualization Manager:
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        {}
+        Pose: true
       Queue Size: 10
       Value: true
     - Class: rviz/Marker
@@ -214,15 +211,16 @@ Visualization Manager:
       Marker Topic: /pose_text
       Name: PoseDescription
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /ray_cast_lines
-      Name: Rays
+      Name: DepthRays
       Namespaces:
-        {}
+        Frustum: true
+        Pose rays: false
       Queue Size: 100
       Value: true
     - Acceleration_Scaling_Factor: 1
@@ -482,25 +480,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.898402452468872
+      Distance: 5.62870454788208
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.618318498134613
-        Y: 0.3846267759799957
-        Z: 0.295869380235672
+        X: 1.3435150384902954
+        Y: 1.2636384963989258
+        Z: -0.10203305631875992
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.015201113186776638
+      Pitch: 0.7652021646499634
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.2512441575527191
+      Yaw: 2.3344216346740723
     Saved: ~
 Window Geometry:
   Displays:

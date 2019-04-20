@@ -183,42 +183,82 @@ class evaluatePose : public generatePose
         // pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
     }
 
-    void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    // void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    // {
+    //     using namespace octomap;
+
+    //     // ROS_INFO("I'm inside the callback");
+
+    //     AbstractOcTree *tree = NULL;
+
+    //     if (octree != NULL)
+    //     {
+    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
+    //         delete (octree);
+    //         // ROS_INFO("DEBUG: Octree DEL");
+    //     }
+
+    //     tree = msgToMap(*map);
+    //     octree = dynamic_cast<OcTree *>(tree);
+    // }
+
+    // void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    // {
+    //     using namespace octomap;
+
+    //     // ROS_INFO("I'm inside the callback");
+
+    //     AbstractOcTree *tree = NULL;
+
+    //     if (unknown_octree != NULL)
+    //     {
+    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
+    //         delete (unknown_octree);
+    //         // ROS_INFO("DEBUG: Octree DEL");
+    //     }
+
+    //     tree = msgToMap(*map);
+    //     unknown_octree = dynamic_cast<OcTree *>(tree);
+    // }
+
+    void writeKnownOctomap()
     {
         using namespace octomap;
 
-        // ROS_INFO("I'm inside the callback");
+        ros::NodeHandle n;
 
         AbstractOcTree *tree = NULL;
 
         if (octree != NULL)
         {
-            // ROS_INFO("DEBUG: Going to DEL OCTREE");
             delete (octree);
-            // ROS_INFO("DEBUG: Octree DEL");
         }
 
+        octomap_msgs::OctomapConstPtr map = ros::topic::waitForMessage<octomap_msgs::Octomap>("/octomap_full", n);
         tree = msgToMap(*map);
         octree = dynamic_cast<OcTree *>(tree);
+
+        // ROS_INFO("Known map written");
     }
 
-    void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    void writeUnknownOctomap()
     {
         using namespace octomap;
 
-        // ROS_INFO("I'm inside the callback");
+        ros::NodeHandle n;
 
         AbstractOcTree *tree = NULL;
 
         if (unknown_octree != NULL)
         {
-            // ROS_INFO("DEBUG: Going to DEL OCTREE");
             delete (unknown_octree);
-            // ROS_INFO("DEBUG: Octree DEL");
         }
 
+        octomap_msgs::OctomapConstPtr map = ros::topic::waitForMessage<octomap_msgs::Octomap>("/unknown_full_map", n);
         tree = msgToMap(*map);
         unknown_octree = dynamic_cast<OcTree *>(tree);
+
+        // ROS_INFO("Unknown map written");
     }
 
     void evalPose()
@@ -232,16 +272,19 @@ class evaluatePose : public generatePose
         ros::NodeHandle n;
 
         //TODO wait for message
-        ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
-        ros::Subscriber unknownFullMap_sub =
-            n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
+        // ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
+        // ros::Subscriber unknownFullMap_sub =
+        //     n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
 
-        while (octree == NULL || unknown_octree == NULL)
-        {
-            ros::spinOnce();
+        // while (octree == NULL || unknown_octree == NULL)
+        // {
+        //     ros::spinOnce();
 
-            ros::Duration(0.01).sleep();
-        }
+        //     ros::Duration(0.01).sleep();
+        // }
+
+        writeKnownOctomap();
+        writeUnknownOctomap();
 
         Pose6D octo_pose = poseTfToOctomap(view_pose);
 
@@ -336,13 +379,13 @@ class evaluatePose : public generatePose
         // ROS_INFO("max: %f %f %f", max.x(), max.y(), max.z());
         // ROS_INFO("min: %f %f %f", min.x(), min.y(), min.z());
 
-        float alpha = 0.5;
+        float weight = 0.5;
 
-        float found_volume = (first_keys.size() + posterior_keys.size() * alpha) * one_volume;
+        float found_volume = (first_keys.size() + posterior_keys.size() * weight) * one_volume;
         // float total_volume = 0;
         // float outside_volume = 0, inside_volume = 0;
 
-/*
+        /*
 //TODO
 #pragma omp parallel for
         for (octomap::OcTree::iterator it = unknown_octree->begin(); it != unknown_octree->end(); it++)
@@ -389,7 +432,7 @@ class evaluatePose : public generatePose
             }
         }
         
-        // total_volume = outside_volume + inside_volume * alpha;
+        // total_volume = outside_volume + inside_volume * weight;
 */
         //third formula
 
@@ -397,10 +440,9 @@ class evaluatePose : public generatePose
 
         float total_volume = deltas.x() * deltas.y() * deltas.z();
         float inner_volume = (deltas.x() - resolution * 2) * (deltas.y() - resolution * 2) * (deltas.z() - resolution * 2);
-        float outter_volume = total_volume - inner_volume;
+        float outer_volume = total_volume - inner_volume;
 
-        float score_volume = outter_volume + inner_volume * alpha;
-
+        float score_volume = outer_volume + inner_volume * weight;
 
         score = found_volume / score_volume;
     }

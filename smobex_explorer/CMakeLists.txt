@@ -153,8 +153,6 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
 add_executable(explorer_node src/explorer_node.cpp)
 
-add_executable(point_cloud_volume_def src/point_cloud_volume_def.cpp)
-
 add_executable(interactive_marker src/interactive_marker.cpp)
 
 add_executable(robot_pose_evaluator src/robot_pose_evaluator.cpp)
@@ -177,11 +175,6 @@ target_link_libraries(explorer_node
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
-)
-
-target_link_libraries(point_cloud_volume_def 
-    ${catkin_LIBRARIES}
-    ${PCL_LIBRARIES}
 )
 
 target_link_libraries(interactive_marker
