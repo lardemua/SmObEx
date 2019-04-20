@@ -27,6 +27,13 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+  message(STATUS "OPENMP FOUND")
+  set(OpenMP_FLAGS ${OpenMP_CXX_FLAGS})  # or if you use C: ${OpenMP_C_FLAGS}
+  set(OpenMP_LIBS gomp)
+endif()
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -152,10 +159,16 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_explorer_node.cpp)
 add_executable(explorer_node src/explorer_node.cpp)
+target_compile_options(explorer_node PRIVATE ${OpenMP_FLAGS})
+add_dependencies(explorer_node ${catkin_EXPORTED_TARGETS})
 
 add_executable(interactive_marker src/interactive_marker.cpp)
+target_compile_options(interactive_marker PRIVATE ${OpenMP_FLAGS})
+add_dependencies(interactive_marker ${catkin_EXPORTED_TARGETS})
 
 add_executable(robot_pose_evaluator src/robot_pose_evaluator.cpp)
+target_compile_options(robot_pose_evaluator PRIVATE ${OpenMP_FLAGS})
+add_dependencies(robot_pose_evaluator ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,18 +188,21 @@ target_link_libraries(explorer_node
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
+    ${OpenMP_LIBS}
 )
 
 target_link_libraries(interactive_marker
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
+    ${OpenMP_LIBS}
 )
 
 target_link_libraries(robot_pose_evaluator
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
+    ${OpenMP_LIBS}
 )
 
 

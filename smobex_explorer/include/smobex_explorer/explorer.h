@@ -238,7 +238,7 @@ class evaluatePose : public generatePose
         tree = msgToMap(*map);
         octree = dynamic_cast<OcTree *>(tree);
 
-        // ROS_INFO("Known map written");
+        ROS_INFO("Known map written");
     }
 
     void writeUnknownOctomap()
@@ -258,7 +258,7 @@ class evaluatePose : public generatePose
         tree = msgToMap(*map);
         unknown_octree = dynamic_cast<OcTree *>(tree);
 
-        // ROS_INFO("Unknown map written");
+        ROS_INFO("Unknown map written");
     }
 
     void evalPose()
@@ -266,8 +266,7 @@ class evaluatePose : public generatePose
         using namespace octomap;
         using namespace octomath;
 
-        Vector3 origin, start_point, direction, end_point;
-        KeyRay ray_keys;
+        Vector3 origin;
 
         ros::NodeHandle n;
 
@@ -283,8 +282,13 @@ class evaluatePose : public generatePose
         //     ros::Duration(0.01).sleep();
         // }
 
+        ros::Time t = ros::Time::now();
+
         writeKnownOctomap();
         writeUnknownOctomap();
+
+        ros::Duration d = (ros::Time::now() - t);
+        ROS_WARN_STREAM("Writes took " << d.toSec() << "secs.");
 
         Pose6D octo_pose = poseTfToOctomap(view_pose);
 
@@ -297,11 +301,16 @@ class evaluatePose : public generatePose
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
+            t = ros::Time::now();
 //TODO
 #pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
             {
+                // int nnn = omp_get_thread_num();
+                // ROS_INFO("%d", nnn);
+                KeyRay ray_keys;
                 pcl::PointXYZ point = rays_point_cloud.at(i);
+                Vector3 start_point, direction, end_point;
 
                 start_point.x() = point.x;
                 start_point.y() = point.y;
@@ -309,7 +318,6 @@ class evaluatePose : public generatePose
 
                 direction = start_point - origin;
 
-                // octree->castRay(start_point, direction, end_point, true, -1.0);
                 octree->castRay(origin, direction, end_point, true, max_range);
 
                 start_point = origin + direction.normalized() * min_range;
@@ -318,8 +326,6 @@ class evaluatePose : public generatePose
                 if (origin.distance(start_point) < origin.distance(end_point))
                 {
                     unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
-
-                    // first_keys.insert(*ray_keys.begin());
                     bool first = true;
                     for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
                     {
@@ -341,6 +347,9 @@ class evaluatePose : public generatePose
                 }
             }
 
+            d = (ros::Time::now() - t);
+            ROS_WARN_STREAM("For took " << d.toSec() << "secs.");
+
             for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
             {
                 if (first_keys.find(*it) != first_keys.end())
@@ -360,7 +369,8 @@ class evaluatePose : public generatePose
         }
     }
 
-    void getScore()
+    void
+    getScore()
     {
         using namespace octomap;
         float resolution = octree->getResolution();

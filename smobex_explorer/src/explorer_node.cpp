@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     geometry_msgs::PoseStamped best_pose;
     float best_score = -1;
 
-    for (size_t i = 0; i < 100; i++)
+    for (size_t i = 0; i < 1; i++)
     {
         ros::Time t = ros::Time::now();
 
