@@ -2,18 +2,26 @@
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
-
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 
 #include <smobex_explorer/explorer.h>
+
 #include <tf/transform_datatypes.h>
 
+// #include <octomap/octomap.h>
+// #include <octomap_msgs/conversions.h>
+// #include <octomap_ros/conversions.h>
+
 using namespace std;
+
+// void lol(const )
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "explorer_node");
+
+    ros::NodeHandle n;
 
     ros::AsyncSpinner spinner(1);
     spinner.start();
@@ -29,64 +37,67 @@ int main(int argc, char **argv)
     ROS_INFO_NAMED("tutorial", "Reference frame: %s", move_group.getPlanningFrame().c_str());
     ROS_INFO_NAMED("tutorial", "End effector link: %s", move_group.getEndEffectorLink().c_str());
 
-    // geometry_msgs::Pose target_pose1;
-    // target_pose1.orientation.w = 1.0;
-    // target_pose1.position.x = 0.6;
-    // target_pose1.position.y = 0.3;
-    // target_pose1.position.z = 0.6;
-    // move_group.setPoseTarget(target_pose1);
+    evaluatePose pose_test(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
 
-    // geometry_msgs::PoseStamped target_pose1 = move_group.getRandomPose();
+    // ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 1, &evaluatePose::writeKnownOctomapCallback, &pose);
+    // ros::Subscriber unknownFullMap_sub = n.subscribe("/unknown_full_map", 1, &evaluatePose::writeUnknownOctomapCallback, &pose);
 
-    // move_group.setPoseTarget(target_pose1);
-
-    // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
-    // bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-    // ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
-
-    /* Uncomment below line when working with a real robot */
-    // move_group.move();
+    pose_test.writeKnownOctomap();
+    pose_test.writeUnknownOctomap();
+    move_group.setPlanningTime(0.3);
 
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-    geometry_msgs::PoseStamped best_pose;
+    geometry_msgs::PoseStamped target_pose, best_pose;
     float best_score = -1;
+    int best_pose_n = -1;
 
-    for (size_t i = 0; i < 1; i++)
+    for (size_t i = 0; i < 100; i++)
     {
         ros::Time t = ros::Time::now();
 
-        geometry_msgs::PoseStamped target_pose1 = move_group.getRandomPose();
+        target_pose = move_group.getRandomPose(move_group.getEndEffectorLink().c_str());
 
-        move_group.setPoseTarget(target_pose1);
+        // ROS_INFO_STREAM("Target pose: " << target_pose);
+
+        move_group.setPoseTarget(target_pose, move_group.getEndEffectorLink().c_str());
 
         // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
+        ros::Duration d = (ros::Time::now() - t);
+        ROS_WARN_STREAM("Planning took " << d.toSec() << " secs.");
+
         ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
 
-        evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+        if (success)
+        {
+            tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
 
-        tf::poseMsgToTF(target_pose1.pose, pose.view_pose);
-        pose.evalPose();
+            t = ros::Time::now();
+            pose_test.evalPose();
+            d = (ros::Time::now() - t);
+            ROS_WARN_STREAM("Evaluation took " << d.toSec() << " secs.");
 
-        ros::Duration d = (ros::Time::now() - t);
+            ROS_INFO_STREAM("Pose " << i << " score: " << pose_test.score);
 
-        ROS_INFO_STREAM("Pose " << i << " score: " << pose.score);
-        ROS_INFO_STREAM("The process took " << d.toSec() << " secs.");
-        ROS_INFO("---------");
-
-        if (pose.score > best_score) {
-            best_score = pose.score;
-            best_pose = target_pose1;
+            if (pose_test.score > best_score)
+            {
+                best_pose_n = i;
+                best_score = pose_test.score;
+                best_pose = target_pose;
+                ROS_INFO_STREAM("Best pose now: " << best_pose);
+                ROS_INFO_STREAM("Target pose now: " << target_pose);
+            }
         }
-        
+
+        ROS_INFO("---------");
     }
 
-    ROS_INFO_STREAM("Best score was " << best_score);
+    ROS_INFO_STREAM("Best score was " << best_score << " of pose " << best_pose_n);
+    ROS_INFO_STREAM("Best pose: " << best_pose);
     move_group.setPoseTarget(best_pose);
+    move_group.setPlanningTime(1);
     move_group.plan(my_plan);
     move_group.move();
 

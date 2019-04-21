@@ -133,7 +133,9 @@ class evaluatePose : public generatePose
     octomap::KeySet first_keys;
     octomap::KeySet posterior_keys;
 
-    pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
+    pcl::PointCloud<pcl::PointXYZ> rays_point_cloud_world;
+
+    octomap::point3d min_bbx, max_bbx;
 
     evaluatePose(int _step, float _min_range, float _max_range, float _width_FOV, float _height_FOV)
     {
@@ -171,7 +173,7 @@ class evaluatePose : public generatePose
                 float z = 1 * sin(rad_h) * sin(rad_w);
                 float y = 1 * cos(rad_h);
 
-                rays_point_cloud.push_back(pcl::PointXYZ(x, y, z));
+                rays_point_cloud_world.push_back(pcl::PointXYZ(x, y, z));
 
                 rad_w += delta_rad_w * step;
             }
@@ -181,45 +183,53 @@ class evaluatePose : public generatePose
         // rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
         // rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
         // pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
+
+        ros::param::get("x_max", max_bbx.x());
+        ros::param::get("y_max", max_bbx.y());
+        ros::param::get("z_max", max_bbx.z());
+
+        ros::param::get("x_min", min_bbx.x());
+        ros::param::get("y_min", min_bbx.y());
+        ros::param::get("z_min", min_bbx.z());
     }
 
-    // void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
-    // {
-    //     using namespace octomap;
+    void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    {
+        using namespace octomap;
 
-    //     // ROS_INFO("I'm inside the callback");
+        // ROS_INFO("I'm inside the callback");
 
-    //     AbstractOcTree *tree = NULL;
+        AbstractOcTree *tree = NULL;
 
-    //     if (octree != NULL)
-    //     {
-    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
-    //         delete (octree);
-    //         // ROS_INFO("DEBUG: Octree DEL");
-    //     }
+        if (octree != NULL)
+        {
+            // ROS_INFO("DEBUG: Going to DEL OCTREE");
+            delete (octree);
+            // ROS_INFO("DEBUG: Octree DEL");
+        }
 
-    //     tree = msgToMap(*map);
-    //     octree = dynamic_cast<OcTree *>(tree);
-    // }
+        tree = msgToMap(*map);
+        octree = dynamic_cast<OcTree *>(tree);
+    }
 
-    // void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
-    // {
-    //     using namespace octomap;
+    void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    {
+        using namespace octomap;
 
-    //     // ROS_INFO("I'm inside the callback");
+        // ROS_INFO("I'm inside the callback");
 
-    //     AbstractOcTree *tree = NULL;
+        AbstractOcTree *tree = NULL;
 
-    //     if (unknown_octree != NULL)
-    //     {
-    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
-    //         delete (unknown_octree);
-    //         // ROS_INFO("DEBUG: Octree DEL");
-    //     }
+        if (unknown_octree != NULL)
+        {
+            // ROS_INFO("DEBUG: Going to DEL OCTREE");
+            delete (unknown_octree);
+            // ROS_INFO("DEBUG: Octree DEL");
+        }
 
-    //     tree = msgToMap(*map);
-    //     unknown_octree = dynamic_cast<OcTree *>(tree);
-    // }
+        tree = msgToMap(*map);
+        unknown_octree = dynamic_cast<OcTree *>(tree);
+    }
 
     void writeKnownOctomap()
     {
@@ -237,8 +247,6 @@ class evaluatePose : public generatePose
         octomap_msgs::OctomapConstPtr map = ros::topic::waitForMessage<octomap_msgs::Octomap>("/octomap_full", n);
         tree = msgToMap(*map);
         octree = dynamic_cast<OcTree *>(tree);
-
-        ROS_INFO("Known map written");
     }
 
     void writeUnknownOctomap()
@@ -257,8 +265,6 @@ class evaluatePose : public generatePose
         octomap_msgs::OctomapConstPtr map = ros::topic::waitForMessage<octomap_msgs::Octomap>("/unknown_full_map", n);
         tree = msgToMap(*map);
         unknown_octree = dynamic_cast<OcTree *>(tree);
-
-        ROS_INFO("Unknown map written");
     }
 
     void evalPose()
@@ -268,9 +274,8 @@ class evaluatePose : public generatePose
 
         Vector3 origin;
 
-        ros::NodeHandle n;
+        // ros::NodeHandle n;
 
-        //TODO wait for message
         // ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
         // ros::Subscriber unknownFullMap_sub =
         //     n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
@@ -282,13 +287,16 @@ class evaluatePose : public generatePose
         //     ros::Duration(0.01).sleep();
         // }
 
-        ros::Time t = ros::Time::now();
+        while (octree == NULL || unknown_octree == NULL)
+        {
+            ROS_WARN("No OcTrees... Did you call the writting functions? Calling them automatically.");
 
-        writeKnownOctomap();
-        writeUnknownOctomap();
+            writeKnownOctomap();
+            writeUnknownOctomap();
+        }
 
-        ros::Duration d = (ros::Time::now() - t);
-        ROS_WARN_STREAM("Writes took " << d.toSec() << "secs.");
+        first_keys.clear();
+        posterior_keys.clear();
 
         Pose6D octo_pose = poseTfToOctomap(view_pose);
 
@@ -296,12 +304,12 @@ class evaluatePose : public generatePose
         origin.y() = octo_pose.y();
         origin.z() = octo_pose.z();
 
-        pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
+        pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
+        pcl_ros::transformPointCloud(rays_point_cloud_world, rays_point_cloud, view_pose);
 
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
-            t = ros::Time::now();
 //TODO
 #pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
@@ -347,9 +355,6 @@ class evaluatePose : public generatePose
                 }
             }
 
-            d = (ros::Time::now() - t);
-            ROS_WARN_STREAM("For took " << d.toSec() << "secs.");
-
             for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
             {
                 if (first_keys.find(*it) != first_keys.end())
@@ -369,84 +374,20 @@ class evaluatePose : public generatePose
         }
     }
 
-    void
-    getScore()
+    void getScore()
     {
         using namespace octomap;
+
         float resolution = octree->getResolution();
         float one_volume = resolution * resolution * resolution;
-
-        point3d min, max;
-
-        ros::param::get("x_max", max.x());
-        ros::param::get("y_max", max.y());
-        ros::param::get("z_max", max.z());
-
-        ros::param::get("x_min", min.x());
-        ros::param::get("y_min", min.y());
-        ros::param::get("z_min", min.z());
-
-        // ROS_INFO("max: %f %f %f", max.x(), max.y(), max.z());
-        // ROS_INFO("min: %f %f %f", min.x(), min.y(), min.z());
 
         float weight = 0.5;
 
         float found_volume = (first_keys.size() + posterior_keys.size() * weight) * one_volume;
-        // float total_volume = 0;
-        // float outside_volume = 0, inside_volume = 0;
 
-        /*
-//TODO
-#pragma omp parallel for
-        for (octomap::OcTree::iterator it = unknown_octree->begin(); it != unknown_octree->end(); it++)
-        {
-            octomap::OcTreeKey key = it.getKey();
-            if (unknown_octree->search(key))
-            {
-//first formula
-#if 0
-                float size = it.getSize();
-                float volume = size * size * size;
-
-                total_volume += volume;
-
-//second formula
-#elif 0
-                float size = it.getSize();
-                float volume = size * size * size;
-
-                float delta = resolution * 2;
-
-                point3d coord = unknown_octree->keyToCoord(key);
-                point3d x_incrm(delta, 0, 0);
-                point3d y_incrm(0, delta, 0);
-                point3d z_incrm(0, 0, delta);
-
-                OcTreeNode *x_pos, *x_neg, *y_pos, *y_neg, *z_pos, *z_neg;
-                x_pos = unknown_octree->search(coord + x_incrm);
-                x_neg = unknown_octree->search(coord - x_incrm);
-                y_pos = unknown_octree->search(coord + y_incrm);
-                y_neg = unknown_octree->search(coord - y_incrm);
-                z_pos = unknown_octree->search(coord + z_incrm);
-                z_neg = unknown_octree->search(coord - z_incrm);
-
-                if (x_pos && x_neg && y_pos && y_neg && z_pos && z_neg)
-                {
-                    inside_volume += volume;
-                }
-                else
-                {
-                    outside_volume += volume;
-                }
-#endif
-            }
-        }
-        
-        // total_volume = outside_volume + inside_volume * weight;
-*/
         //third formula
 
-        point3d deltas = max - min;
+        point3d deltas = max_bbx - min_bbx;
 
         float total_volume = deltas.x() * deltas.y() * deltas.z();
         float inner_volume = (deltas.x() - resolution * 2) * (deltas.y() - resolution * 2) * (deltas.z() - resolution * 2);
