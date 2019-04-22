@@ -55,11 +55,11 @@ int main(int argc, char **argv)
     {
         ros::Time t = ros::Time::now();
 
-        target_pose = move_group.getRandomPose(move_group.getEndEffectorLink().c_str());
+        target_pose = move_group.getRandomPose();
 
         // ROS_INFO_STREAM("Target pose: " << target_pose);
 
-        move_group.setPoseTarget(target_pose, move_group.getEndEffectorLink().c_str());
+        move_group.setPoseTarget(target_pose);
 
         // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
@@ -99,7 +99,14 @@ int main(int argc, char **argv)
     move_group.setPoseTarget(best_pose);
     move_group.setPlanningTime(1);
     move_group.plan(my_plan);
-    move_group.move();
+
+    ROS_INFO_STREAM("Go to pose?");
+    int c = getchar();
+
+    if (c == 'y' || c == 'Y')
+    {
+        move_group.move();
+    }
 
     ros::shutdown();
 
