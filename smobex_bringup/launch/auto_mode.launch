@@ -5,7 +5,7 @@
     <arg name="online" doc="If robot is online or not"/>
     <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
 
-    <arg name="scale" default="3" />
+    <arg name="scale" default="5" />
 
     <!-- Initializing robot and camera calibrated -->
     <!-- <include file="$(find smobex_calibration)/launch/calibrated.launch">

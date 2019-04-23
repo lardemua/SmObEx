@@ -118,6 +118,7 @@ class evaluatePose : public generatePose
 {
   public:
     float score = 0;
+    std_msgs::ColorRGBA score_color;
 
     int step;
     float min_range;
@@ -396,6 +397,10 @@ class evaluatePose : public generatePose
         float score_volume = outer_volume + inner_volume * weight;
 
         score = found_volume / score_volume;
+
+        class_colormap frustum_color("jet", 64, 1, true);
+
+        score_color = frustum_color.color(score * 64);
     }
 
     octomap::point3d_collection getDiscoveredCenters()
@@ -571,9 +576,9 @@ class evaluatePose : public generatePose
         // line_vis.color.b = 0.2;
         // line_vis.color.a = 1.0;
 
-        class_colormap frustum_color("winter", 64, 1, true);
+        line_vis.color = score_color;
 
-        line_vis.color = frustum_color.color(score * 64);
+        // line_vis.color = frustum_color.color(score * 64);
 
         pcl::PointCloud<pcl::PointXYZ> frustum_cloud_start, frustum_cloud_end;
 

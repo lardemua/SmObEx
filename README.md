@@ -256,7 +256,7 @@ For the calibration do the following steps:
 
 1. place the ArUco marker (on smobex_bringup/launch/bringup.launch put the correct marker id and size)
 
-2. run 
+2. run ROSSTATE on the TP and then
 
 ```bash 
 roslaunch smobex_bringup bringup.launch config:=true calibration:=true
