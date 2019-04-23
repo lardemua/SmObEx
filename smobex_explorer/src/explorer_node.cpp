@@ -15,12 +15,15 @@
 
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <sensor_msgs/PointCloud2.h>
 
-// #include <octomap/octomap.h>
-// #include <octomap_msgs/conversions.h>
-// #include <octomap_ros/conversions.h>
+#include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
+#include <pcl_ros/transforms.h>
 
 using namespace std;
+
+sensor_msgs::PointCloud2ConstPtr unknown_cloud;
 
 geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose)
 {
@@ -29,12 +32,19 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose)
     tf::Quaternion view_orientation;
 
     geometry_msgs::Quaternion quat_out;
+    pcl::PointCloud<pcl::PointXYZ> unknown_pcl;
 
-    std::vector<geometry_msgs::Point> centers;
+    pcl::fromROSMsg(*unknown_cloud, unknown_pcl);
 
-    float xc = 1;
-    float yc = 0;
-    float zc = -0.2;
+    size_t n_points = unknown_pcl.size();
+
+    int pt_number = ((double)rand() / RAND_MAX) * n_points;
+
+    pcl::PointXYZ point_pcl = unknown_pcl.at(pt_number);
+
+    float xc = point_pcl.x;
+    float yc = point_pcl.y;
+    float zc = point_pcl.z;
 
     float x = pose.pose.position.x;
     float y = pose.pose.position.y;
@@ -73,7 +83,11 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
 
+    unknown_cloud = ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+
     ros::Publisher pub_arrows = n.advertise<visualization_msgs::MarkerArray>("/pose_arrows", 10);
+
+    srand(time(NULL));
 
     ros::AsyncSpinner spinner(1);
     spinner.start();
@@ -111,9 +125,8 @@ int main(int argc, char **argv)
         srand(time(NULL));
 
         target_pose = move_group.getRandomPose();
-        // move_group.setPositionTarget(target_pose.pose.position.x, target_pose.pose.position.y, target_pose.pose.position.z);
+
         geometry_msgs::Quaternion quat_orient = getOrientation(target_pose);
-        // move_group.setOrientationTarget(quat_orient.x, quat_orient.y, quat_orient.z, quat_orient.w);
         target_pose.pose.orientation = quat_orient;
 
         move_group.setPoseTarget(target_pose);
@@ -171,9 +184,9 @@ int main(int argc, char **argv)
             tf::quaternionTFToMsg(q_new, q_arrow);
             arrow.pose.orientation = q_arrow;
 
-            arrow.scale.x = 0.1;
-            arrow.scale.y = 0.05;
-            arrow.scale.z = 0.05;
+            arrow.scale.x = 0.10;
+            arrow.scale.y = 0.02;
+            arrow.scale.z = 0.02;
 
             all_poses.markers.push_back(arrow);
 
@@ -185,6 +198,7 @@ int main(int argc, char **argv)
 
     ROS_INFO_STREAM("Best score was " << best_score << " of pose " << best_pose_n);
     ROS_INFO_STREAM("Best pose: " << best_pose);
+    move_group.clearPoseTargets();
     move_group.setPoseTarget(best_pose);
     move_group.setPlanningTime(1);
     move_group.plan(my_plan);

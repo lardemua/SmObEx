@@ -7,8 +7,8 @@ Panels:
         - /SearchSpace1/Namespaces1
         - /DiscoveredSpace1/Namespaces1
         - /DepthRays1/Namespaces1
-        - /MotionPlanning1/Scene Geometry1
-        - /Arrows1
+        - /MotionPlanning1/Planning Metrics1
+        - /MotionPlanning1/Planned Path1
       Splitter Ratio: 0.537401556968689
     Tree Height: 156
   - Class: rviz/Selection
@@ -172,6 +172,8 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
+        free_boxes: true
+        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -325,7 +327,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Loop Animation: false
+        Loop Animation: true
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
@@ -457,7 +459,7 @@ Visualization Manager:
       Marker Topic: /pose_arrows
       Name: Arrows
       Namespaces:
-        {}
+        "": true
       Queue Size: 10
       Value: true
   Enabled: true
@@ -488,25 +490,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.997562885284424
+      Distance: 7.91552734375
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.4652738571166992
-        Y: 0.8793573975563049
-        Z: 0.22611995041370392
+        X: 0.03860881179571152
+        Y: 0.24642589688301086
+        Z: 0.23668155074119568
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.37520238757133484
+      Pitch: 0.5002020001411438
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.3294308185577393
+      Yaw: 5.180751800537109
     Saved: ~
 Window Geometry:
   Displays:
