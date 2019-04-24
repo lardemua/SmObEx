@@ -71,7 +71,7 @@
     <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" output="screen">
         <param name="~step" value="10"/>
         <param name="~min_range" value="0.8"/>
-        <param name="~max_range" value="10"/>
+        <param name="~max_range" value="3.5"/>
         <param name="~width_FOV" value="1.01229"/>
         <param name="~height_FOV" value="0.785398"/>
         <param name="~frame_id" value="/base_link"/>

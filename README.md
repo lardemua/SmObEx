@@ -118,8 +118,9 @@ Porto, Portugal
 
 ## Week 17
 
-- [ ] Use MoveIt! to generate reachable poses
-- [ ] Find the center of the unknown clusters
+- [x] Use MoveIt! to generate reachable poses
+- [x] Find the center of the unknown clusters
+- [ ] Finish up auto mode
 
 # Built with
 
@@ -376,3 +377,5 @@ roslaunch smobex_bringup bringup.launch
 ![running mode](./files/running.png)
 
 ![pose evaluated](./files/pose_evaluated_text.png)
+
+![MoveIt! aided poses generated and evaluated](./files/poses_gen_moveit.png)

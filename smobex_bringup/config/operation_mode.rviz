@@ -4,7 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /SearchSpace1
         - /SearchSpace1/Namespaces1
         - /DiscoveredSpace1/Namespaces1
         - /DepthRays1/Namespaces1
@@ -173,8 +172,6 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
-        free_boxes: false
-        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -207,7 +204,7 @@ Visualization Manager:
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        {}
+        Pose: true
       Queue Size: 10
       Value: true
     - Class: rviz/Marker
@@ -215,7 +212,7 @@ Visualization Manager:
       Marker Topic: /pose_text
       Name: PoseDescription
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -223,7 +220,8 @@ Visualization Manager:
       Marker Topic: /ray_cast_lines
       Name: DepthRays
       Namespaces:
-        {}
+        Frustum: true
+        Pose rays: false
       Queue Size: 100
       Value: true
     - Acceleration_Scaling_Factor: 1
@@ -460,7 +458,7 @@ Visualization Manager:
       Marker Topic: /pose_arrows
       Name: Arrows
       Namespaces:
-        "": true
+        {}
       Queue Size: 10
       Value: true
   Enabled: true
@@ -491,7 +489,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.047207832336426
+      Distance: 3.0833652019500732
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -506,10 +504,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5352016687393188
+      Pitch: 0.7102015018463135
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.5470876693725586
+      Yaw: 1.8470853567123413
     Saved: ~
 Window Geometry:
   Displays:

@@ -58,6 +58,9 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
     ros::Time t = ros::Time::now();
 
+    pose.writeKnownOctomap();
+    pose.writeUnknownOctomap();
+
     pose.evalPose();
 
     ros::Duration d = (ros::Time::now() - t);
