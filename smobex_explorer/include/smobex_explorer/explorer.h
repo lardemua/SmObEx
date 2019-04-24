@@ -194,43 +194,43 @@ class evaluatePose : public generatePose
         ros::param::get("z_min", min_bbx.z());
     }
 
-    void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
-    {
-        using namespace octomap;
+    // void writeKnownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    // {
+    //     using namespace octomap;
 
-        // ROS_INFO("I'm inside the callback");
+    //     // ROS_INFO("I'm inside the callback");
 
-        AbstractOcTree *tree = NULL;
+    //     AbstractOcTree *tree = NULL;
 
-        if (octree != NULL)
-        {
-            // ROS_INFO("DEBUG: Going to DEL OCTREE");
-            delete (octree);
-            // ROS_INFO("DEBUG: Octree DEL");
-        }
+    //     if (octree != NULL)
+    //     {
+    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
+    //         delete (octree);
+    //         // ROS_INFO("DEBUG: Octree DEL");
+    //     }
 
-        tree = msgToMap(*map);
-        octree = dynamic_cast<OcTree *>(tree);
-    }
+    //     tree = msgToMap(*map);
+    //     octree = dynamic_cast<OcTree *>(tree);
+    // }
 
-    void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
-    {
-        using namespace octomap;
+    // void writeUnknownOctomapCallback(const octomap_msgs::OctomapConstPtr &map)
+    // {
+    //     using namespace octomap;
 
-        // ROS_INFO("I'm inside the callback");
+    //     // ROS_INFO("I'm inside the callback");
 
-        AbstractOcTree *tree = NULL;
+    //     AbstractOcTree *tree = NULL;
 
-        if (unknown_octree != NULL)
-        {
-            // ROS_INFO("DEBUG: Going to DEL OCTREE");
-            delete (unknown_octree);
-            // ROS_INFO("DEBUG: Octree DEL");
-        }
+    //     if (unknown_octree != NULL)
+    //     {
+    //         // ROS_INFO("DEBUG: Going to DEL OCTREE");
+    //         delete (unknown_octree);
+    //         // ROS_INFO("DEBUG: Octree DEL");
+    //     }
 
-        tree = msgToMap(*map);
-        unknown_octree = dynamic_cast<OcTree *>(tree);
-    }
+    //     tree = msgToMap(*map);
+    //     unknown_octree = dynamic_cast<OcTree *>(tree);
+    // }
 
     void writeKnownOctomap()
     {
@@ -275,19 +275,6 @@ class evaluatePose : public generatePose
 
         Vector3 origin;
 
-        // ros::NodeHandle n;
-
-        // ros::Subscriber octomapFull_sub = n.subscribe("/octomap_full", 10, &evaluatePose::writeKnownOctomapCallback, this);
-        // ros::Subscriber unknownFullMap_sub =
-        //     n.subscribe("/unknown_full_map", 10, &evaluatePose::writeUnknownOctomapCallback, this);
-
-        // while (octree == NULL || unknown_octree == NULL)
-        // {
-        //     ros::spinOnce();
-
-        //     ros::Duration(0.01).sleep();
-        // }
-
         while (octree == NULL || unknown_octree == NULL)
         {
             ROS_WARN("No OcTrees... Did you call the writting functions? Calling them automatically.");
@@ -311,7 +298,7 @@ class evaluatePose : public generatePose
         int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
         if (octree != NULL && unknown_octree != NULL)
         {
-//TODO
+
 #pragma omp parallel for
             for (size_t i = 0; i < n_start_points; i++)
             {

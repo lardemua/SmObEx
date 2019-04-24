@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /SearchSpace1
         - /SearchSpace1/Namespaces1
         - /DiscoveredSpace1/Namespaces1
         - /DepthRays1/Namespaces1
@@ -172,7 +173,7 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
-        free_boxes: true
+        free_boxes: false
         occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
@@ -490,7 +491,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 7.91552734375
+      Distance: 3.047207832336426
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -505,10 +506,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5002020001411438
+      Pitch: 0.5352016687393188
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.180751800537109
+      Yaw: 2.5470876693725586
     Saved: ~
 Window Geometry:
   Displays:
