@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /SearchSpace1
         - /SearchSpace1/Namespaces1
         - /DiscoveredSpace1/Namespaces1
         - /DepthRays1/Namespaces1
@@ -172,6 +173,8 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
+        free_boxes: false
+        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -204,7 +207,7 @@ Visualization Manager:
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        Pose: true
+        {}
       Queue Size: 10
       Value: true
     - Class: rviz/Marker
@@ -212,7 +215,7 @@ Visualization Manager:
       Marker Topic: /pose_text
       Name: PoseDescription
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -220,8 +223,7 @@ Visualization Manager:
       Marker Topic: /ray_cast_lines
       Name: DepthRays
       Namespaces:
-        Frustum: true
-        Pose rays: false
+        {}
       Queue Size: 100
       Value: true
     - Acceleration_Scaling_Factor: 1
@@ -458,7 +460,7 @@ Visualization Manager:
       Marker Topic: /pose_arrows
       Name: Arrows
       Namespaces:
-        {}
+        "": true
       Queue Size: 10
       Value: true
   Enabled: true
@@ -489,25 +491,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.0833652019500732
+      Distance: 4.147449493408203
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.03860881179571152
-        Y: 0.24642589688301086
-        Z: 0.23668155074119568
+        X: 1.2115004062652588
+        Y: 0.5763046145439148
+        Z: 0.2396843135356903
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7102015018463135
+      Pitch: 0.5902016162872314
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.8470853567123413
+      Yaw: 1.4170857667922974
     Saved: ~
 Window Geometry:
   Displays:

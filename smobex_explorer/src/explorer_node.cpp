@@ -35,7 +35,7 @@ using namespace std;
 
 bool customRegionGrowing(const PointTypeIO &point_a, const PointTypeIO &point_b, float squared_distance)
 {
-  if (squared_distance < 0.1 * 0.1 * 1.1)
+  if (squared_distance < 0.1 * 0.1 * 1.1) //TODO params!!!!
   {
     return true;
   }
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "explorer_node");
 
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(1);  // TODO see if increse improves performance
   spinner.start();
 
   ros::NodeHandle n;
@@ -215,119 +215,132 @@ int main(int argc, char **argv)
   // TODO params!!!
   evaluatePose pose_test(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
 
-  int n_poses = 100;
+  int n_poses = 10;
+  float threshold = 0.005;
   int arrow_id = -1;
   float best_score = -1;
-  float threshold = 0.01;
 
-  t = ros::Time::now();
-  pose_test.writeKnownOctomap();
-  pose_test.writeUnknownOctomap();
-  d = ros::Time::now() - t;
-  ROS_INFO_STREAM("OctoMaps writing: " << d.toSec() << " secs.");
-
-  t = ros::Time::now();
-  clusters_centroids = findClusters(unknown_cloud);
-  d = ros::Time::now() - t;
-  ROS_INFO_STREAM("Finding clustes: " << d.toSec() << " secs.");
-
-  move_group.setPlanningTime(0.3);
-
-  for (size_t cluster_idx = 0; cluster_idx < clusters_centroids.size(); cluster_idx++)
+  do
   {
-    observation_point = clusters_centroids[cluster_idx];
+    arrow_id = -1;
+    best_score = -1;
 
-    for (size_t pose_idx = 0; pose_idx < n_poses; pose_idx++)
+    t = ros::Time::now();
+    pose_test.writeKnownOctomap();
+    pose_test.writeUnknownOctomap();
+    d = ros::Time::now() - t;
+    ROS_INFO_STREAM("OctoMaps writing: " << d.toSec() << " secs.");
+
+    t = ros::Time::now();
+    clusters_centroids = findClusters(unknown_cloud);
+    d = ros::Time::now() - t;
+    ROS_INFO_STREAM("Finding " << clusters_centroids.size() << " clustes: " << d.toSec() << " secs.");
+
+    move_group.setPlanningTime(0.3);
+
+    for (size_t cluster_idx = 0; cluster_idx < clusters_centroids.size(); cluster_idx++)
     {
-      t = ros::Time::now();
-      target_pose = move_group.getRandomPose();
-      target_pose.pose.position.x = abs(target_pose.pose.position.x);
+      observation_point = clusters_centroids[cluster_idx];
 
-      geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
-      target_pose.pose.orientation = quat_orient;
-
-      move_group.setPoseTarget(target_pose);
-      d = ros::Time::now() - t;
-      ROS_INFO_STREAM("Pose gen process: " << d.toSec() << " secs.");
-
-      t = ros::Time::now();
-      bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-      d = ros::Time::now() - t;
-      ROS_INFO_STREAM("Planning: " << d.toSec() << " secs.");
-
-      ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
-      ROS_INFO("Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
-
-      if (success)
+      for (size_t pose_idx = 0; pose_idx < n_poses; pose_idx++)
       {
-        tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
+        t = ros::Time::now();
+        target_pose = move_group.getRandomPose();
+        target_pose.pose.position.x = abs(target_pose.pose.position.x);
+
+        geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
+        target_pose.pose.orientation = quat_orient;
+
+        // move_group.setPoseTarget(target_pose);
+        move_group.setApproximateJointValueTarget(target_pose); //TODO explain why it's much more reliable
+        d = ros::Time::now() - t;
+        ROS_INFO_STREAM("Pose gen process: " << d.toSec() << " secs.");
 
         t = ros::Time::now();
-        pose_test.evalPose();
+        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
         d = ros::Time::now() - t;
-        ROS_INFO_STREAM("Pose eval and scoring: " << d.toSec() << " secs.");
+        ROS_INFO_STREAM("Planning: " << d.toSec() << " secs.");
 
-        ROS_INFO_STREAM("Score: " << pose_test.score);
+        ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
+        ROS_INFO("Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
 
-        if (pose_test.score > best_score)
+        if (success)
         {
-          best_score = pose_test.score;
-          best_pose = target_pose;
+          tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
+
+          t = ros::Time::now();
+          pose_test.evalPose();
+          d = ros::Time::now() - t;
+          ROS_INFO_STREAM("Pose eval and scoring: " << d.toSec() << " secs.");
+
+          ROS_INFO_STREAM("Score: " << pose_test.score);
+
+          if (pose_test.score > best_score)
+          {
+            best_score = pose_test.score;
+            best_pose = target_pose;
+          }
+
+          t = ros::Time::now();
+          arrow.header.stamp = ros::Time::now();
+          arrow.header.frame_id = "/base_link";
+
+          arrow.id = ++arrow_id;
+
+          arrow.type = visualization_msgs::Marker::ARROW;
+          arrow.color = pose_test.score_color;
+
+          arrow.pose.position = target_pose.pose.position;
+
+          tf::Quaternion q_rot, q_new;
+          geometry_msgs::Quaternion q_arrow;
+          tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
+
+          q_rot.setRPY(0, -M_PI / 2, 0);
+          q_new = q_new * q_rot;
+          q_new.normalize();
+
+          tf::quaternionTFToMsg(q_new, q_arrow);
+          arrow.pose.orientation = q_arrow;
+
+          arrow.scale.x = 0.10;
+          arrow.scale.y = 0.02;
+          arrow.scale.z = 0.02;
+
+          all_poses.markers.push_back(arrow);
+
+          pub_arrows.publish(all_poses);
+          d = ros::Time::now() - t;
+          ROS_INFO_STREAM("Marker publishing: " << d.toSec() << " secs.");
         }
 
-        t = ros::Time::now();
-        arrow.header.stamp = ros::Time::now();
-        arrow.header.frame_id = "/base_link";
-
-        arrow.id = ++arrow_id;
-
-        arrow.type = visualization_msgs::Marker::ARROW;
-        arrow.color = pose_test.score_color;
-
-        arrow.pose.position = target_pose.pose.position;
-
-        tf::Quaternion q_rot, q_new;
-        geometry_msgs::Quaternion q_arrow;
-        tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
-
-        q_rot.setRPY(0, -M_PI / 2, 0);
-        q_new = q_new * q_rot;
-        q_new.normalize();
-
-        tf::quaternionTFToMsg(q_new, q_arrow);
-        arrow.pose.orientation = q_arrow;
-
-        arrow.scale.x = 0.10;
-        arrow.scale.y = 0.02;
-        arrow.scale.z = 0.02;
-
-        all_poses.markers.push_back(arrow);
-
-        pub_arrows.publish(all_poses);
-        d = ros::Time::now() - t;
-        ROS_INFO_STREAM("Marker publishing: " << d.toSec() << " secs.");
+        ROS_INFO("---------");
       }
-
-      ROS_INFO("---------");
     }
-  }
 
-  t = ros::Time::now();
-  move_group.clearPoseTargets();
-  move_group.setPoseTarget(best_pose);
-  move_group.setPlanningTime(1);
-  move_group.plan(my_plan);
-  d = ros::Time::now() - t;
-  ROS_INFO_STREAM("Final planning: " << d.toSec() << " secs.");
+    t = ros::Time::now();
+    move_group.clearPoseTargets();
+    // move_group.setPoseTarget(best_pose);
+    move_group.setApproximateJointValueTarget(best_pose);
+    move_group.setPlanningTime(1);
+    move_group.plan(my_plan);
+    d = ros::Time::now() - t;
+    ROS_INFO_STREAM("Final planning: " << d.toSec() << " secs, " << best_score << " score.");
 
-  ROS_INFO_STREAM("Go to pose?");
-  int c = getchar();
-
-  if (c == 'y' || c == 'Y')
-  {
-    // move_group.move();
     move_group.execute(my_plan);
-  }
+
+  } while (best_score > threshold);
+
+  ROS_INFO_STREAM("Final best score: " << best_score);
+
+  // ROS_INFO_STREAM("Go to pose?");
+  // int c = getchar();
+
+  // if (c == 'y' || c == 'Y')
+  // {
+  //   // move_group.move();
+  //   move_group.execute(my_plan);
+  // }
 
   ros::shutdown();
 
