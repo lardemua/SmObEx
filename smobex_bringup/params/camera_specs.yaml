@@ -1,0 +1,5 @@
+step: 20
+min_range: 0.8
+max_range: 3.5
+width_FOV: deg(58)
+height_FOV: deg(45)

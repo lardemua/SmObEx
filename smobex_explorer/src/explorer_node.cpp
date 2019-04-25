@@ -31,11 +31,14 @@
 
 typedef pcl::PointXYZRGBA PointTypeIO;
 
+sensor_msgs::PointCloud2 cloud_clusters_publish;
+float octomap_resolution = 0.1;
+
 using namespace std;
 
 bool customRegionGrowing(const PointTypeIO &point_a, const PointTypeIO &point_b, float squared_distance)
 {
-  if (squared_distance < 0.1 * 0.1 * 1.1) //TODO params!!!!
+  if (squared_distance < (octomap_resolution * 2) * (octomap_resolution * 2) * 1.1)
   {
     return true;
   }
@@ -63,7 +66,7 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
   pcl::ConditionalEuclideanClustering<PointTypeIO> cec(true);
   cec.setInputCloud(cloud_out);
   cec.setConditionFunction(&customRegionGrowing);
-  cec.setClusterTolerance(0.20);  // TODO params!!!!
+  cec.setClusterTolerance(octomap_resolution * 3);
   cec.segment(*clusters);
 
   for (int i = 0; i < clusters->size(); ++i)
@@ -71,15 +74,15 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
     pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
     geometry_msgs::Point centroid;
 
-    // int label_r = ((double)rand() / RAND_MAX) * 255;
-    // int label_g = ((double)rand() / RAND_MAX) * 255;
-    // int label_b = ((double)rand() / RAND_MAX) * 255;
+    int label_r = ((double)rand() / RAND_MAX) * 255;
+    int label_g = ((double)rand() / RAND_MAX) * 255;
+    int label_b = ((double)rand() / RAND_MAX) * 255;
 
     for (int j = 0; j < (*clusters)[i].indices.size(); ++j)
     {
-      // cloud_out->points[(*clusters)[i].indices[j]].r = label_r;
-      // cloud_out->points[(*clusters)[i].indices[j]].g = label_g;
-      // cloud_out->points[(*clusters)[i].indices[j]].b = label_b;
+      cloud_out->points[(*clusters)[i].indices[j]].r = label_r;
+      cloud_out->points[(*clusters)[i].indices[j]].g = label_g;
+      cloud_out->points[(*clusters)[i].indices[j]].b = label_b;
 
       point_add_rgba = cloud_out->points[(*clusters)[i].indices[j]];
 
@@ -100,6 +103,8 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
   // Save the output point cloud
   // ROS_INFO("SAVING PCL");
   // pcl::io::savePCDFile("output.pcd", *cloud_out);
+
+  pcl::toROSMsg(*cloud_out, cloud_clusters_publish);
 
   return centroids_vect;
 }
@@ -183,7 +188,6 @@ int main(int argc, char **argv)
   geometry_msgs::Point observation_point;
   geometry_msgs::PoseStamped target_pose, best_pose;
 
-  visualization_msgs::MarkerArray all_poses;
   visualization_msgs::Marker arrow;
 
   std::vector<geometry_msgs::Point> clusters_centroids;
@@ -197,8 +201,9 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
 
-  sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-      ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+  ros::param::get("/octomap_server_node/resolution", octomap_resolution);
+
+  ros::Publisher pub_cloud_clusters = n.advertise<sensor_msgs::PointCloud2>("/clusters_cloud", 10);
 
   ros::Publisher pub_arrows = n.advertise<visualization_msgs::MarkerArray>("/pose_arrows", 10);
   moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
@@ -210,20 +215,48 @@ int main(int argc, char **argv)
   ros::Time t;
   ros::Duration d;
 
-  srand(time(NULL));
+  int step = 1;
+  float min_range = 0;
+  float max_range = 1;
+  float width_FOV = M_PI;
+  float height_FOV = M_PI;
+  std::string frame_id = "/world";
 
-  // TODO params!!!
-  evaluatePose pose_test(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
+  ros::param::get("~" + ros::names::remap("step"), step);
+  ros::param::get("~" + ros::names::remap("min_range"), min_range);
+  ros::param::get("~" + ros::names::remap("max_range"), max_range);
+  ros::param::get("~" + ros::names::remap("width_FOV"), width_FOV);
+  ros::param::get("~" + ros::names::remap("height_FOV"), height_FOV);
+  ros::param::get("~" + ros::names::remap("frame_id"), frame_id);
 
-  int n_poses = 10;
-  float threshold = 0.005;
+  // evaluatePose pose_test(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
+  evaluatePose pose_test(step, min_range, max_range, width_FOV, height_FOV);
+
+  // TODO PARAMS
+  int n_poses = 20;
+  float threshold = 0.01;
+
+  ros::param::get("~n_poses", n_poses);
+  ros::param::get("~threshold", threshold);
+
   int arrow_id = -1;
   float best_score = -1;
 
+  srand(time(NULL));
+
   do
   {
+    visualization_msgs::MarkerArray all_poses;
     arrow_id = -1;
     best_score = -1;
+
+    move_group.clearPoseTargets();
+
+    t = ros::Time::now();
+    sensor_msgs::PointCloud2ConstPtr unknown_cloud =
+        ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+    d = ros::Time::now() - t;
+    ROS_INFO_STREAM("Waiting unknown cloud: " << d.toSec() << " secs.");
 
     t = ros::Time::now();
     pose_test.writeKnownOctomap();
@@ -236,35 +269,56 @@ int main(int argc, char **argv)
     d = ros::Time::now() - t;
     ROS_INFO_STREAM("Finding " << clusters_centroids.size() << " clustes: " << d.toSec() << " secs.");
 
-    move_group.setPlanningTime(0.3);
+    if (clusters_centroids.size() > 0)
+    {
+      pub_cloud_clusters.publish(cloud_clusters_publish);
+    }
+
+    move_group.setPlanningTime(0.4);
+    const std::string end_effector_link = move_group.getEndEffectorLink();
+    // ROS_INFO_STREAM(end_effector_link);
+    // move_group.setNumPlanningAttempts(5);  // TODO imporves anything?
+
+    // ROS_INFO_STREAM("Joint tolerence: " << move_group.getGoalJointTolerance());
+    // ROS_INFO_STREAM("Orientation tolerence: " << move_group.getGoalOrientationTolerance());
+    // ROS_INFO_STREAM("Position tolerence: " << move_group.getGoalPositionTolerance());
 
     for (size_t cluster_idx = 0; cluster_idx < clusters_centroids.size(); cluster_idx++)
     {
       observation_point = clusters_centroids[cluster_idx];
 
-      for (size_t pose_idx = 0; pose_idx < n_poses; pose_idx++)
+      size_t pose_idx = 0;
+      // for (size_t pose_idx = 0; pose_idx < n_poses; pose_idx++)
+      while (pose_idx < n_poses)
       {
         t = ros::Time::now();
         target_pose = move_group.getRandomPose();
         target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
+        if (target_pose.pose.position.x < 0.2)
+        {
+          target_pose.pose.position.x = 0.2;
+        }
+
         geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
         target_pose.pose.orientation = quat_orient;
 
-        // move_group.setPoseTarget(target_pose);
-        move_group.setApproximateJointValueTarget(target_pose); //TODO explain why it's much more reliable
+        // move_group.setPoseTarget(best_pose, end_effector_link);
+        bool set_target =
+            move_group.setJointValueTarget(target_pose,
+                                           end_effector_link);  // TODO explain why it's much more reliable
         d = ros::Time::now() - t;
         ROS_INFO_STREAM("Pose gen process: " << d.toSec() << " secs.");
 
         t = ros::Time::now();
-        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
         d = ros::Time::now() - t;
         ROS_INFO_STREAM("Planning: " << d.toSec() << " secs.");
 
         ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
-        ROS_INFO("Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+        ROS_INFO("Visualizing plan 1 (pose goal) %s", set_plan ? "" : "FAILED");
 
-        if (success)
+        if (set_target && set_plan)
         {
           tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
 
@@ -310,37 +364,44 @@ int main(int argc, char **argv)
           all_poses.markers.push_back(arrow);
 
           pub_arrows.publish(all_poses);
+
           d = ros::Time::now() - t;
           ROS_INFO_STREAM("Marker publishing: " << d.toSec() << " secs.");
+
+          pose_idx++;
         }
 
         ROS_INFO("---------");
       }
     }
 
-    t = ros::Time::now();
-    move_group.clearPoseTargets();
-    // move_group.setPoseTarget(best_pose);
-    move_group.setApproximateJointValueTarget(best_pose);
-    move_group.setPlanningTime(1);
-    move_group.plan(my_plan);
-    d = ros::Time::now() - t;
-    ROS_INFO_STREAM("Final planning: " << d.toSec() << " secs, " << best_score << " score.");
+    ROS_INFO("MOVING!!!");
 
-    move_group.execute(my_plan);
+    // move_group.setPoseTarget(best_pose, end_effector_link);
+    // move_group.plan(my_plan);
+
+    t = ros::Time::now();
+    move_group.setPlanningTime(1);
+    // move_group.setPoseTarget(best_pose, end_effector_link);
+    move_group.setJointValueTarget(best_pose, end_effector_link);
+    move_group.plan(my_plan);
+
+    // int c = getchar();
+
+    // if (c == 'y')
+    // {
+    bool success = (move_group.move() == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    d = ros::Time::now() - t;
+    ROS_INFO_STREAM("Final planning and moving: " << (success ? "DONE" : "FAILED") << ", " << d.toSec() << " secs, "
+                                                  << best_score << " score.");
+    //   getchar();
+    // }
+
+    ROS_INFO("---------");
 
   } while (best_score > threshold);
 
   ROS_INFO_STREAM("Final best score: " << best_score);
-
-  // ROS_INFO_STREAM("Go to pose?");
-  // int c = getchar();
-
-  // if (c == 'y' || c == 'Y')
-  // {
-  //   // move_group.move();
-  //   move_group.execute(my_plan);
-  // }
 
   ros::shutdown();
 

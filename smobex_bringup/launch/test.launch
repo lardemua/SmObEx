@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
+
+        <param name="~frame_id" value="/base_link"/>
+        <param name="~n_poses" value="15"/>
+        <param name="~threshold" value="0.01"/>
+
+        <rosparam file="$(find smobex_bringup)/params/camera_specs.yaml" command="load" />
+
+    </node>
+</launch>
