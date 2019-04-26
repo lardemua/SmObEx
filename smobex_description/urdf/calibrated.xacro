@@ -18,4 +18,11 @@
         <child link="camera_link"/>
     </joint>
 
+    <xacro:include filename="$(find pedestal_description)/urdf/pedestal.urdf"/>
+    <joint name="pedestal_joint" type="fixed">
+        <origin xyz="0.00000 0.00000 0.00000" rpy="-3.14159265359 0.00000 0.00000"/>
+        <parent link="base_link"/>
+        <child link="pedestal_description"/>
+    </joint>
+
 </robot>

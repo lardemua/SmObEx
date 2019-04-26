@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "explorer_node");
 
-  ros::AsyncSpinner spinner(1);  // TODO see if increse improves performance
+  ros::AsyncSpinner spinner(4);  // TODO see if increse improves performance
   spinner.start();
 
   ros::NodeHandle n;
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
     move_group.setPlanningTime(0.4);
     const std::string end_effector_link = move_group.getEndEffectorLink();
     // ROS_INFO_STREAM(end_effector_link);
-    // move_group.setNumPlanningAttempts(5);  // TODO imporves anything?
+    move_group.setNumPlanningAttempts(10);  // TODO improves anything?
 
     // ROS_INFO_STREAM("Joint tolerence: " << move_group.getGoalJointTolerance());
     // ROS_INFO_STREAM("Orientation tolerence: " << move_group.getGoalOrientationTolerance());
@@ -294,6 +294,7 @@ int main(int argc, char **argv)
         t = ros::Time::now();
         target_pose = move_group.getRandomPose();
         target_pose.pose.position.x = abs(target_pose.pose.position.x);
+        target_pose.pose.position.z = abs(target_pose.pose.position.z);
 
         if (target_pose.pose.position.x < 0.2)
         {

@@ -1,0 +1,43 @@
+<robot
+  name="pedestal">
+  <link
+    name="pedestal_description">
+    <inertial>
+      <origin
+        xyz="-4.7138E-17 -9.95858624594052E-18 0.35114"
+        rpy="0 0 0" />
+      <mass
+        value="143.64" />
+      <inertia
+        ixx="11.252935824593"
+        ixy="1.36738999752713E-16"
+        ixz="-3.52006097001589E-16"
+        iyy="11.252935824593"
+        iyz="4.99960915842552E-16"
+        izz="18.8720539166667" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pedestal_description/meshes/pedestal_description.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pedestal_description/meshes/pedestal_description.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

@@ -128,7 +128,8 @@ void makeMenuMarker(std::string name)
     InteractiveMarker int_marker = makeEmptyMarker();
     int_marker.name = name;
 
-    int_marker.pose.position.z = -0.5;
+    int_marker.pose.position.x = -0.3;
+    int_marker.pose.position.z = -0.15;
 
     InteractiveMarkerControl control;
 
