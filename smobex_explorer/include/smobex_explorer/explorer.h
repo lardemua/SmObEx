@@ -431,6 +431,8 @@ class evaluatePose : public generatePose
 
 			std::vector<unknownVoxel> unknown_voxels;
 
+			ROS_INFO_STREAM("N points unknown: " << points_inside.size());
+
 			for (pcl::PointCloud<pcl::PointXYZ>::iterator it = points_inside.begin(); it != points_inside.end(); it++)
 			{
 				unknownVoxel a_voxel;
@@ -444,22 +446,36 @@ class evaluatePose : public generatePose
 
 			std::sort(unknown_voxels.begin(), unknown_voxels.end(), compareVoxelDistance);
 
-			KeyRay ray_keys;
-			Vector3 end_point, direction;
+			KeyRay ray_keys_before, ray_keys_after;
+			Vector3 voxel_center, end_point, direction;
 
 			ros::Time t = ros::Time::now();
-// #pragma omp parallel for
 			for (size_t idx = 0; idx < unknown_voxels.size(); idx++)
 			{
-				end_point = unknown_octree->keyToCoord(unknown_voxels[idx].key);
+				voxel_center = unknown_octree->keyToCoord(unknown_voxels[idx].key);
 
-				direction = end_point - origin;
-				octree->castRay(origin, direction, end_point, true, max_range);
+				direction = voxel_center - origin;
+				bool occupied = octree->castRay(origin, direction, end_point, true, max_range);
 
-				unknown_octree->computeRayKeys(origin, end_point, ray_keys);
+				unknown_octree->computeRayKeys(origin, end_point, ray_keys_before);
+
+				if (occupied)
+				{
+					unknown_octree->computeRayKeys(end_point, voxel_center, ray_keys_after);
+
+					for (KeyRay::iterator it = ray_keys_after.begin(); it != ray_keys_after.end(); it++)
+					{
+						std::vector<unknownVoxel>::iterator it_del = std::find(unknown_voxels.begin(), unknown_voxels.end(), *it);
+
+						if (it_del != unknown_voxels.end())
+						{
+							unknown_voxels.erase(it_del);
+						}
+					}
+				}
 
 				bool first = true;
-				for (KeyRay::iterator it_key = ray_keys.begin(); it_key != ray_keys.end(); it_key++)
+				for (KeyRay::iterator it_key = ray_keys_before.begin(); it_key != ray_keys_before.end(); it_key++)
 				{
 					if (unknown_octree->search(*it_key) && origin.distance(unknown_octree->keyToCoord(*it_key)) >= min_range)
 					{
@@ -472,7 +488,6 @@ class evaluatePose : public generatePose
 						{
 							posterior_keys.insert(*it_key);
 						}
-
 						ray_points_list.push_back(origin);
 						ray_points_list.push_back(end_point);
 					}
@@ -487,7 +502,7 @@ class evaluatePose : public generatePose
 			}
 			ros::Duration d = ros::Time::now() - t;
 			ROS_INFO_STREAM("New for: " << d.toSec() << " secs.");
-			
+
 			getScore();
 		}
 		else

@@ -170,8 +170,8 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
 	x_direction.normalize();
 
 	rotation_matrix.setValue(x_direction.getX(), y_direction.getX(), z_direction.getX(), x_direction.getY(),
-							 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
-							 z_direction.getZ());
+													 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
+													 z_direction.getZ());
 
 	rotation_matrix.getRotation(view_orientation);
 	view_orientation.normalize();
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
 	moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
 	const robot_state::JointModelGroup *joint_model_group =
-		move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+			move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
 	ros::Time t;
 	ros::Duration d;
@@ -254,13 +254,16 @@ int main(int argc, char **argv)
 
 		t = ros::Time::now();
 		sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-			ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+				ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
 		d = ros::Time::now() - t;
 		ROS_INFO_STREAM("Waiting unknown cloud: " << d.toSec() << " secs.");
 
 		t = ros::Time::now();
 		pose_test.writeKnownOctomap();
 		pose_test.writeUnknownOctomap();
+		
+		pose_test.writeUnknownCloud();
+
 		d = ros::Time::now() - t;
 		ROS_INFO_STREAM("OctoMaps writing: " << d.toSec() << " secs.");
 
@@ -305,8 +308,8 @@ int main(int argc, char **argv)
 
 				// move_group.setPoseTarget(best_pose, end_effector_link);
 				bool set_target =
-					move_group.setJointValueTarget(target_pose,
-												   end_effector_link); // TODO explain why it's much more reliable
+						move_group.setJointValueTarget(target_pose,
+																					 end_effector_link); // TODO explain why it's much more reliable
 				d = ros::Time::now() - t;
 				ROS_INFO_STREAM("Pose gen process: " << d.toSec() << " secs.");
 
@@ -377,8 +380,6 @@ int main(int argc, char **argv)
 
 		ROS_INFO("MOVING!!!");
 
-		getchar();
-
 		// move_group.setPoseTarget(best_pose, end_effector_link);
 		// move_group.plan(my_plan);
 
@@ -395,7 +396,7 @@ int main(int argc, char **argv)
 		bool success = (move_group.move() == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 		d = ros::Time::now() - t;
 		ROS_INFO_STREAM("Final planning and moving: " << (success ? "DONE" : "FAILED") << ", " << d.toSec() << " secs, "
-													  << best_score << " score.");
+																									<< best_score << " score.");
 		//   getchar();
 		// }
 
