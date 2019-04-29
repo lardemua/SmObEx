@@ -9,4 +9,5 @@
         <rosparam file="$(find smobex_bringup)/params/camera_specs.yaml" command="load" />
 
     </node>
+
 </launch>

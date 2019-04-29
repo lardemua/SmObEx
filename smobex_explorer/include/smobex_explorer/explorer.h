@@ -124,14 +124,30 @@ class unknownVoxel
 	octomap::OcTreeKey key;
 	octomap::point3d center;
 	double distance_to_camera;
+	bool to_visit;
+	size_t map_key;
+
+	unknownVoxel()
+	{
+		to_visit = true;
+	}
 
 	bool operator==(const unknownVoxel &rhs) const { return this->key == rhs.key; }
 	bool operator==(const octomap::OcTreeKey &rhs) const { return this->key == rhs; }
 };
 
+typedef std::map<size_t, unknownVoxel> map_type;
+
 bool compareVoxelDistance(unknownVoxel const &a, unknownVoxel const &b)
 {
 	return a.distance_to_camera > b.distance_to_camera;
+	// return a->second.distance_to_camera > b->second.distance_to_camera;
+}
+
+bool compareVoxelDistanceIterator(map_type::iterator const &a, map_type::iterator const &b)
+{
+	// return a.distance_to_camera > b.distance_to_camera;
+	return a->second.distance_to_camera > b->second.distance_to_camera;
 }
 
 class evaluatePose : public generatePose
@@ -429,79 +445,143 @@ class evaluatePose : public generatePose
 			pcl::PointCloud<pcl::PointXYZ> points_inside;
 			fc.filter(points_inside);
 
-			std::vector<unknownVoxel> unknown_voxels;
+			std::vector<map_type::iterator> unknown_voxels;
+			map_type map_unknown_voxels;
 
 			ROS_INFO_STREAM("N points unknown: " << points_inside.size());
 
 			for (pcl::PointCloud<pcl::PointXYZ>::iterator it = points_inside.begin(); it != points_inside.end(); it++)
 			{
 				unknownVoxel a_voxel;
+				octomap::OcTreeKey::KeyHash hash;
 
 				a_voxel.key = unknown_octree->coordToKey(it->x, it->y, it->z);
 				a_voxel.center = Vector3(it->x, it->y, it->z);
 				a_voxel.distance_to_camera = origin.distance(Vector3(it->x, it->y, it->z));
+				a_voxel.map_key = hash(a_voxel.key);
 
-				unknown_voxels.push_back(a_voxel);
+				map_unknown_voxels.insert(std::pair<size_t, unknownVoxel>(a_voxel.map_key, a_voxel));
+
+				map_type::iterator map_it = map_unknown_voxels.find(a_voxel.map_key);
+
+				unknown_voxels.push_back(map_it);
 			}
 
-			std::sort(unknown_voxels.begin(), unknown_voxels.end(), compareVoxelDistance);
+			std::sort(unknown_voxels.begin(), unknown_voxels.end(), compareVoxelDistanceIterator);
+
+			// uint64 k = unknown_voxels[0].map_key;
+			// unknownVoxel uv = map_unknown_voxels.at(k);
+			// if (uv.to_visit == false)
+			// {
+			// 	ROS_INFO_STREAM("inside");
+			// 	// continue;
+			// }
 
 			KeyRay ray_keys_before, ray_keys_after;
 			Vector3 voxel_center, end_point, direction;
 
 			ros::Time t = ros::Time::now();
+			ros::Time t_for;
+			ros::Duration d_for_total(0);
+
+			t_for = ros::Time::now();
+			double total1 = 0;
+			double total2 = 0;
+			double total3 = 0;
+			double total4 = 0;
+
+			int checked_voxels = 0;
 			for (size_t idx = 0; idx < unknown_voxels.size(); idx++)
 			{
-				voxel_center = unknown_octree->keyToCoord(unknown_voxels[idx].key);
+				octomap::OcTreeKey::KeyHash hash;
+
+				if (map_unknown_voxels[unknown_voxels[idx]->second.map_key].to_visit == false)
+				{
+					continue;
+				}
+
+				checked_voxels++;
+
+				voxel_center = unknown_octree->keyToCoord(unknown_voxels[idx]->second.key);
 
 				direction = voxel_center - origin;
 				bool occupied = octree->castRay(origin, direction, end_point, true, max_range);
 
 				unknown_octree->computeRayKeys(origin, end_point, ray_keys_before);
 
+				bool first = true;
+
+				ros::Time tic, tic_inside;
+				for (KeyRay::iterator it_key = ray_keys_before.begin(); it_key != ray_keys_before.end(); it_key++)
+				{
+
+					tic = ros::Time::now();
+					bool C1 = origin.distance(unknown_octree->keyToCoord(*it_key)) >= min_range;
+					total1 += (ros::Time::now() - tic).toSec();
+
+					if (C1)
+					{
+
+						tic = ros::Time::now();
+						bool C2 = unknown_octree->search(*it_key);
+						total2 += (ros::Time::now() - tic).toSec();
+
+						tic = ros::Time::now();
+						if (C2)
+						{
+
+							if (first)
+							{
+								first_keys.insert(*it_key);
+								first = false;
+							}
+							else
+							{
+								posterior_keys.insert(*it_key);
+							}
+							ray_points_list.push_back(origin);
+							ray_points_list.push_back(end_point);
+
+							tic_inside = ros::Time::now();
+
+							map_type::iterator map_it = map_unknown_voxels.find(hash(*it_key));
+
+							if (map_it != map_unknown_voxels.end())
+							{
+								map_it->second.to_visit = false;
+							}
+
+							total4 += (ros::Time::now() - tic_inside).toSec();
+						}
+					}
+					total3 += (ros::Time::now() - tic).toSec();
+				}
+				d_for_total += (ros::Time::now() - t_for);
+
 				if (occupied)
 				{
 					unknown_octree->computeRayKeys(end_point, voxel_center, ray_keys_after);
 
-					for (KeyRay::iterator it = ray_keys_after.begin(); it != ray_keys_after.end(); it++)
+					for (KeyRay::iterator it_key = ray_keys_after.begin(); it_key != ray_keys_after.end(); it_key++)
 					{
-						std::vector<unknownVoxel>::iterator it_del = std::find(unknown_voxels.begin(), unknown_voxels.end(), *it);
+						map_type::iterator map_it = map_unknown_voxels.find(hash(*it_key));
 
-						if (it_del != unknown_voxels.end())
+						if (map_it != map_unknown_voxels.end())
 						{
-							unknown_voxels.erase(it_del);
+							map_it->second.to_visit = false;
 						}
-					}
-				}
-
-				bool first = true;
-				for (KeyRay::iterator it_key = ray_keys_before.begin(); it_key != ray_keys_before.end(); it_key++)
-				{
-					if (unknown_octree->search(*it_key) && origin.distance(unknown_octree->keyToCoord(*it_key)) >= min_range)
-					{
-						if (first)
-						{
-							first_keys.insert(*it_key);
-							first = false;
-						}
-						else
-						{
-							posterior_keys.insert(*it_key);
-						}
-						ray_points_list.push_back(origin);
-						ray_points_list.push_back(end_point);
-					}
-
-					std::vector<unknownVoxel>::iterator it_del = std::find(unknown_voxels.begin(), unknown_voxels.end(), *it_key);
-
-					if (it_del != unknown_voxels.end())
-					{
-						unknown_voxels.erase(it_del);
 					}
 				}
 			}
 			ros::Duration d = ros::Time::now() - t;
-			ROS_INFO_STREAM("New for: " << d.toSec() << " secs.");
+			ROS_INFO_STREAM("for iterator: " << d_for_total.toSec());
+			ROS_INFO_STREAM("1: " << total1);
+			ROS_INFO_STREAM("2: " << total2);
+			ROS_INFO_STREAM("3: " << total3);
+			ROS_INFO_STREAM("4: " << total4);
+			// ROS_INFO_STREAM("New for: " << d.toSec() << " secs. N points final: " << unknown_voxels.size());
+
+			ROS_INFO_STREAM("Checked voxels: " << checked_voxels);
 
 			getScore();
 		}

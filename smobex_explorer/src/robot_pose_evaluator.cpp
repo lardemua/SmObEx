@@ -51,7 +51,7 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
 	ROS_INFO_STREAM("Pose received...");
 
-	// evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+	// evaluatePose pose(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
 	evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
 	// pose.view_pose = transform;
 	tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
@@ -81,6 +81,7 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 	ros::spinOnce();
 
 	ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
+
 }
 
 void autoModeCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
