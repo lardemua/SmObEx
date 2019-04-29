@@ -58,7 +58,8 @@ bool publish = false;
 
 void genAndEvalPose(geometry_msgs::Pose marker_pose)
 {
-    evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+    // evaluatePose pose(20, 0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
+    evaluatePose pose(0.8, 10, 58 * M_PI / 180, 45 * M_PI / 180);
     tf::poseMsgToTF(marker_pose, pose.view_pose);
 
     pose.evalPose();

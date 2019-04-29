@@ -156,7 +156,7 @@ class evaluatePose : public generatePose
 	float score = 0;
 	std_msgs::ColorRGBA score_color;
 
-	int step;
+	// int step;
 	float min_range;
 	float max_range;
 	float width_FOV;
@@ -170,18 +170,20 @@ class evaluatePose : public generatePose
 	octomap::KeySet first_keys;
 	octomap::KeySet posterior_keys;
 
-	pcl::PointCloud<pcl::PointXYZ> rays_point_cloud_world;
+	// pcl::PointCloud<pcl::PointXYZ> rays_point_cloud_world;
 	pcl::PointCloud<pcl::PointXYZ> unknown_centers_pcl;
 
 	octomap::point3d min_bbx, max_bbx;
 
-	evaluatePose(int _step, float _min_range, float _max_range, float _width_FOV, float _height_FOV)
+	evaluatePose(/*int _step,*/ float _min_range, float _max_range, float _width_FOV, float _height_FOV)
 	{
-		step = _step;
+		// step = _step;
 		min_range = _min_range;
 		max_range = _max_range;
 		width_FOV = _width_FOV;
 		height_FOV = _height_FOV;
+
+		/*
 
 		ros::NodeHandle n;
 		sensor_msgs::CameraInfoConstPtr CamInfo;
@@ -221,6 +223,7 @@ class evaluatePose : public generatePose
 		// rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
 		// rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
 		// pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
+		*/
 
 		ros::param::get("x_max", max_bbx.x());
 		ros::param::get("y_max", max_bbx.y());
@@ -338,14 +341,14 @@ class evaluatePose : public generatePose
 		origin.x() = octo_pose.x();
 		origin.y() = octo_pose.y();
 		origin.z() = octo_pose.z();
-
+#if 0
 		pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
 		pcl_ros::transformPointCloud(rays_point_cloud_world, rays_point_cloud, view_pose);
 
 		int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
 		if (octree != NULL && unknown_octree != NULL)
 		{
-#if 0
+
       ros::Duration d, d1;
       ros::Time t;
       ros::Time t1 = ros::Time::now();
@@ -419,6 +422,8 @@ class evaluatePose : public generatePose
         }
       }
 #endif
+		if (octree != NULL && unknown_octree != NULL)
+		{
 
 			pcl::FrustumCulling<pcl::PointXYZ> fc;
 			fc.setInputCloud(unknown_centers_pcl.makeShared());

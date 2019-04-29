@@ -32,7 +32,7 @@ ros::Publisher pub_text;
 visualization_msgs::Marker line, text, frustum_lines;
 visualization_msgs::MarkerArray single_view_boxes;
 
-int step = 1;
+// int step = 1;
 float min_range = 0;
 float max_range = 1;
 float width_FOV = M_PI;
@@ -52,7 +52,8 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 	ROS_INFO_STREAM("Pose received...");
 
 	// evaluatePose pose(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
-	evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
+	// evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
+	evaluatePose pose(min_range, max_range, width_FOV, height_FOV);
 	// pose.view_pose = transform;
 	tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
@@ -161,7 +162,7 @@ int main(int argc, char **argv)
 	// tf::TransformListener lr(ros::Duration(10));
 	// listener = &lr;
 
-	ros::param::get("~" + ros::names::remap("step"), step);
+	// ros::param::get("~" + ros::names::remap("step"), step);
 	ros::param::get("~" + ros::names::remap("min_range"), min_range);
 	ros::param::get("~" + ros::names::remap("max_range"), max_range);
 	ros::param::get("~" + ros::names::remap("width_FOV"), width_FOV);

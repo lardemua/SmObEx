@@ -219,14 +219,14 @@ int main(int argc, char **argv)
 	const robot_state::JointModelGroup *joint_model_group =
 			move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
-	int step = 1;
+	// int step = 1;
 	float min_range = 0;
 	float max_range = 1;
 	float width_FOV = M_PI;
 	float height_FOV = M_PI;
 	std::string frame_id = "/world";
 
-	ros::param::get("~" + ros::names::remap("step"), step);
+	// ros::param::get("~" + ros::names::remap("step"), step);
 	ros::param::get("~" + ros::names::remap("min_range"), min_range);
 	ros::param::get("~" + ros::names::remap("max_range"), max_range);
 	ros::param::get("~" + ros::names::remap("width_FOV"), width_FOV);
@@ -234,7 +234,8 @@ int main(int argc, char **argv)
 	ros::param::get("~" + ros::names::remap("frame_id"), frame_id);
 
 	// evaluatePose pose_test(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
-	evaluatePose pose_test(step, min_range, max_range, width_FOV, height_FOV);
+	// evaluatePose pose_test(step, min_range, max_range, width_FOV, height_FOV);
+	evaluatePose pose_test(min_range, max_range, width_FOV, height_FOV);
 
 	// TODO PARAMS
 	int n_poses = 20;
