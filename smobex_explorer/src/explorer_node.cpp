@@ -218,28 +218,11 @@ int main(int argc, char **argv)
 	const robot_state::JointModelGroup *joint_model_group =
 		move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
-	//-----------------
-
-	// const moveit::core::JointBoundsVector active_joints_bounds = joint_model_group->getActiveJointModelsBounds();
-	// const moveit::core::JointModel::Bounds *bounds = active_joints_bounds[0];
-
-	// std::vector<const moveit::core::JointModel *> active_joint_models = joint_model_group->getActiveJointModels();
-
-	// // const std::vector<moveit_msgs::JointLimits> joint_limits_msg = active_joint_models[0]->getVariableBoundsMsg();
-
-	// const moveit::core::JointModel * ajm0 = 
-	// const std::vector<moveit_msgs::JointLimits> joint_limits_msg = {}
-
-	// ROS_INFO_STREAM("size " << joint_limits_msg.size());
-
-	// ROS_INFO_STREAM("min " << joint_limits_msg[0].min_position);
-
-	// joint_limits_msg[0].min_position = -0.1;
-	// joint_limits_msg[0].max_position = 0.1;
-
-	// active_joint_models[0]->setVariableBounds(joint_limits_msg);
-
-	//-----------------
+	std_msgs::ColorRGBA green_color;
+	green_color.r = 0.0;
+	green_color.g = 1.0;
+	green_color.b = 0.0;
+	green_color.a = 1.0;
 
 	// int step = 1;
 	float min_range = 0;
@@ -259,7 +242,6 @@ int main(int argc, char **argv)
 	// evaluatePose pose_test(step, min_range, max_range, width_FOV, height_FOV);
 	evaluatePose pose_test(min_range, max_range, width_FOV, height_FOV);
 
-	// TODO PARAMS
 	int n_poses = 20;
 	float threshold = 0.01;
 
@@ -268,9 +250,10 @@ int main(int argc, char **argv)
 
 	int arrow_id = -1;
 	float best_score = -1;
+	int best_arrow_id;
 
 	srand(time(NULL));
-
+#if 0
 	do
 	{
 		visualization_msgs::MarkerArray all_poses;
@@ -396,6 +379,159 @@ int main(int argc, char **argv)
 
 		move_group.setPlanningTime(1);
 		// move_group.setPoseTarget(best_pose, end_effector_link);
+		move_group.setJointValueTarget(best_pose, end_effector_link);
+		move_group.plan(my_plan);
+
+		bool success = (move_group.move() == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+		ROS_INFO("---------");
+
+		for (size_t id_arrow_mrk = 0; id_arrow_mrk < all_poses.markers.size(); id_arrow_mrk++)
+		{
+			all_poses.markers[id_arrow_mrk].action = visualization_msgs::Marker::DELETEALL;
+		}
+		pub_arrows.publish(all_poses);
+
+		for (size_t id_vol = 0; id_vol < single_view_boxes.markers.size(); id_vol++)
+		{
+			single_view_boxes.markers[id_vol].action = visualization_msgs::Marker::DELETEALL;
+		}
+		pub_space.publish(single_view_boxes);
+
+	} while (best_score > threshold);
+#endif
+
+	do
+	{
+		visualization_msgs::MarkerArray all_poses;
+		visualization_msgs::MarkerArray single_view_boxes;
+
+		arrow_id = -1;
+		best_score = -1;
+
+		move_group.clearPoseTargets();
+
+		sensor_msgs::PointCloud2ConstPtr unknown_cloud =
+			ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+
+		pose_test.writeKnownOctomap();
+		pose_test.writeUnknownOctomap();
+
+		pose_test.writeUnknownCloud();
+
+		clusters_centroids = findClusters(unknown_cloud);
+
+		if (clusters_centroids.size() > 0)
+		{
+			pub_cloud_clusters.publish(cloud_clusters_publish);
+
+			centroid_clusters_publish.header.stamp = ros::Time::now();
+			centroid_clusters_publish.header.frame_id = frame_id;
+
+			pub_centers_clusters.publish(centroid_clusters_publish);
+		}
+
+		move_group.setPlanningTime(0.4);
+		const std::string end_effector_link = move_group.getEndEffectorLink();
+
+		size_t total_clusters = clusters_centroids.size();
+
+		size_t poses_by_cluster = n_poses / total_clusters;
+
+		size_t pose_idx = 0;
+
+		for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
+		{
+			geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
+
+			while (pose_idx < poses_by_cluster)
+			{
+				geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
+				target_pose.pose.position.x = abs(target_pose.pose.position.x);
+
+				if (target_pose.pose.position.x < 0.2)
+				{
+					target_pose.pose.position.x = 0.2;
+				}
+
+				geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
+				target_pose.pose.orientation = quat_orient;
+
+				bool set_target = move_group.setJointValueTarget(target_pose, end_effector_link);
+
+				bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+				ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
+				ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
+				ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
+
+				if (set_target && set_plan)
+				{
+					tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
+
+					pose_test.evalPose();
+
+					ROS_INFO_STREAM("Score: " << pose_test.score);
+
+					arrow.header.stamp = ros::Time::now();
+					arrow.header.frame_id = frame_id;
+
+					arrow.id = ++arrow_id;
+
+					arrow.type = visualization_msgs::Marker::ARROW;
+					arrow.color = pose_test.score_color;
+
+					arrow.pose.position = target_pose.pose.position;
+
+					tf::Quaternion q_rot, q_new;
+					geometry_msgs::Quaternion q_arrow;
+					tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
+
+					q_rot.setRPY(0, -M_PI / 2, 0);
+					q_new = q_new * q_rot;
+					q_new.normalize();
+
+					tf::quaternionTFToMsg(q_new, q_arrow);
+					arrow.pose.orientation = q_arrow;
+
+					arrow.scale.x = 0.10;
+					arrow.scale.y = 0.02;
+					arrow.scale.z = 0.02;
+
+					all_poses.markers.push_back(arrow);
+
+					if (pose_test.score > best_score)
+					{
+						best_score = pose_test.score;
+						best_pose = target_pose;
+						best_arrow_id = arrow_id;
+
+						single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
+					}
+
+					pub_arrows.publish(all_poses);
+
+					pose_idx++;
+				}
+
+				ROS_INFO("---------");
+			}
+		}
+
+		all_poses.markers[best_arrow_id].color = green_color;
+		all_poses.markers[best_arrow_id].scale.x *= 2;
+		all_poses.markers[best_arrow_id].scale.y *= 2;
+		all_poses.markers[best_arrow_id].scale.z *= 2;
+
+		pub_arrows.publish(all_poses);
+
+		ROS_INFO("MOVING!!!");
+
+		pub_space.publish(single_view_boxes);
+
+		move_group.setPlanningTime(1);
+		move_group.setNumPlanningAttempts(10);
+
 		move_group.setJointValueTarget(best_pose, end_effector_link);
 		move_group.plan(my_plan);
 
