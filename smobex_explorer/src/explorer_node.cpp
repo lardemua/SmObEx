@@ -168,15 +168,15 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
 	rand_vector.setZ((double)rand() / RAND_MAX);
 
 	y_direction = z_direction.cross(rand_vector);
-	y_direction.setZ(-1 * abs(y_direction.getZ()));
+	// y_direction.setZ(-1 * abs(y_direction.getZ()));
 	y_direction.normalize();
 
 	x_direction = y_direction.cross(z_direction);
 	x_direction.normalize();
 
 	rotation_matrix.setValue(x_direction.getX(), y_direction.getX(), z_direction.getX(), x_direction.getY(),
-													 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
-													 z_direction.getZ());
+							 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
+							 z_direction.getZ());
 
 	rotation_matrix.getRotation(view_orientation);
 	view_orientation.normalize();
@@ -188,8 +188,6 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
 
 int main(int argc, char **argv)
 {
-	moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
 	geometry_msgs::PoseStamped best_pose;
 
 	visualization_msgs::Marker arrow;
@@ -215,9 +213,33 @@ int main(int argc, char **argv)
 
 	moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
 	moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+	moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
 	const robot_state::JointModelGroup *joint_model_group =
-			move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+		move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+
+	//-----------------
+
+	// const moveit::core::JointBoundsVector active_joints_bounds = joint_model_group->getActiveJointModelsBounds();
+	// const moveit::core::JointModel::Bounds *bounds = active_joints_bounds[0];
+
+	// std::vector<const moveit::core::JointModel *> active_joint_models = joint_model_group->getActiveJointModels();
+
+	// // const std::vector<moveit_msgs::JointLimits> joint_limits_msg = active_joint_models[0]->getVariableBoundsMsg();
+
+	// const moveit::core::JointModel * ajm0 = 
+	// const std::vector<moveit_msgs::JointLimits> joint_limits_msg = {}
+
+	// ROS_INFO_STREAM("size " << joint_limits_msg.size());
+
+	// ROS_INFO_STREAM("min " << joint_limits_msg[0].min_position);
+
+	// joint_limits_msg[0].min_position = -0.1;
+	// joint_limits_msg[0].max_position = 0.1;
+
+	// active_joint_models[0]->setVariableBounds(joint_limits_msg);
+
+	//-----------------
 
 	// int step = 1;
 	float min_range = 0;
@@ -260,7 +282,7 @@ int main(int argc, char **argv)
 		move_group.clearPoseTargets();
 
 		sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-				ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+			ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
 
 		pose_test.writeKnownOctomap();
 		pose_test.writeUnknownOctomap();
@@ -305,8 +327,8 @@ int main(int argc, char **argv)
 
 				// move_group.setPoseTarget(best_pose, end_effector_link);
 				bool set_target =
-						move_group.setJointValueTarget(target_pose,
-																					 end_effector_link); // TODO explain why it's much more reliable
+					move_group.setJointValueTarget(target_pose,
+												   end_effector_link);
 
 				bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
@@ -330,7 +352,7 @@ int main(int argc, char **argv)
 					}
 
 					arrow.header.stamp = ros::Time::now();
-					arrow.header.frame_id = "/base_link";
+					arrow.header.frame_id = frame_id;
 
 					arrow.id = ++arrow_id;
 

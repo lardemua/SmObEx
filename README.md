@@ -120,7 +120,14 @@ Porto, Portugal
 
 - [x] Use MoveIt! to generate reachable poses
 - [x] Find the center of the unknown clusters
+
+## Week 18
+
+- [x] Create faster evaluation method
 - [ ] Finish up auto mode
+     - [x] Limit even more joint bounds
+     - [ ] Integrate with interactive marker
+     - [ ] Do parelization 
 
 # Built with
 

@@ -22,7 +22,7 @@
         rpy="1.5707963267949 0 0" />
       <geometry>
         <mesh
-          filename="package://pedestal_description/meshes/pedestal_description.STL" />
+          filename="package://smobex_description/meshes/pedestal_description.STL" />
       </geometry>
       <material
         name="">
@@ -36,7 +36,7 @@
         rpy="1.5707963267949 0 0" />
       <geometry>
         <mesh
-          filename="package://pedestal_description/meshes/pedestal_description.STL" />
+          filename="package://smobex_description/meshes/pedestal_description.STL" />
       </geometry>
     </collision>
   </link>
