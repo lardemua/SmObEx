@@ -110,7 +110,7 @@
       </collision>
     </link>
 
-    <xacro:property name="delta" value="0.1" />
+    <xacro:property name="delta" value="0.2" />
 
     <!-- joints: main serial chain -->
     <joint name="${prefix}joint_1" type="revolute">

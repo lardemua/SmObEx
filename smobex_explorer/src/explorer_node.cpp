@@ -175,8 +175,8 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
 	x_direction.normalize();
 
 	rotation_matrix.setValue(x_direction.getX(), y_direction.getX(), z_direction.getX(), x_direction.getY(),
-							 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
-							 z_direction.getZ());
+													 y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
+													 z_direction.getZ());
 
 	rotation_matrix.getRotation(view_orientation);
 	view_orientation.normalize();
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 	moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
 	const robot_state::JointModelGroup *joint_model_group =
-		move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+			move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
 	std_msgs::ColorRGBA green_color;
 	green_color.r = 0.0;
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
 	ros::param::get("~threshold", threshold);
 
 	int arrow_id = -1;
-	float best_score = -1;
+	float best_score = 1;
 	int best_arrow_id;
 
 	srand(time(NULL));
@@ -401,7 +401,8 @@ int main(int argc, char **argv)
 	} while (best_score > threshold);
 #endif
 
-	do
+	//do
+	while (best_score > threshold)
 	{
 		visualization_msgs::MarkerArray all_poses;
 		visualization_msgs::MarkerArray single_view_boxes;
@@ -412,7 +413,7 @@ int main(int argc, char **argv)
 		move_group.clearPoseTargets();
 
 		sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-			ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+				ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
 
 		pose_test.writeKnownOctomap();
 		pose_test.writeUnknownOctomap();
@@ -438,21 +439,25 @@ int main(int argc, char **argv)
 
 		size_t poses_by_cluster = n_poses / total_clusters;
 
-		size_t pose_idx = 0;
+		ROS_INFO_STREAM("Number of cluster: " << total_clusters);
+		ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
 
 		for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
 		{
 			geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
 
-			while (pose_idx < poses_by_cluster)
+			// size_t pose_idx = 0;
+
+			// while (pose_idx < poses_by_cluster)
+			for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
 			{
 				geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
 				target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
-				if (target_pose.pose.position.x < 0.2)
-				{
-					target_pose.pose.position.x = 0.2;
-				}
+				// if (target_pose.pose.position.x < 0.2)
+				// {
+				// 	target_pose.pose.position.x = 0.2;
+				// }
 
 				geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
 				target_pose.pose.orientation = quat_orient;
@@ -461,7 +466,7 @@ int main(int argc, char **argv)
 
 				bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
-				ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
+				ROS_INFO_STREAM("Cluster " << cluster_idx + 1 << " of " << total_clusters << " Pose " << pose_idx + 1 << " of " << poses_by_cluster);
 				ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
 				ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
 
@@ -511,7 +516,7 @@ int main(int argc, char **argv)
 
 					pub_arrows.publish(all_poses);
 
-					pose_idx++;
+					// pose_idx++;
 				}
 
 				ROS_INFO("---------");
@@ -525,7 +530,7 @@ int main(int argc, char **argv)
 
 		pub_arrows.publish(all_poses);
 
-		ROS_INFO("MOVING!!!");
+		ROS_WARN("MOVING!!!");
 
 		pub_space.publish(single_view_boxes);
 
@@ -551,7 +556,7 @@ int main(int argc, char **argv)
 		}
 		pub_space.publish(single_view_boxes);
 
-	} while (best_score > threshold);
+	} //while (best_score > threshold);
 
 	ROS_INFO_STREAM("Final best score: " << best_score);
 
