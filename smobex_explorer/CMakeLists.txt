@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  octomap REQUIRED
   pcl_ros
   rviz
   colormap
@@ -21,6 +20,11 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning_interface
   moveit_ros_perception
 )
+
+find_package(octomap REQUIRED)
+include_directories(${OCTOMAP_INCLUDE_DIRS})
+# target_link_libraries(${OCTOMAP_LIBRARIES})
+link_directories(${OCTOMAP_LIBRARY_DIRS})
 
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
@@ -139,7 +143,6 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-  ${OCTOMAP_INCLUDE_DIRS}
   ${colormap_INCLUDE_DIRS}
   include
 )

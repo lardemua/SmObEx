@@ -439,7 +439,7 @@ int main(int argc, char **argv)
 
 		size_t poses_by_cluster = n_poses / total_clusters;
 
-		ROS_INFO_STREAM("Number of cluster: " << total_clusters);
+		ROS_INFO_STREAM("Number of clusters: " << total_clusters);
 		ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
 
 		for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
@@ -449,6 +449,7 @@ int main(int argc, char **argv)
 			// size_t pose_idx = 0;
 
 			// while (pose_idx < poses_by_cluster)
+			// #pragma omp parallel for //TODO
 			for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
 			{
 				geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();

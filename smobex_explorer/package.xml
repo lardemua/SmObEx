@@ -62,6 +62,9 @@
     <build_depend>octomap</build_depend>
     <exec_depend>octomap</exec_depend>
 
+    <build_depend>colormap</build_depend>
+    <exec_depend>colormap</exec_depend>
+
     <!-- The export tag contains other, unspecified, tags -->
     <export>
         <!-- Other tools can request additional information be placed here -->
