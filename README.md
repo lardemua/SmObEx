@@ -4,7 +4,7 @@ My Mechanical Engineering Masters Thesis in the field of Robotics.
 
 ## Thesis title
 
-*Smart object exploration by robotic manipulator*
+_Smart object exploration by robotic manipulator_
 
 Department of Mechanical Engineering (DEM), University of Aveiro (UA)
 
@@ -31,34 +31,54 @@ Porto, Portugal
 # Table of contents
 
 - [Completed tasks](#completed-tasks)
-  * [Week 10](#week-10)
-  * [Week 11](#week-11)
-  * [Week 12](#week-12)
-  * [Week 13](#week-13)
-  * [Week 14](#week-14)
-  * [Week 15](#week-15)
-- [Built with](#built-with)
-  * [Hardware](#hardware)
-  * [Software](#software)
-- [Installation guides](#installation-guides)
-  * [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
-  * [Aruco Hand Eye](#aruco-hand-eye)
-- [See the robot](#see-the-robot)
-  * [Moving the joint with the interface](#moving-the-joint-with-the-interface)
-  * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
-  * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
-- [Usage](#usage)
-  * [Intrinsic Calibration](#intrinsic-calibration)
-  * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
-  * [Recording mode](#recording-mode)
-    + [Results](#results)
-  * [Operation mode](#operation-mode)
-    + [Simulating in Roboguide](#simulating-in-roboguide)
-    + [Offline (robot) Mode](#offline--robot--mode)
-    + [Define Space Mode](#define-space-mode)
-    + [Autonomous](#autonomous)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+  - [Week 10](#week-10)
+  - [Week 11](#week-11)
+  - [Week 12](#week-12)
+  - [Week 13](#week-13)
+  - [Week 14](#week-14)
+  - [Week 15](#week-15)
+  - [Week 16](#week-16)
+  - [Week 17](#week-17)
+  - [Week 18](#week-18)
+
+- [Built with](#built-with)
+
+  - [Hardware](#hardware)
+  - [Software](#software)
+
+- [Installation guides](#installation-guides)
+
+  - [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
+  - [Aruco Hand Eye](#aruco-hand-eye)
+
+- [See the robot](#see-the-robot)
+
+  - [Moving the joint with the interface](#moving-the-joint-with-the-interface)
+  - [Moving the robot with the TP](#moving-the-robot-with-the-tp)
+  - [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
+
+- [Usage](#usage)
+
+  - [Intrinsic Calibration](#intrinsic-calibration)
+  - [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
+  - [Recording mode](#recording-mode)
+
+    - [Results](#results)
+
+  - [Operation mode](#operation-mode)
+
+    - [Simulating in Roboguide](#simulating-in-roboguide)
+    - [Offline (robot) Mode](#offline--robot--mode)
+    - [Define Space Mode](#define-space-mode)
+    - [Manual Pose Evaluation](#manual-pose-evaluation)
+    - [Autonomous](#autonomous)
+
+<small>
+  <i>
+  <a href="http://ecotrust-canada.github.io/markdown-toc/">Table of contents generated with markdown-toc</a>
+</i>
+</small>
 
 # Completed tasks
 
@@ -72,15 +92,18 @@ Porto, Portugal
 - [x] Installed ROS Industrial on the Fanuc m6ib/6s
 - [x] Connected ROS to the Fanuc
 - [x] Updated the Fanuc package
-     - [x] Updated the xacro file
-     - [x] Updated the stl
-     - [x] Create the support package 
-     - [x] Create MoveIt "package"
+
+  - [x] Updated the xacro file
+  - [x] Updated the stl
+  - [x] Create the support package
+  - [x] Create MoveIt "package"
+
 - [x] Calibrate Xtion
-     - [x] Configure Rviz with Xtion + Robot
-     - [x] Obtained the tf from the end effector to the camera
-     - [x] Implemented the tf automatically
-     - [x] Get the best calibration possible (RGB intrinsic and camera extrinsic)
+
+  - [x] Configure Rviz with Xtion + Robot
+  - [x] Obtained the tf from the end effector to the camera
+  - [x] Implemented the tf automatically
+  - [x] Get the best calibration possible (RGB intrinsic and camera extrinsic)
 
 ## Week 12
 
@@ -88,11 +111,11 @@ Porto, Portugal
 - [x] Added mode to record Point Cloud and OctoMap
 - [x] Restrict the volume to generate the model
 - [x] Multiple view model of the world
-- [x] Communicated with robot in Roboguide (other pc) 
+- [x] Communicated with robot in Roboguide (other pc)
 
 ## Week 13
 
-- [x] Created node to generate multi view poses 
+- [x] Created node to generate multi view poses
 
 ## Week 14
 
@@ -102,17 +125,18 @@ Porto, Portugal
 ## Week 15
 
 - [x] Visualization of the unknown space
-- [x] Integrated the *octomap_bounding_box* node
+- [x] Integrated the _octomap_bounding_box_ node
 - [x] Evaluate each pose
-     - [x] Evaluated one ray
-     - [x] Generated all camera rays for given pose
-     - [x] Evaluate all rays
-     - [x] Store the score
+
+  - [x] Evaluated one ray
+  - [x] Generated all camera rays for given pose
+  - [x] Evaluate all rays
+  - [x] Store the score
 
 ## Week 16
 
 - [x] Use interactive markers to evaluate a pose
-- [x] Implemented MoveIt! controls to test pose moving the robot 
+- [x] Implemented MoveIt! controls to test pose moving the robot
 - [x] Frustum color changes accordingly to pose score
 - [x] Update the score formula
 
@@ -125,9 +149,10 @@ Porto, Portugal
 
 - [x] Create faster evaluation method
 - [ ] Finish up auto mode
-     - [x] Limit even more joint bounds
-     - [ ] Integrate with interactive marker
-     - [ ] Do parelization 
+
+  - [x] Limit even more joint bounds
+  - [ ] Integrate with interactive marker
+  - [ ] Do parelization
 
 # Built with
 
@@ -143,11 +168,16 @@ Porto, Portugal
 - [Octomap Server](http://wiki.ros.org/octomap_server)
 - [FANUC Driver](http://wiki.ros.org/fanuc) (based on)
 - [ARUCO / VISP Hand-Eye Calibration](https://github.com/jhu-lcsr/aruco_hand_eye)
-   * [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
-   * [visp](https://github.com/lagadic/vision_visp)  
+
+  - [Aruco ROS](https://github.com/pal-robotics/aruco_ros)
+  - [visp](https://github.com/lagadic/vision_visp)
+
 - [Hector Models](https://github.com/tu-darmstadt-ros-pkg/hector_models)
+
 - [Camera Calibraton](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration)
+
 - [OctoMap tools](https://github.com/miguelriemoliveira/octomap_tools)
+
 - [PCL ROS](http://wiki.ros.org/pcl)
 
 # Installation guides
@@ -181,7 +211,7 @@ After this run `catkin_make` to try everything.
 
 **Note: added my implementation to the m6ib6s.**
 
-Already made a pull request with the M6iB/6S implementation. It has the same problem and solution described in the previous lines. 
+Already made a pull request with the M6iB/6S implementation. It has the same problem and solution described in the previous lines.
 
 ![robot on rviz](./files/fanuc_m6ib6s_implement.png)
 
@@ -218,6 +248,7 @@ export LC_NUMERIC="en_US.UTF-8"
 
 roslaunch fanuc_m6ib_support test_m6ib6s.launch
 ```
+
 ## Moving the robot with the TP
 
 Wire connect the robot to the machine.
@@ -226,7 +257,7 @@ Set the IP of the machine to 192.168.0.200
 
 On the TP, run rosstate
 
-On the Linux machine, run 
+On the Linux machine, run
 
 ```bash
 roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.168.0.230
@@ -236,7 +267,7 @@ roslaunch fanuc_m6ib_support robot_state_visualize_m6ib6s.launch robot_ip:=192.1
 
 Start the ros TPE program in auto mode.
 
-In the terminal run 
+In the terminal run
 
 ```bash
 roslaunch fanuc_xtion_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=192.168.0.230
@@ -266,11 +297,11 @@ For the calibration do the following steps:
 
 2. run ROSSTATE on the TP and then
 
-```bash 
+```bash
 roslaunch smobex_bringup bringup.launch config:=true calibration:=true
 ```
 
-3. to store the calibration, open another terminal and run 
+1. to store the calibration, open another terminal and run
 
 ```bash
 rosrun smobex_calibration store_calibration.py
@@ -286,15 +317,15 @@ rosrun smobex_calibration store_calibration.py
 
 ## Recording mode
 
-To record the point cloud run 
+To record the point cloud run
 
 ```bash
-roslaunch smobex_bringup record.launch 
+roslaunch smobex_bringup record.launch
 ```
 
 (You must change the saving path in the launch file)
 
-If at any moment you desire to save the OctoMap run 
+If at any moment you desire to save the OctoMap run
 
 ```bash
 rosnode kill /accumulatedpointcloud
@@ -302,7 +333,7 @@ rosnode kill /accumulatedpointcloud
 rosrun octomap_server octomap_saver -f test.ot
 ```
 
-To visualize the point cloud or the OctoMap run, respectively, 
+To visualize the point cloud or the OctoMap run, respectively,
 
 ```bash
 pcl_viewer auto_save.pcd
@@ -328,7 +359,7 @@ octovis test.ot
 
 Connect both Linux and Windows machines by ethernet cable.
 
-In the Windows set the IPv4 as 192.168.0.233. In the Linux as 192.168.0.230.
+In the Windows set the IPv4 as 192.168.0.233\. In the Linux as 192.168.0.230.
 
 Start Roboguide and run the ROS TPE program.
 
@@ -347,7 +378,7 @@ and set with rqt_reconfigure
 
 ### Offline (robot) Mode
 
-```bash 
+```bash
 roslaunch smobex_bringup bringup.launch online:=false
 ```
 
@@ -357,7 +388,7 @@ roslaunch smobex_bringup bringup.launch online:=false
 
 **_Video_**: [SmObEx - OctoMap mapping of selected volume of the world](https://youtu.be/pa0htI7LZPg)
 
-```bash 
+```bash
 roslaunch smobex_bringup bringup.launch config:=true define_vol:=true
 ```
 
@@ -375,9 +406,9 @@ rosrun smobex_bringup store_volume.py
 
 ### Autonomous
 
-1. run 
+1. run
 
-```bash 
+```bash
 roslaunch smobex_bringup bringup.launch
 ```
 

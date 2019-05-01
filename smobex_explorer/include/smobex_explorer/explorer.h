@@ -609,6 +609,12 @@ class evaluatePose : public generatePose
 
 		score = found_volume / score_volume;
 
+		// class_colormap frustum_color("jet", 64, 1, true);
+		getColor();
+	}
+
+	void getColor()
+	{
 		class_colormap frustum_color("jet", 64, 1, true);
 
 		score_color = frustum_color.color(score * 64);

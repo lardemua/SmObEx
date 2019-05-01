@@ -253,153 +253,6 @@ int main(int argc, char **argv)
 	int best_arrow_id;
 
 	srand(time(NULL));
-#if 0
-	do
-	{
-		visualization_msgs::MarkerArray all_poses;
-		visualization_msgs::MarkerArray single_view_boxes;
-
-		arrow_id = -1;
-		best_score = -1;
-
-		move_group.clearPoseTargets();
-
-		sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-			ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
-
-		pose_test.writeKnownOctomap();
-		pose_test.writeUnknownOctomap();
-
-		pose_test.writeUnknownCloud();
-
-		clusters_centroids = findClusters(unknown_cloud);
-
-		if (clusters_centroids.size() > 0)
-		{
-			pub_cloud_clusters.publish(cloud_clusters_publish);
-
-			centroid_clusters_publish.header.stamp = ros::Time::now();
-			centroid_clusters_publish.header.frame_id = frame_id;
-
-			pub_centers_clusters.publish(centroid_clusters_publish);
-		}
-
-		move_group.setPlanningTime(0.4);
-		const std::string end_effector_link = move_group.getEndEffectorLink();
-
-		// #pragma omp parallel for //TODO
-		for (size_t cluster_idx = 0; cluster_idx < clusters_centroids.size(); cluster_idx++)
-		{
-			geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
-
-			size_t pose_idx = 0;
-			// for (size_t pose_idx = 0; pose_idx < n_poses; pose_idx++)
-			while (pose_idx < n_poses)
-			{
-
-				geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
-				target_pose.pose.position.x = abs(target_pose.pose.position.x);
-
-				if (target_pose.pose.position.x < 0.2)
-				{
-					target_pose.pose.position.x = 0.2;
-				}
-
-				geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
-				target_pose.pose.orientation = quat_orient;
-
-				// move_group.setPoseTarget(best_pose, end_effector_link);
-				bool set_target =
-					move_group.setJointValueTarget(target_pose,
-												   end_effector_link);
-
-				bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-				ROS_INFO_STREAM("Cluster " << cluster_idx << " Pose " << pose_idx);
-				ROS_INFO("Visualizing plan 1 (pose goal) %s", set_plan ? "" : "FAILED");
-
-				if (set_target && set_plan)
-				{
-					tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
-
-					pose_test.evalPose();
-
-					ROS_INFO_STREAM("Score: " << pose_test.score);
-
-					if (pose_test.score > best_score)
-					{
-						best_score = pose_test.score;
-						best_pose = target_pose;
-
-						single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
-					}
-
-					arrow.header.stamp = ros::Time::now();
-					arrow.header.frame_id = frame_id;
-
-					arrow.id = ++arrow_id;
-
-					arrow.type = visualization_msgs::Marker::ARROW;
-					arrow.color = pose_test.score_color;
-
-					arrow.pose.position = target_pose.pose.position;
-
-					tf::Quaternion q_rot, q_new;
-					geometry_msgs::Quaternion q_arrow;
-					tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
-
-					q_rot.setRPY(0, -M_PI / 2, 0);
-					q_new = q_new * q_rot;
-					q_new.normalize();
-
-					tf::quaternionTFToMsg(q_new, q_arrow);
-					arrow.pose.orientation = q_arrow;
-
-					arrow.scale.x = 0.10;
-					arrow.scale.y = 0.02;
-					arrow.scale.z = 0.02;
-
-					all_poses.markers.push_back(arrow);
-
-					pub_arrows.publish(all_poses);
-
-					pose_idx++;
-				}
-
-				ROS_INFO("---------");
-			}
-		}
-
-		ROS_INFO("MOVING!!!");
-
-		// move_group.setPoseTarget(best_pose, end_effector_link);
-		// move_group.plan(my_plan);
-
-		pub_space.publish(single_view_boxes);
-
-		move_group.setPlanningTime(1);
-		// move_group.setPoseTarget(best_pose, end_effector_link);
-		move_group.setJointValueTarget(best_pose, end_effector_link);
-		move_group.plan(my_plan);
-
-		bool success = (move_group.move() == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-		ROS_INFO("---------");
-
-		for (size_t id_arrow_mrk = 0; id_arrow_mrk < all_poses.markers.size(); id_arrow_mrk++)
-		{
-			all_poses.markers[id_arrow_mrk].action = visualization_msgs::Marker::DELETEALL;
-		}
-		pub_arrows.publish(all_poses);
-
-		for (size_t id_vol = 0; id_vol < single_view_boxes.markers.size(); id_vol++)
-		{
-			single_view_boxes.markers[id_vol].action = visualization_msgs::Marker::DELETEALL;
-		}
-		pub_space.publish(single_view_boxes);
-
-	} while (best_score > threshold);
-#endif
 
 	//do
 	while (best_score > threshold)
@@ -471,40 +324,39 @@ int main(int argc, char **argv)
 				ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
 				ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
 
+				tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
+
+				arrow.header.stamp = ros::Time::now();
+				arrow.header.frame_id = frame_id;
+
+				arrow.id = ++arrow_id;
+
+				arrow.type = visualization_msgs::Marker::ARROW;
+
+				arrow.pose.position = target_pose.pose.position;
+
+				tf::Quaternion q_rot, q_new;
+				geometry_msgs::Quaternion q_arrow;
+				tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
+
+				q_rot.setRPY(0, -M_PI / 2, 0);
+				q_new = q_new * q_rot;
+				q_new.normalize();
+
+				tf::quaternionTFToMsg(q_new, q_arrow);
+				arrow.pose.orientation = q_arrow;
+
+				arrow.scale.x = 0.10;
+				arrow.scale.y = 0.02;
+				arrow.scale.z = 0.02;
+
 				if (set_target && set_plan)
 				{
-					tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
-
 					pose_test.evalPose();
 
 					ROS_INFO_STREAM("Score: " << pose_test.score);
 
-					arrow.header.stamp = ros::Time::now();
-					arrow.header.frame_id = frame_id;
-
-					arrow.id = ++arrow_id;
-
-					arrow.type = visualization_msgs::Marker::ARROW;
 					arrow.color = pose_test.score_color;
-
-					arrow.pose.position = target_pose.pose.position;
-
-					tf::Quaternion q_rot, q_new;
-					geometry_msgs::Quaternion q_arrow;
-					tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
-
-					q_rot.setRPY(0, -M_PI / 2, 0);
-					q_new = q_new * q_rot;
-					q_new.normalize();
-
-					tf::quaternionTFToMsg(q_new, q_arrow);
-					arrow.pose.orientation = q_arrow;
-
-					arrow.scale.x = 0.10;
-					arrow.scale.y = 0.02;
-					arrow.scale.z = 0.02;
-
-					all_poses.markers.push_back(arrow);
 
 					if (pose_test.score > best_score)
 					{
@@ -515,10 +367,19 @@ int main(int argc, char **argv)
 						single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
 					}
 
-					pub_arrows.publish(all_poses);
-
 					// pose_idx++;
 				}
+				else
+				{
+					pose_test.score = 0;
+
+					ROS_INFO_STREAM("Score: " << pose_test.score);
+
+					arrow.color = pose_test.score_color;
+				}
+
+				all_poses.markers.push_back(arrow);
+				pub_arrows.publish(all_poses);
 
 				ROS_INFO("---------");
 			}
