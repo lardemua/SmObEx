@@ -110,7 +110,7 @@
       </collision>
     </link>
 
-    <xacro:property name="delta" value="0.2" />
+    <xacro:property name="delta" value="0.0" />
 
     <!-- joints: main serial chain -->
     <joint name="${prefix}joint_1" type="revolute">
@@ -155,7 +155,8 @@
       <parent link="${prefix}link_5"/>
       <child link="${prefix}link_6"/>
       <axis xyz="-1 0 0"/>
-      <limit lower="${-6.2831+delta}" upper="${6.2831-delta}" effort="0" velocity="12.5663"/>
+      <!-- <limit lower="${-6.2831+delta}" upper="${6.2831-delta}" effort="0" velocity="12.5663"/> -->
+      <limit lower="${-3.14159+delta}" upper="${3.14159-delta}" effort="0" velocity="12.5663"/>
     </joint>
 
     <!-- ROS-Industrial 'base' frame: base_link to Fanuc World Coordinates transform -->
