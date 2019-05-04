@@ -309,25 +309,25 @@ int main(int argc, char **argv)
 			// #pragma omp parallel for //TODO
 			for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
 			{
-				// geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
-				// target_pose.pose.position.x = abs(target_pose.pose.position.x);
+				geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
+				target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
-				double pose_dist;
+				// double pose_dist;
 
-				geometry_msgs::PoseStamped target_pose ;
+				// geometry_msgs::PoseStamped target_pose ;
 
-				do
-				{
-					target_pose = move_group.getRandomPose();
-					target_pose.pose.position.x = abs(target_pose.pose.position.x);
+				// do
+				// {
+				// 	target_pose = move_group.getRandomPose();
+				// 	target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
-					float x = target_pose.pose.position.x;
-					float y = target_pose.pose.position.y;
-					float z = target_pose.pose.position.z;
+				// 	float x = target_pose.pose.position.x;
+				// 	float y = target_pose.pose.position.y;
+				// 	float z = target_pose.pose.position.z;
 
-					pose_dist = sqrt(x * x + y * y + z * z);
+				// 	pose_dist = sqrt(x * x + y * y + z * z);
 
-				} while (pose_dist > max_range * 0.8);
+				// } while (pose_dist > max_range * 0.8);
 
 				// if (target_pose.pose.position.x < 0.2)
 				// {
