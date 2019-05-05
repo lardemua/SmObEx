@@ -153,6 +153,7 @@ Porto, Portugal
   - [x] Limit even more joint bounds
   - [ ] Integrate with interactive marker
   - [ ] Do parelization
+  - [ ] Generate IKFAST kinematics solver 
 
 # Built with
 
@@ -179,6 +180,10 @@ Porto, Portugal
 - [OctoMap tools](https://github.com/miguelriemoliveira/octomap_tools)
 
 - [PCL ROS](http://wiki.ros.org/pcl)
+
+- [OpenRAVE installation](https://github.com/crigroup/openrave-installation)
+
+  - [OpenRAVE](https://github.com/rdiankov/openrave)
 
 # Installation guides
 
