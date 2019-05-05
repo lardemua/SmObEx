@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<library path="lib/libfanuc_xtiob_manipulator_moveit_ikfast_plugin">
-  <class base_class_type="kinematics::KinematicsBase" name="fanuc_xtiob_manipulator/IKFastKinematicsPlugin" type="fanuc_xtiob_manipulator::IKFastKinematicsPlugin">
-    <description>IKFast61 plugin for closed-form kinematics of fanuc_xtiob manipulator</description>
-  </class>
-</library>

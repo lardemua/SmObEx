@@ -181,10 +181,6 @@ Porto, Portugal
 
 - [PCL ROS](http://wiki.ros.org/pcl)
 
-- [OpenRAVE installation](https://github.com/crigroup/openrave-installation)
-
-  - [OpenRAVE](https://github.com/rdiankov/openrave)
-
 # Installation guides
 
 ## ROS Industrial and FANUC
@@ -219,6 +215,10 @@ After this run `catkin_make` to try everything.
 Already made a pull request with the M6iB/6S implementation. It has the same problem and solution described in the previous lines.
 
 ![robot on rviz](./files/fanuc_m6ib6s_implement.png)
+
+## IKFAST Plugin
+
+For [this tutorial](https://acutronicrobotics.com/docs/products/robots/mara/moveit2/tutorials/ros/ikfast) a virtual machine with ubuntu 16.04 was needed. In 16.04 follow all steps to [Generate IK Solver](https://acutronicrobotics.com/docs/products/robots/mara/moveit2/tutorials/ros/ikfast#generate-ik-solver) (inclusive) and the rest on your system.
 
 ## Aruco Hand Eye
 
