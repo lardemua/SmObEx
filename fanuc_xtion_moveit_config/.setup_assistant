@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: smobex_description
+    relative_path: urdf/calibrated.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/fanuc_xtion.srdf
+  CONFIG:
+    author_name: Joao Sanros
+    author_email: santos.martins.joao@ua.pt
+    generated_timestamp: 1557691141
