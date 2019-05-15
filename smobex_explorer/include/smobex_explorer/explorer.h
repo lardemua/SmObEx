@@ -30,7 +30,8 @@
 #include <octomap_msgs/conversions.h>
 #include <octomap_ros/conversions.h>
 
-#include <eigen3/Eigen/Eigen>
+// #include <eigen3/Eigen/Eigen>
+#include <eigen3/Eigen/Core>
 
 #include <colormap/colormap.h>
 

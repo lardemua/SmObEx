@@ -65,6 +65,10 @@
     <build_depend>colormap</build_depend>
     <exec_depend>colormap</exec_depend>
 
+    <build_depend>smobex_explorer_action_skill_msgs</build_depend>
+    <build_export_depend>smobex_explorer_action_skill_msgs</build_export_depend>
+    <exec_depend>smobex_explorer_action_skill_msgs</exec_depend>
+
     <!-- The export tag contains other, unspecified, tags -->
     <export>
         <!-- Other tools can request additional information be placed here -->

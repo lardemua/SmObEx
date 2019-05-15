@@ -1,0 +1,11 @@
+#goal definition
+float32 threshold
+---
+#result definition
+int32 percentage
+string skillStatus
+string outcome
+---
+#feedback
+int32 percentage
+string skillStatus

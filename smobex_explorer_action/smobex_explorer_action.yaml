@@ -1,0 +1,7 @@
+skill_name: smobex_explorer_action
+
+server_language: cpp
+
+goals:
+  threshold: float32
+  

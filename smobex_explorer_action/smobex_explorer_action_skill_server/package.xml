@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <name>smobex_explorer_action_skill_server</name>
+  <version>0.0.0</version>
+  <description>The smobex_explorer_action_skill_server package</description>
+
+  <maintainer email="user@todo.todo">user</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>smobex_explorer_action_skill_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>actionlib</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>smobex_explorer_action_skill_msgs</run_depend>
+
+</package>

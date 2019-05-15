@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Arguments -->
+    <arg name="action_name" default="SmobexExplorerActionSkill"/>
+
+    <!-- Symbolic Pose Interaction Skill -->
+    <node name="smobex_explorer_action_skill" pkg="smobex_explorer_action_skill_server" type="smobex_explorer_action_skill_server" output="screen">
+      <param name='action_name' value='$(arg action_name)' />
+    </node>
+</launch>

@@ -9,10 +9,14 @@
 #include <math.h>
 
 #include <smobex_explorer/explorer.h>
+
 #include <tf/transform_listener.h>
 #include <visualization_msgs/InteractiveMarkerInit.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+
+#include <actionlib/client/simple_action_client.h>
+#include <smobex_explorer_action_skill_msgs/SmobexExplorerActionSkillAction.h>
 
 using namespace visualization_msgs;
 using namespace interactive_markers;
@@ -55,6 +59,8 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 	// evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
 	evaluatePose pose(min_range, max_range, width_FOV, height_FOV);
 	// pose.view_pose = transform;
+
+	//TODO catch
 	tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
 	pose.writeKnownOctomap();
@@ -82,12 +88,36 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 	ros::spinOnce();
 
 	ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
-
 }
 
 void autoModeCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
 	ROS_INFO_STREAM("Auto mode not yet implemented.");
+
+	actionlib::SimpleActionClient<smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillAction> ac("SmobexExplorerActionSkill", true);
+
+	ROS_INFO("Waiting for action server to start.");
+	// wait for the action server to start
+	ac.waitForServer(); //will wait for infinite time
+
+	ROS_INFO("Action server started, sending goal.");
+	// send a goal to the action
+	smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillGoal goal;
+	goal.threshold = 0.5;
+	ac.sendGoal(goal);
+
+	//wait for the action to return
+	bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
+
+	if (finished_before_timeout)
+	{
+		actionlib::SimpleClientGoalState state = ac.getState();
+		ROS_INFO("Action finished: %s", state.toString().c_str());
+	}
+	else
+	{
+		ROS_INFO("Action did not finish before the time out.");
+	}
 }
 
 Marker makeBox(InteractiveMarker &msg)
