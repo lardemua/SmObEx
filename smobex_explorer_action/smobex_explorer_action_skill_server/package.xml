@@ -13,10 +13,12 @@
   <build_depend>actionlib</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>smobex_explorer_action_skill_msgs</build_depend>
+  <build_depend>smobex_explorer</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>smobex_explorer_action_skill_msgs</run_depend>
+  <run_depend>smobex_explorer</run_depend>
 
 </package>
