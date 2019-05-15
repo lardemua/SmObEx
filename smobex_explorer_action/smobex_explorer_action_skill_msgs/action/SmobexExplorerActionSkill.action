@@ -1,5 +1,6 @@
 #goal definition
 float32 threshold
+int32 n_poses
 ---
 #result definition
 int32 percentage

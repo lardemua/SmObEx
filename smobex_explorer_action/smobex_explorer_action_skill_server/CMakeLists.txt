@@ -5,7 +5,16 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
   smobex_explorer_action_skill_msgs
+  rospy
+  std_msgs
+  pcl_ros
+  rviz
   colormap
+  moveit_core
+  moveit_visual_tools
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_ros_perception
   smobex_explorer
 )
 

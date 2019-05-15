@@ -27,7 +27,6 @@ float marker_pos = 0;
 MenuHandler menu_handler;
 
 MenuHandler::EntryHandle h_first_entry;
-MenuHandler::EntryHandle h_mode_last;
 
 ros::Publisher pub_lines;
 ros::Publisher pub_space;
@@ -90,11 +89,12 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 	ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
 }
 
-void autoModeCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
+void autoModeStartCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
-	ROS_INFO_STREAM("Auto mode not yet implemented.");
+	std::string skill_name = "SmobexExplorerActionSkill";
+	ros::param::get("action_name", skill_name);
 
-	actionlib::SimpleActionClient<smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillAction> ac("SmobexExplorerActionSkill", true);
+	actionlib::SimpleActionClient<smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillAction> ac(skill_name, true);
 
 	ROS_INFO("Waiting for action server to start.");
 	// wait for the action server to start
@@ -103,21 +103,46 @@ void autoModeCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &fee
 	ROS_INFO("Action server started, sending goal.");
 	// send a goal to the action
 	smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillGoal goal;
-	goal.threshold = 0.5;
+
+	int n_poses = 20;
+	float threshold = 0.01;
+
+	ros::param::get("~n_poses", n_poses);
+	ros::param::get("~threshold", threshold);
+
+	goal.threshold = threshold;
+	goal.n_poses = n_poses;
 	ac.sendGoal(goal);
 
 	//wait for the action to return
-	bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
+	// bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
 
-	if (finished_before_timeout)
-	{
-		actionlib::SimpleClientGoalState state = ac.getState();
-		ROS_INFO("Action finished: %s", state.toString().c_str());
-	}
-	else
-	{
-		ROS_INFO("Action did not finish before the time out.");
-	}
+	// if (finished_before_timeout)
+	// {
+	// 	actionlib::SimpleClientGoalState state = ac.getState();
+	// 	ROS_INFO("Action finished: %s", state.toString().c_str());
+	// }
+	// else
+	// {
+	// 	ROS_INFO("Action did not finish before the time out.");
+	// }
+}
+
+void autoModeCancelCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
+{
+
+	std::string skill_name = "SmobexExplorerActionSkill";
+	ros::param::get("action_name", skill_name);
+
+	actionlib::SimpleActionClient<smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillAction> ac(skill_name, true);
+
+	ROS_INFO("Waiting for action server to start.");
+	// wait for the action server to start
+	ac.waitForServer(); //will wait for infinite time
+
+	ROS_INFO("Action server started, sending cancel.");
+
+	ac.cancelAllGoals();
 }
 
 Marker makeBox(InteractiveMarker &msg)
@@ -180,7 +205,10 @@ void makeMenuMarker(std::string name)
 void initMenu()
 {
 	h_first_entry = menu_handler.insert("Evaluate Pose", &clickCB);
-	h_first_entry = menu_handler.insert("Auto Mode", &autoModeCB);
+	h_first_entry = menu_handler.insert("Auto Mode");
+
+	MenuHandler::EntryHandle entry = menu_handler.insert(h_first_entry, "Start", &autoModeStartCB);
+	entry = menu_handler.insert(h_first_entry, "Cancel", &autoModeCancelCB);
 }
 
 int main(int argc, char **argv)
