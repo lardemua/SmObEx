@@ -31,54 +31,42 @@ Porto, Portugal
 # Table of contents
 
 - [Completed tasks](#completed-tasks)
-
-  - [Week 10](#week-10)
-  - [Week 11](#week-11)
-  - [Week 12](#week-12)
-  - [Week 13](#week-13)
-  - [Week 14](#week-14)
-  - [Week 15](#week-15)
-  - [Week 16](#week-16)
-  - [Week 17](#week-17)
-  - [Week 18](#week-18)
-
+  * [Week 10](#week-10)
+  * [Week 11](#week-11)
+  * [Week 12](#week-12)
+  * [Week 13](#week-13)
+  * [Week 14](#week-14)
+  * [Week 15](#week-15)
+  * [Week 16](#week-16)
+  * [Week 17](#week-17)
+  * [Week 18](#week-18)
+  * [Week 19](#week-19)
+  * [Week 20](#week-20)
 - [Built with](#built-with)
-
-  - [Hardware](#hardware)
-  - [Software](#software)
-
+  * [Hardware](#hardware)
+  * [Software](#software)
 - [Installation guides](#installation-guides)
-
-  - [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
-  - [Aruco Hand Eye](#aruco-hand-eye)
-
+  * [ROS Industrial and FANUC](#ros-industrial-and-fanuc)
+  * [IKFAST Plugin](#ikfast-plugin)
+  * [Aruco Hand Eye](#aruco-hand-eye)
 - [See the robot](#see-the-robot)
-
-  - [Moving the joint with the interface](#moving-the-joint-with-the-interface)
-  - [Moving the robot with the TP](#moving-the-robot-with-the-tp)
-  - [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
-
+  * [Moving the joint with the interface](#moving-the-joint-with-the-interface)
+  * [Moving the robot with the TP](#moving-the-robot-with-the-tp)
+  * [Moving the robot with MoveIt](#moving-the-robot-with-moveit)
 - [Usage](#usage)
+  * [Intrinsic Calibration](#intrinsic-calibration)
+  * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
+  * [Recording mode](#recording-mode)
+    + [Results](#results)
+  * [Operation mode](#operation-mode)
+    + [Simulating in Roboguide](#simulating-in-roboguide)
+    + [Offline (robot) Mode](#offline--robot--mode)
+    + [Define Space Mode](#define-space-mode)
+    + [Manual Pose Evaluation](#manual-pose-evaluation)
+    + [Autonomous](#autonomous)
 
-  - [Intrinsic Calibration](#intrinsic-calibration)
-  - [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
-  - [Recording mode](#recording-mode)
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-    - [Results](#results)
-
-  - [Operation mode](#operation-mode)
-
-    - [Simulating in Roboguide](#simulating-in-roboguide)
-    - [Offline (robot) Mode](#offline--robot--mode)
-    - [Define Space Mode](#define-space-mode)
-    - [Manual Pose Evaluation](#manual-pose-evaluation)
-    - [Autonomous](#autonomous)
-
-<small>
-  <i>
-  <a href="http://ecotrust-canada.github.io/markdown-toc/">Table of contents generated with markdown-toc</a>
-</i>
-</small>
 
 # Completed tasks
 
@@ -148,12 +136,18 @@ Porto, Portugal
 ## Week 18
 
 - [x] Create faster evaluation method
-- [ ] Finish up auto mode
 
-  - [x] Limit even more joint bounds
-  - [ ] Integrate with interactive marker
-  - [ ] Do parelization
-  - [ ] Generate IKFAST kinematics solver 
+## Week 19
+
+ - [x] INESC TEC collaboration
+
+## Week 20
+
+  - [x] INESC TEC collaboration
+  - [ ] Finish up auto mode
+        - [x] Integrate with interactive marker
+        - [x] Generate IKFAST kinematics solver 
+        - [ ] Solve singularity issues
 
 # Built with
 

@@ -177,6 +177,7 @@ Visualization Manager:
       Marker Topic: /cells_vis_array
       Name: SearchSpace
       Namespaces:
+        free_boxes: false
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -428,10 +429,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.07020319253206253
+      Pitch: 0.4352032542228699
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.5771220922470093
+      Yaw: 2.0121219158172607
     Saved: ~
 Window Geometry:
   Displays:
