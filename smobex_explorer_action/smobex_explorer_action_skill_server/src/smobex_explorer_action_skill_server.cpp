@@ -297,6 +297,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     }
 
     move_group.setPlanningTime(0.4);
+
     const std::string end_effector_link = move_group.getEndEffectorLink();
 
     size_t total_clusters = clusters_centroids.size();
@@ -316,8 +317,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       // #pragma omp parallel for //TODO
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
-        geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
-        target_pose.pose.position.x = abs(target_pose.pose.position.x);
+        // geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
+        // target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
         // double pose_dist;
 
@@ -341,15 +342,26 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         // 	target_pose.pose.position.x = 0.2;
         // }
 
-        geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
-        target_pose.pose.orientation = quat_orient;
+        geometry_msgs::PoseStamped target_pose;
+        bool set_target;
 
-        bool set_target = move_group.setJointValueTarget(target_pose, end_effector_link);
+        do
+        {
+          target_pose = move_group.getRandomPose();
+          target_pose.pose.position.x = abs(target_pose.pose.position.x);
+
+          geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
+          target_pose.pose.orientation = quat_orient;
+
+          set_target = move_group.setJointValueTarget(target_pose, end_effector_link);
+
+          ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
+
+        } while (set_target == false);
 
         bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
         ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
-        ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
 
         ROS_INFO_STREAM("Cluster " << cluster_idx + 1 << " of " << total_clusters << " Pose " << pose_idx + 1 << " of " << poses_by_cluster);
 

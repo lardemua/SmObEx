@@ -145,9 +145,9 @@ Porto, Portugal
 
   - [x] INESC TEC collaboration
   - [ ] Finish up auto mode
-        - [x] Integrate with interactive marker
-        - [x] Generate IKFAST kinematics solver 
-        - [ ] Solve singularity issues
+    - [x] Integrate with interactive marker
+    - [x] Generate IKFAST kinematics solver 
+    - [ ] Solve singularity issues
 
 # Built with
 
