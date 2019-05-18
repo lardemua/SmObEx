@@ -43,6 +43,8 @@ print "============ Printing robot state"
 print robot.get_current_state()
 print ""
 
+move_group.set_planner_id("RRTConnectkConfigDefault")
+
 # We can get the joint values from the group and adjust some of the values:
 joint_goal = move_group.get_current_joint_values()
 joint_goal[0] = 0
