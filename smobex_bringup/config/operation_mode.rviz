@@ -29,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: FilteredCloud
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -129,6 +129,36 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
+        Max Value: 2.5908150672912598
+        Min Value: -0.5297295451164246
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 0; 0; 0
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: FullCloud
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic: /camera/depth_registered/points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
         Max Value: 10
         Min Value: -10
         Value: true
@@ -178,17 +208,18 @@ Visualization Manager:
       Name: SearchSpace
       Namespaces:
         free_boxes: false
+        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /point_cloud_filter/rviz/filter
       Name: FullOctomapBBox
       Namespaces:
-        {}
+        wireframe: true
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /discovered_space
@@ -414,25 +445,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.571046352386475
+      Distance: 18.118938446044922
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5673189163208008
-        Y: 0.03536815941333771
-        Z: 0.30400747060775757
+        X: 4.406598091125488
+        Y: 1.8880852460861206
+        Z: -0.4109596312046051
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4352032542228699
+      Pitch: 0.374796986579895
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.0121219158172607
+      Yaw: 4.750288963317871
     Saved: ~
 Window Geometry:
   Displays:

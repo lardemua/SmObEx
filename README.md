@@ -149,6 +149,10 @@ Porto, Portugal
     - [x] Generate IKFAST kinematics solver 
     - [ ] Solve singularity issues
 
+## Week 21
+
+  - Dissertation writing
+
 # Built with
 
 ## Hardware

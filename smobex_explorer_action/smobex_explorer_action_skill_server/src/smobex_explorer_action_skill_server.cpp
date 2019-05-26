@@ -434,6 +434,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     pub_arrows.publish(all_poses);
     pub_space.publish(single_view_boxes);
 
+    getchar();
+
     ROS_WARN("MOVING!!!");
 
     // move_group.setPlanningTime(1);

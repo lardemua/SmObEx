@@ -10,10 +10,12 @@ int main(int argc, char **argv)
   // ros::spin();
   ros::AsyncSpinner spinner(0);
   spinner.start();
-  while (ros::ok())
-  {
-    ros::spinOnce();
-  }
+  // while (ros::ok())
+  // {
+  //   ros::spinOnce();
+  // }
+
+  ros::waitForShutdown();
 
   return 0;
 }

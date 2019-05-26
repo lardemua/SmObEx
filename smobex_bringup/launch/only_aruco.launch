@@ -1,15 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-
-    <arg name="robot_ip" doc="The IP of the robot"/>
-
-    <!-- Launch camera and fanuc as separate robots -->
-    <include file="$(find smobex_calibration)/launch/uncalibrated.launch">
-        <arg name="robot_ip" value="$(arg robot_ip)" />
-    </include>
-
-    <!-- Calibration launch file -->
-    <include file="$(find aruco_hand_eye)/launch/aruco_hand_eye.launch">
+     <include file="$(find aruco_hand_eye)/launch/aruco_hand_eye.launch">
 
         <!-- ArUco gigante -->
         <arg name="markerid" value="617"/>
@@ -21,7 +12,7 @@
 
         <arg name="publish_tf" value="true"/>
         <arg name="interactive" value="false"/>
-        <arg name="sample_rate" value="4" />
+        <arg name="sample_rate" value="1" />
 
         <arg name="marker_parent_frame" value="/base_link"/>
         <arg name="camera_parent_frame" value="/flange"/>
@@ -33,8 +24,4 @@
         <arg name="camera_info" value="/camera/rgb/camera_info"/>
 
     </include>
-
-    <!-- Rviz for visualization -->
-    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/calibration_mode.rviz" required="true"/>
-
 </launch>

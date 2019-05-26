@@ -534,6 +534,7 @@ class evaluatePose : public generatePose
 							{
 								posterior_keys.insert(*it_key);
 							}
+							
 							ray_points_list.push_back(origin);
 							ray_points_list.push_back(end_point);
 
