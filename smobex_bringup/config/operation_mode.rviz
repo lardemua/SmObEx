@@ -29,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: FilteredCloud
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -208,18 +208,17 @@ Visualization Manager:
       Name: SearchSpace
       Namespaces:
         free_boxes: false
-        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /point_cloud_filter/rviz/filter
       Name: FullOctomapBBox
       Namespaces:
-        wireframe: true
+        {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /discovered_space
@@ -445,25 +444,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 18.118938446044922
+      Distance: 8.414509773254395
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.406598091125488
-        Y: 1.8880852460861206
-        Z: -0.4109596312046051
+        X: 1.2190912961959839
+        Y: 1.1081496477127075
+        Z: -0.2198946326971054
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.374796986579895
+      Pitch: 0.32979702949523926
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.750288963317871
+      Yaw: 4.165280342102051
     Saved: ~
 Window Geometry:
   Displays:

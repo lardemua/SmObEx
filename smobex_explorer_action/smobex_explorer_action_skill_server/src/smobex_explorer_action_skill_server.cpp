@@ -42,6 +42,20 @@ float octomap_resolution = 0.1;
 
 using namespace std;
 
+class aPose
+{
+public:
+  float score;
+  geometry_msgs::PoseStamped pose;
+  int arrow_id;
+  visualization_msgs::MarkerArray boxes;
+};
+
+bool cmp_aPose(const aPose &a, const aPose &b)
+{
+  return a.score > b.score;
+}
+
 bool customRegionGrowing(const PointTypeIO &point_a, const PointTypeIO &point_b, float squared_distance)
 {
   if (squared_distance < (octomap_resolution * 2) * (octomap_resolution * 2) * 1.1)
@@ -296,7 +310,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       pub_centers_clusters.publish(centroid_clusters_publish);
     }
 
-    move_group.setPlanningTime(0.4);
+    //  move_group.setPlanningTime(0.4);
 
     const std::string end_effector_link = move_group.getEndEffectorLink();
 
@@ -306,62 +320,24 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     ROS_INFO_STREAM("Number of clusters: " << total_clusters);
     ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
+    std::vector<aPose> poses_vector;
 
     for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
     {
       geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
+      poses_vector.clear();
 
-      // size_t pose_idx = 0;
-
-      // while (pose_idx < poses_by_cluster)
-      // #pragma omp parallel for //TODO
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
-        // geometry_msgs::PoseStamped target_pose = move_group.getRandomPose();
-        // target_pose.pose.position.x = abs(target_pose.pose.position.x);
-
-        // double pose_dist;
-
-        // geometry_msgs::PoseStamped target_pose ;
-
-        // do
-        // {
-        // 	target_pose = move_group.getRandomPose();
-        // 	target_pose.pose.position.x = abs(target_pose.pose.position.x);
-
-        // 	float x = target_pose.pose.position.x;
-        // 	float y = target_pose.pose.position.y;
-        // 	float z = target_pose.pose.position.z;
-
-        // 	pose_dist = sqrt(x * x + y * y + z * z);
-
-        // } while (pose_dist > max_range * 0.8);
-
-        // if (target_pose.pose.position.x < 0.2)
-        // {
-        // 	target_pose.pose.position.x = 0.2;
-        // }
-
         geometry_msgs::PoseStamped target_pose;
         bool set_target;
+        aPose one_pose;
 
-        do
-        {
-          target_pose = move_group.getRandomPose();
-          target_pose.pose.position.x = abs(target_pose.pose.position.x);
+        target_pose = move_group.getRandomPose();
+        target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
-          geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
-          target_pose.pose.orientation = quat_orient;
-
-          set_target = move_group.setJointValueTarget(target_pose, end_effector_link);
-
-          ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
-
-        } while (set_target == false);
-
-        bool set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-        ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
+        geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
+        target_pose.pose.orientation = quat_orient;
 
         ROS_INFO_STREAM("Cluster " << cluster_idx + 1 << " of " << total_clusters << " Pose " << pose_idx + 1 << " of " << poses_by_cluster);
 
@@ -391,33 +367,27 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         arrow.scale.y = 0.02;
         arrow.scale.z = 0.02;
 
-        if (set_target && set_plan)
-        {
-          pose_test.evalPose();
+        pose_test.evalPose();
 
-          ROS_INFO_STREAM("Score: " << pose_test.score);
+        ROS_INFO_STREAM("Score: " << pose_test.score);
 
-          arrow.color = pose_test.score_color;
+        arrow.color = pose_test.score_color;
 
-          if (pose_test.score > best_score)
-          {
-            best_score = pose_test.score;
-            best_pose = target_pose;
-            best_arrow_id = arrow_id;
+        // if (pose_test.score > best_score)
+        // {
+        //   best_score = pose_test.score;
+        //   best_pose = target_pose;
+        //   best_arrow_id = arrow_id;
 
-            single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
-          }
+        //   single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
+        // }
 
-          // pose_idx++;
-        }
-        else
-        {
-          pose_test.score = 0;
+        one_pose.score = pose_test.score;
+        one_pose.pose = target_pose;
+        one_pose.arrow_id = arrow_id;
+        one_pose.boxes = pose_test.discoveredBoxesVis(frame_id);
 
-          ROS_INFO_STREAM("Score: " << pose_test.score);
-
-          arrow.color = pose_test.score_color;
-        }
+        poses_vector.push_back(one_pose);
 
         all_poses.markers.push_back(arrow);
         pub_arrows.publish(all_poses);
@@ -425,6 +395,47 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         ROS_INFO("---------");
       }
     }
+
+    ROS_INFO("Sorting...");
+
+    std::sort(poses_vector.begin(), poses_vector.end(), cmp_aPose);
+
+    ROS_INFO("Sorted!");
+
+    bool set_target = false;
+    bool set_plan = false;
+
+    int sorted_pose_idx = -1;
+    geometry_msgs::PoseStamped best_pose;
+    move_group.setPlanningTime(0.5);
+    move_group.setNumPlanningAttempts(5);
+
+    do
+    {
+      sorted_pose_idx++;
+
+      best_pose = poses_vector[sorted_pose_idx].pose;
+
+      ROS_INFO_STREAM("Planning " << sorted_pose_idx << " ...");
+
+      set_target = move_group.setJointValueTarget(best_pose, end_effector_link);
+      set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+      ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
+      ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
+
+      if (sorted_pose_idx == poses_vector.size() - 1)
+      {
+        ROS_INFO("Couldn't plan for any pose...");
+        this->set_aborted();
+        return;
+      }
+
+    } while ((set_target == false) || (set_plan == false));
+
+    best_score = poses_vector[sorted_pose_idx].score;
+    best_arrow_id = poses_vector[sorted_pose_idx].arrow_id;
+    single_view_boxes = poses_vector[sorted_pose_idx].boxes;
 
     all_poses.markers[best_arrow_id].color = green_color;
     all_poses.markers[best_arrow_id].scale.x *= 2;
@@ -434,19 +445,17 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     pub_arrows.publish(all_poses);
     pub_space.publish(single_view_boxes);
 
-    getchar();
-
     ROS_WARN("MOVING!!!");
 
     // move_group.setPlanningTime(1);
     // move_group.setNumPlanningAttempts(10);
 
-    move_group.setJointValueTarget(best_pose, end_effector_link);
+    // move_group.setJointValueTarget(best_pose, end_effector_link);
     // move_group.plan(my_plan);
 
-    bool success = (move_group.move() == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    bool success = (move_group.execute(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
-    ROS_INFO("Plan (best pose goal) %s", success ? "SUCCESS" : "FAILED");
+    ROS_INFO("Execute (best pose goal) %s", success ? "SUCCESS" : "FAILED");
 
     ROS_INFO("---------");
 
