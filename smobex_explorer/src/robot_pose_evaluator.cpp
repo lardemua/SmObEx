@@ -130,7 +130,6 @@ void autoModeStartCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 
 void autoModeCancelCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
-
 	std::string skill_name = "SmobexExplorerActionSkill";
 	ros::param::get("action_name", skill_name);
 

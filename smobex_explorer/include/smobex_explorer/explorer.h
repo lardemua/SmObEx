@@ -631,7 +631,7 @@ public:
 		{
 			ROS_INFO("No OcTree.");
 		}
-	}
+	} 
 
 	void getScore()
 	{
