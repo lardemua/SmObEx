@@ -40,7 +40,7 @@
 
 class generatePose
 {
-  public:
+public:
 	tf::Pose view_pose;
 
 	// tf::Pose genPose(float r_min, float r_max, tf::Point observation_center)
@@ -121,7 +121,7 @@ class generatePose
 class unknownVoxel
 {
 
-  public:
+public:
 	octomap::OcTreeKey key;
 	octomap::point3d center;
 	double distance_to_camera;
@@ -153,11 +153,11 @@ bool compareVoxelDistanceIterator(map_type::iterator const &a, map_type::iterato
 
 class evaluatePose : public generatePose
 {
-  public:
+public:
 	float score = 0;
 	std_msgs::ColorRGBA score_color;
 
-	// int step;
+	int step;
 	float min_range;
 	float max_range;
 	float width_FOV;
@@ -171,20 +171,34 @@ class evaluatePose : public generatePose
 	octomap::KeySet first_keys;
 	octomap::KeySet posterior_keys;
 
-	// pcl::PointCloud<pcl::PointXYZ> rays_point_cloud_world;
+	pcl::PointCloud<pcl::PointXYZ> rays_point_cloud_world;
 	pcl::PointCloud<pcl::PointXYZ> unknown_centers_pcl;
 
 	octomap::point3d min_bbx, max_bbx;
 
 	evaluatePose(/*int _step,*/ float _min_range, float _max_range, float _width_FOV, float _height_FOV)
 	{
-		// step = _step;
 		min_range = _min_range;
 		max_range = _max_range;
 		width_FOV = _width_FOV;
 		height_FOV = _height_FOV;
 
-		/*
+		ros::param::get("x_max", max_bbx.x());
+		ros::param::get("y_max", max_bbx.y());
+		ros::param::get("z_max", max_bbx.z());
+
+		ros::param::get("x_min", min_bbx.x());
+		ros::param::get("y_min", min_bbx.y());
+		ros::param::get("z_min", min_bbx.z());
+	}
+
+	evaluatePose(int _step, float _min_range, float _max_range, float _width_FOV, float _height_FOV)
+	{
+		step = _step;
+		min_range = _min_range;
+		max_range = _max_range;
+		width_FOV = _width_FOV;
+		height_FOV = _height_FOV;
 
 		ros::NodeHandle n;
 		sensor_msgs::CameraInfoConstPtr CamInfo;
@@ -224,7 +238,6 @@ class evaluatePose : public generatePose
 		// rays_point_cloud.push_back(pcl::PointXYZ(-0.01, 0, 0.8));
 		// rays_point_cloud.push_back(pcl::PointXYZ(0.01, 0, 0.8));
 		// pcl_ros::transformPointCloud(rays_point_cloud, rays_point_cloud, view_pose);
-		*/
 
 		ros::param::get("x_max", max_bbx.x());
 		ros::param::get("y_max", max_bbx.y());
@@ -342,87 +355,7 @@ class evaluatePose : public generatePose
 		origin.x() = octo_pose.x();
 		origin.y() = octo_pose.y();
 		origin.z() = octo_pose.z();
-#if 0
-		pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
-		pcl_ros::transformPointCloud(rays_point_cloud_world, rays_point_cloud, view_pose);
 
-		int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
-		if (octree != NULL && unknown_octree != NULL)
-		{
-
-      ros::Duration d, d1;
-      ros::Time t;
-      ros::Time t1 = ros::Time::now();
-#pragma omp parallel for
-      for (size_t i = 0; i < n_start_points; i++)
-      {
-        KeyRay ray_keys;
-        pcl::PointXYZ point = rays_point_cloud.at(i);
-        Vector3 start_point, direction, end_point;
-
-        start_point.x() = point.x;
-        start_point.y() = point.y;
-        start_point.z() = point.z;
-
-        direction = start_point - origin;
-
-        t = ros::Time::now();
-        octree->castRay(origin, direction, end_point, true, max_range);
-        d = ros::Time::now() - t;
-        ROS_INFO_STREAM("castRay: " << d.toSec() << "secs.");
-
-        start_point = origin + direction.normalized() * min_range;
-
-        t = ros::Time::now();
-        octree->getRayIntersection(origin, direction, end_point, end_point);
-        d = ros::Time::now() - t;
-        ROS_INFO_STREAM("getRayIntersection: " << d.toSec() << "secs.");
-
-        if (origin.distance(start_point) < origin.distance(end_point))
-        {
-          t = ros::Time::now();
-          unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
-          d = ros::Time::now() - t;
-          ROS_INFO_STREAM("computeRayKeys: " << d.toSec() << "secs.");
-
-          bool first = true;
-          t = ros::Time::now();
-          for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
-          {
-            if (unknown_octree->search(*it))
-            {
-              if (first)
-              {
-                first_keys.insert(*it);
-                first = false;
-              }
-              else
-              {
-                posterior_keys.insert(*it);
-              }
-            }
-          }
-          d = ros::Time::now() - t;
-          ROS_INFO_STREAM("iterator: " << d.toSec() << "secs.");
-
-          t = ros::Time::now();
-          ray_points_list.push_back(start_point);
-          ray_points_list.push_back(end_point);
-          d = ros::Time::now() - t;
-          ROS_INFO_STREAM("pushBack: " << d.toSec() << "secs.");
-        }
-      }
-      d1 = ros::Time::now() - t1;
-      ROS_INFO_STREAM("#pragma took: " << d1.toSec() << "secs for " << n_start_points << " points.");
-
-      for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
-      {
-        if (first_keys.find(*it) != first_keys.end())
-        {
-          posterior_keys.erase(*it);
-        }
-      }
-#endif
 		if (octree != NULL && unknown_octree != NULL)
 		{
 
@@ -534,7 +467,7 @@ class evaluatePose : public generatePose
 							{
 								posterior_keys.insert(*it_key);
 							}
-							
+
 							ray_points_list.push_back(origin);
 							ray_points_list.push_back(end_point);
 
@@ -581,6 +514,119 @@ class evaluatePose : public generatePose
 
 			getScore();
 		}
+		else
+		{
+			ROS_INFO("No OcTree.");
+		}
+	}
+
+	void evalPosePixelBased()
+	{
+		using namespace octomap;
+		using namespace octomath;
+
+		Vector3 origin;
+
+		while (octree == NULL || unknown_octree == NULL)
+		{
+			ROS_WARN("No OcTrees... Did you call the writting functions? Calling them automatically.");
+
+			writeKnownOctomap();
+			writeUnknownOctomap();
+		}
+
+		first_keys.clear();
+		posterior_keys.clear();
+
+		Pose6D octo_pose = poseTfToOctomap(view_pose);
+
+		origin.x() = octo_pose.x();
+		origin.y() = octo_pose.y();
+		origin.z() = octo_pose.z();
+
+		pcl::PointCloud<pcl::PointXYZ> rays_point_cloud;
+		pcl_ros::transformPointCloud(rays_point_cloud_world, rays_point_cloud, view_pose);
+
+		int n_start_points = rays_point_cloud.height * rays_point_cloud.width;
+		if (octree != NULL && unknown_octree != NULL)
+		{
+
+			ros::Duration d, d1;
+			ros::Time t;
+			ros::Time t1 = ros::Time::now();
+#pragma omp parallel for
+			for (size_t i = 0; i < n_start_points; i++)
+			{
+				KeyRay ray_keys;
+				pcl::PointXYZ point = rays_point_cloud.at(i);
+				Vector3 start_point, direction, end_point;
+
+				start_point.x() = point.x;
+				start_point.y() = point.y;
+				start_point.z() = point.z;
+
+				direction = start_point - origin;
+
+				t = ros::Time::now();
+				octree->castRay(origin, direction, end_point, true, max_range);
+				d = ros::Time::now() - t;
+				ROS_INFO_STREAM("castRay: " << d.toSec() << "secs.");
+
+				start_point = origin + direction.normalized() * min_range;
+
+				t = ros::Time::now();
+				octree->getRayIntersection(origin, direction, end_point, end_point);
+				d = ros::Time::now() - t;
+				ROS_INFO_STREAM("getRayIntersection: " << d.toSec() << "secs.");
+
+				if (origin.distance(start_point) < origin.distance(end_point))
+				{
+					t = ros::Time::now();
+					unknown_octree->computeRayKeys(start_point, end_point, ray_keys);
+					d = ros::Time::now() - t;
+					ROS_INFO_STREAM("computeRayKeys: " << d.toSec() << "secs.");
+
+					bool first = true;
+					t = ros::Time::now();
+					for (KeyRay::iterator it = ray_keys.begin(); it != ray_keys.end(); it++)
+					{
+						if (unknown_octree->search(*it))
+						{
+							if (first)
+							{
+								first_keys.insert(*it);
+								first = false;
+							}
+							else
+							{
+								posterior_keys.insert(*it);
+							}
+						}
+					}
+					d = ros::Time::now() - t;
+					ROS_INFO_STREAM("iterator: " << d.toSec() << "secs.");
+
+					t = ros::Time::now();
+					ray_points_list.push_back(start_point);
+					ray_points_list.push_back(end_point);
+					d = ros::Time::now() - t;
+					ROS_INFO_STREAM("pushBack: " << d.toSec() << "secs.");
+				}
+			}
+			d1 = ros::Time::now() - t1;
+			ROS_INFO_STREAM("#pragma took: " << d1.toSec() << "secs for " << n_start_points << " points.");
+
+			for (KeySet::iterator it = posterior_keys.begin(); it != posterior_keys.end(); it++)
+			{
+				if (first_keys.find(*it) != first_keys.end())
+				{
+					posterior_keys.erase(*it);
+				}
+			}
+
+			getScore();
+		}
+
 		else
 		{
 			ROS_INFO("No OcTree.");

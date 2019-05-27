@@ -447,12 +447,6 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     ROS_WARN("MOVING!!!");
 
-    // move_group.setPlanningTime(1);
-    // move_group.setNumPlanningAttempts(10);
-
-    // move_group.setJointValueTarget(best_pose, end_effector_link);
-    // move_group.plan(my_plan);
-
     bool success = (move_group.execute(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
     ROS_INFO("Execute (best pose goal) %s", success ? "SUCCESS" : "FAILED");
