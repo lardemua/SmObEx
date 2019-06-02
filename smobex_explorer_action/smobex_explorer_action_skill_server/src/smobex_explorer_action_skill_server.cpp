@@ -78,7 +78,8 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
 
   pcl::PointXYZRGBA point_add_rgba;
   pcl::PointXYZ point_add, centroid_pcl;
-  pcl::PointCloud<pcl::PointXYZ> all_centroids_pcl;
+  // pcl::PointCloud<pcl::PointXYZ> all_centroids_pcl;
+  pcl::PointCloud<PointTypeIO> all_centroids_pcl;
 
   // Load the input point cloud
   pcl::fromROSMsg(*unknown_cloud, *cloud_out);
@@ -120,7 +121,18 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
 
     centroids_vect.push_back(centroid);
 
-    all_centroids_pcl.push_back(centroid_pcl);
+    PointTypeIO centroid_pcl_colored;
+
+    centroid_pcl_colored.x = centroid_pcl.x;
+    centroid_pcl_colored.y = centroid_pcl.y;
+    centroid_pcl_colored.z = centroid_pcl.z;
+
+    centroid_pcl_colored.x = label_r;
+    centroid_pcl_colored.y = label_g;
+    centroid_pcl_colored.z = label_b;
+    centroid_pcl_colored.a = 1;
+
+    all_centroids_pcl.push_back(centroid_pcl_colored);
   }
 
   // Save the output point cloud
