@@ -29,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Clusters Centers
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -208,6 +208,7 @@ Visualization Manager:
       Name: SearchSpace
       Namespaces:
         free_boxes: false
+        occupied_boxes: true
         unknown_boxes: true
       Queue Size: 10
       Value: true
@@ -224,7 +225,7 @@ Visualization Manager:
       Marker Topic: /discovered_space
       Name: DiscoveredSpace
       Namespaces:
-        {}
+        Pose: true
       Queue Size: 10
       Value: true
     - Class: rviz/Marker
@@ -341,7 +342,7 @@ Visualization Manager:
       Marker Topic: /pose_arrows
       Name: Arrows
       Namespaces:
-        {}
+        "": true
       Queue Size: 10
       Value: true
     - Alpha: 1
@@ -384,7 +385,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 52; 101; 164
-      Color Transformer: FlatColor
+      Color Transformer: RGB8
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -459,10 +460,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.32979702949523926
+      Pitch: 0.17979714274406433
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.165280342102051
+      Yaw: 4.320281505584717
     Saved: ~
 Window Geometry:
   Displays:

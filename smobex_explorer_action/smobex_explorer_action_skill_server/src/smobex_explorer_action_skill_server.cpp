@@ -127,10 +127,10 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
     centroid_pcl_colored.y = centroid_pcl.y;
     centroid_pcl_colored.z = centroid_pcl.z;
 
-    centroid_pcl_colored.x = label_r;
-    centroid_pcl_colored.y = label_g;
-    centroid_pcl_colored.z = label_b;
-    centroid_pcl_colored.a = 1;
+    centroid_pcl_colored.r = label_r;
+    centroid_pcl_colored.g = label_g;
+    centroid_pcl_colored.b = label_b;
+    // centroid_pcl_colored.a = 1;
 
     all_centroids_pcl.push_back(centroid_pcl_colored);
   }
@@ -456,6 +456,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     pub_arrows.publish(all_poses);
     pub_space.publish(single_view_boxes);
+
+    getchar();
 
     ROS_WARN("MOVING!!!");
 

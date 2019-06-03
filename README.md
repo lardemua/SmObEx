@@ -115,7 +115,6 @@ Porto, Portugal
 - [x] Visualization of the unknown space
 - [x] Integrated the _octomap_bounding_box_ node
 - [x] Evaluate each pose
-
   - [x] Evaluated one ray
   - [x] Generated all camera rays for given pose
   - [x] Evaluate all rays
@@ -152,6 +151,12 @@ Porto, Portugal
 ## Week 21
 
   - Dissertation writing
+
+## Week 22
+
+  - Dissertation writing
+
+## Week 23
 
 # Built with
 
