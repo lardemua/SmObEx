@@ -176,6 +176,9 @@ add_executable(robot_pose_evaluator src/robot_pose_evaluator.cpp)
 # target_compile_options(robot_pose_evaluator PRIVATE ${OpenMP_FLAGS})
 add_dependencies(robot_pose_evaluator ${catkin_EXPORTED_TARGETS} ${smobex_explorer_action_skill_msgs_EXPORTED_TARGETS})
 
+add_executable(scene_node src/scene_node.cpp)
+add_dependencies(robot_pose_evaluator ${catkin_EXPORTED_TARGETS})
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -209,6 +212,10 @@ target_link_libraries(robot_pose_evaluator
     ${PCL_LIBRARIES}
     ${OCTOMAP_LIBRARIES}
     # ${OpenMP_LIBS}
+)
+
+target_link_libraries(scene_node
+    ${catkin_LIBRARIES}
 )
 
 
