@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="file" default=""/>
+
+    <param name="/use_sim_time" value="true"/>
+
+    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause /home/joao/bagfiles/$(arg file)" />
+</launch>

@@ -42,6 +42,10 @@ Porto, Portugal
   * [Week 18](#week-18)
   * [Week 19](#week-19)
   * [Week 20](#week-20)
+  * [Week 21](#week-21)
+  * [Week 22](#week-22)
+  * [Week 23](#week-23)
+  * [Week 24](#week-24)
 - [Built with](#built-with)
   * [Hardware](#hardware)
   * [Software](#software)
@@ -57,6 +61,8 @@ Porto, Portugal
   * [Intrinsic Calibration](#intrinsic-calibration)
   * [Extrinsic Calibration Mode](#extrinsic-calibration-mode)
   * [Recording mode](#recording-mode)
+  * [Record bagfile](#record-bagfile)
+  * [Play bagfile](#play-bagfile)
     + [Results](#results)
   * [Operation mode](#operation-mode)
     + [Simulating in Roboguide](#simulating-in-roboguide)
@@ -66,7 +72,6 @@ Porto, Portugal
     + [Autonomous](#autonomous)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 
 # Completed tasks
 
@@ -157,6 +162,12 @@ Porto, Portugal
   - Dissertation writing
 
 ## Week 23
+
+  - Dissertation writing
+
+## Week 24
+
+  - Getting results
 
 # Built with
 
@@ -347,6 +358,22 @@ To visualize the point cloud or the OctoMap run, respectively,
 pcl_viewer auto_save.pcd
 
 octovis test.ot
+```
+
+## Record bagfile
+
+```bash
+roslaunch smobex_bringup record_bag.launch name:=file_name
+
+roslaunch smobex_bringup bringup.launch
+```
+
+## Play bagfile
+
+```bash
+roslaunch smobex_bringup play_bag.launch file:=file_name
+
+roslaunch smobex_bringup bringup.launch online:=false
 ```
 
 ### Results
