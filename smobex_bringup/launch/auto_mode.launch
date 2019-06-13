@@ -92,7 +92,7 @@
 
         <param name="~frame_id" value="/base_link"/>
         <param name="~n_poses" value="150"/>
-        <param name="~threshold" value="0.005"/>
+        <param name="~threshold" value="0.001"/>
 
         <rosparam file="$(find smobex_bringup)/params/camera_specs.yaml" command="load" />
 

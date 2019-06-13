@@ -141,7 +141,11 @@ void autoModeCancelCB(const visualization_msgs::InteractiveMarkerFeedbackConstPt
 
 	ROS_INFO("Action server started, sending cancel.");
 
+	ac.getState();
 	ac.cancelAllGoals();
+	ac.getState();
+	
+	ROS_INFO("Cancelled.");
 }
 
 Marker makeBox(InteractiveMarker &msg)

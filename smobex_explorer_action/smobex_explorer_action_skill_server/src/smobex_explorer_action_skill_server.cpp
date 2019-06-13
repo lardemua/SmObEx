@@ -405,6 +405,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         pub_arrows.publish(all_poses);
 
         ROS_INFO("---------");
+        ros::spinOnce();
       }
     }
 
@@ -485,6 +486,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   ROS_INFO_STREAM("Final best score: " << best_score);
 
   this->set_succeeded();
+  
 }
 
 void SmobexExplorerActionSkill::set_succeeded(std::string outcome)
