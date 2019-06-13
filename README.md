@@ -360,6 +360,18 @@ pcl_viewer auto_save.pcd
 octovis test.ot
 ```
 
+### Results
+
+360 degree mapping of LAR files:
+
+- [Octree](./files/test.bt)
+
+- [Point Cloud](./files/auto_save.pcd)
+
+![LAR_360_octomap](./files/LAR_360_octomap.png)
+
+![LAR_360_pointCloud](./files/LAR_360_pointCloud.png)
+
 ## Record bagfile
 
 ```bash
@@ -375,18 +387,6 @@ roslaunch smobex_bringup play_bag.launch file:=file_name
 
 roslaunch smobex_bringup bringup.launch online:=false
 ```
-
-### Results
-
-360 degree mapping of LAR files:
-
-- [Octree](./files/test.bt)
-
-- [Point Cloud](./files/auto_save.pcd)
-
-![LAR_360_octomap](./files/LAR_360_octomap.png)
-
-![LAR_360_pointCloud](./files/LAR_360_pointCloud.png)
 
 ## Operation mode
 

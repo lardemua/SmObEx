@@ -4,6 +4,8 @@
 
     <node pkg="rosbag" type="record" name="record_bag" output="screen" args="-O /home/joao/bagfiles/$(arg name) 
         /camera/depth/camera_info
+        /camera/depth_registered/camera_info
+        /camera/depth_registered/image_raw
         /camera/depth_registered/points
         /camera/rgb/camera_info
         /camera/rgb/image_raw
@@ -11,16 +13,28 @@
         /clusters_centers
         /discovered_space
         /free_cells_vis_array
+        /joint_path_command
         /joint_states
+        /move_group/display_contacts
+        /move_group/display_planned_path
+        /move_group/filtered_cloud
+        /move_group/monitored_planning_scene
         /occupied_cells_vis_array
         /octomap_binary
         /octomap_full
         /octomap_point_cloud_centers
+        /planning_scene
+        /planning_scene_world\
         /point_cloud_filter/points
         /point_cloud_filter/rviz/filter
         /pose_arrows
+        /robot_status
+        /rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/feedback
+        /rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update
+        /rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update_full
         /tf
         /tf_static
+        /trajectory_execution_event
         /unknown_full_map
         /unknown_pc"/>
 </launch>
