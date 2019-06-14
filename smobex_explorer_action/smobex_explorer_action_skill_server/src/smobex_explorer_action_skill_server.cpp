@@ -431,7 +431,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
       ROS_INFO_STREAM("Planning " << sorted_pose_idx << " ...");
 
-      set_target = move_group.setJointValueTarget(best_pose, end_effector_link);
+      // set_target = move_group.setJointValueTarget(best_pose, end_effector_link);
+      set_target = move_group.setPoseTarget(best_pose, end_effector_link);
       set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
       ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
@@ -485,8 +486,20 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
   ROS_INFO_STREAM("Final best score: " << best_score);
 
+  moveit::core::RobotStatePtr current_state = move_group.getCurrentState();
+  std::vector<double> joint_group_positions;
+  current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
+
+  joint_group_positions[0] = -1.570723533630371; // radians
+  joint_group_positions[1] = 0.0; // radians
+  joint_group_positions[2] = 0.0; // radians
+  joint_group_positions[3] = 0.0; // radians
+  joint_group_positions[4] = 0.0; // radians
+  joint_group_positions[5] = 0.0; // radians
+
+  move_group.setJointValueTarget(joint_group_positions);
+
   this->set_succeeded();
-  
 }
 
 void SmobexExplorerActionSkill::set_succeeded(std::string outcome)

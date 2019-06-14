@@ -2,13 +2,11 @@
 <launch>
     <arg name="name" default=""/>
 
-    <node pkg="rosbag" type="record" name="record_bag" output="screen" args="-b 2048 -O /mnt/HDD/Linux_Files/bagfiles/$(arg name) 
-        /camera/depth/camera_info
+    <node pkg="rosbag" type="record" name="record_bag" output="screen" args="-b 2048 -O /home/joao/bagfiles/$(arg name) 
         /camera/depth_registered/camera_info
         /camera/depth_registered/image_raw
-        /camera/depth_registered/points
         /camera/rgb/camera_info
-        /camera/rgb/image_raw
+        /camera/rgb/image_raw/compressed
         /cells_vis_array
         /clusters_centers
         /discovered_space
