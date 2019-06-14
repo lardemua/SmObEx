@@ -4,5 +4,5 @@
 
     <param name="/use_sim_time" value="true"/>
 
-    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause /home/joao/bagfiles/$(arg file)" />
+    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause /mnt/HDD/Linux_Files/bagfiles/$(arg file).bag" />
 </launch>

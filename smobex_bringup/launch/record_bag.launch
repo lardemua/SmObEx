@@ -2,7 +2,7 @@
 <launch>
     <arg name="name" default=""/>
 
-    <node pkg="rosbag" type="record" name="record_bag" output="screen" args="-O /home/joao/bagfiles/$(arg name) 
+    <node pkg="rosbag" type="record" name="record_bag" output="screen" args="-b 2048 -O /mnt/HDD/Linux_Files/bagfiles/$(arg name) 
         /camera/depth/camera_info
         /camera/depth_registered/camera_info
         /camera/depth_registered/image_raw
@@ -24,7 +24,7 @@
         /octomap_full
         /octomap_point_cloud_centers
         /planning_scene
-        /planning_scene_world\
+        /planning_scene_world
         /point_cloud_filter/points
         /point_cloud_filter/rviz/filter
         /pose_arrows
