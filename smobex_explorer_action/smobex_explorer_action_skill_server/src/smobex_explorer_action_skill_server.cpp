@@ -330,6 +330,11 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     size_t poses_by_cluster = n_poses / total_clusters;
 
+    if (poses_by_cluster < 1)
+    {
+      poses_by_cluster = 1;
+    }
+
     ROS_INFO_STREAM("Number of clusters: " << total_clusters);
     ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
     std::vector<aPose> poses_vector;
@@ -337,7 +342,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
     {
       geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
-      poses_vector.clear();
+      // poses_vector.clear();
 
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
@@ -397,7 +402,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         one_pose.score = pose_test.score;
         one_pose.pose = target_pose;
         one_pose.arrow_id = arrow_id;
-        one_pose.boxes = pose_test.discoveredBoxesVis(frame_id);
+        // one_pose.boxes = pose_test.discoveredBoxesVis(frame_id);
 
         poses_vector.push_back(one_pose);
 
@@ -469,9 +474,13 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     } while ((set_target == false) || (set_plan == false));
 
+    tf::poseMsgToTF(best_pose.pose, pose_test.view_pose);
+    pose_test.evalPose();
+
     best_score = poses_vector[sorted_pose_idx].score;
     best_arrow_id = poses_vector[sorted_pose_idx].arrow_id;
-    single_view_boxes = poses_vector[sorted_pose_idx].boxes;
+    // single_view_boxes = poses_vector[sorted_pose_idx].boxes;
+    single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
 
     all_poses.markers[best_arrow_id].color = green_color;
     all_poses.markers[best_arrow_id].scale.x *= 2;
@@ -504,6 +513,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     }
     pub_space.publish(single_view_boxes);
 
+    ros::Duration(2).sleep(); //Give time for map to update
+
   } //while (best_score > threshold);
 
   ROS_INFO_STREAM("Final best score: " << best_score);
@@ -513,11 +524,11 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
   joint_group_positions[0] = -M_PI / 2; // radians
-  joint_group_positions[1] = 0.0;                // radians
-  joint_group_positions[2] = 0.0;                // radians
-  joint_group_positions[3] = 0.0;                // radians
-  joint_group_positions[4] = 0.0;                // radians
-  joint_group_positions[5] = 0.0;                // radians
+  joint_group_positions[1] = 0.0;       // radians
+  joint_group_positions[2] = 0.0;       // radians
+  joint_group_positions[3] = 0.0;       // radians
+  joint_group_positions[4] = 0.0;       // radians
+  joint_group_positions[5] = 0.0;       // radians
 
   move_group.setJointValueTarget(joint_group_positions);
   move_group.move();

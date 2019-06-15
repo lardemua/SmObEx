@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="name" default=""/>
+    <arg name="play" default="true"/>
+    <arg name="factor" default="1"/>
 
     <param name="/use_sim_time" value="true"/>
 
@@ -13,7 +15,7 @@
         <arg name="depth_registration" value="true"/>
     </include>
 
-    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -l /mnt/HDD/Linux_Files/bagfiles/$(arg name).bag" />
+    <node if="$(arg play)" pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -r $(arg factor) /mnt/HDD/Linux_Files/bagfiles/$(arg name).bag" />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
