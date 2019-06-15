@@ -13,5 +13,12 @@
         <arg name="depth_registration" value="true"/>
     </include>
 
-    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -l /home/joao/bagfiles/$(arg name).bag" />
+    <node pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -l /mnt/HDD/Linux_Files/bagfiles/$(arg name).bag" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find smobex_description)/urdf/calibrated.xacro'" />
+
+    <!-- Rviz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="--display-config $(find smobex_bringup)/config/operation_mode.rviz" required="true"/>
 </launch>
