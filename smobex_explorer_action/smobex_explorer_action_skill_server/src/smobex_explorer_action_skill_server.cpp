@@ -506,6 +506,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   joint_group_positions[5] = 0.0;                // radians
 
   move_group.setJointValueTarget(joint_group_positions);
+  move_group.move();
 
   this->set_succeeded();
 }
