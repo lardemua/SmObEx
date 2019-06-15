@@ -435,6 +435,14 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       set_target = move_group.setPoseTarget(best_pose, end_effector_link);
       set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
+      // std::vector<geometry_msgs::Pose> waypoints;
+      // waypoints.push_back(best_pose.pose);
+
+      // moveit_msgs::RobotTrajectory trajectory;
+      // set_target = (move_group.computeCartesianPath(waypoints, 0.005, 0.0, trajectory, true) > 0.95);
+      // my_plan.trajectory_ = trajectory;
+      // set_plan = true;
+
       ROS_INFO("Target (pose goal) %s", set_target ? "SUCCESS" : "FAILED");
       ROS_INFO("Plan (pose goal) %s", set_plan ? "SUCCESS" : "FAILED");
 
@@ -491,11 +499,11 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
   joint_group_positions[0] = -1.570723533630371; // radians
-  joint_group_positions[1] = 0.0; // radians
-  joint_group_positions[2] = 0.0; // radians
-  joint_group_positions[3] = 0.0; // radians
-  joint_group_positions[4] = 0.0; // radians
-  joint_group_positions[5] = 0.0; // radians
+  joint_group_positions[1] = 0.0;                // radians
+  joint_group_positions[2] = 0.0;                // radians
+  joint_group_positions[3] = 0.0;                // radians
+  joint_group_positions[4] = 0.0;                // radians
+  joint_group_positions[5] = 0.0;                // radians
 
   move_group.setJointValueTarget(joint_group_positions);
 
