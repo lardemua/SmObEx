@@ -23,8 +23,8 @@ if __name__ == '__main__':
     move_group = moveit_commander.MoveGroupCommander(group_name)
 
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
-                                                moveit_msgs.msg.DisplayTrajectory,
-                                                queue_size=20)
+                                                   moveit_msgs.msg.DisplayTrajectory,
+                                                   queue_size=20)
 
     # We can get the name of the reference frame for this robot:
     planning_frame = move_group.get_planning_frame()
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # box_pose.pose.position.x = 0.6
     # # scene.add_box(box_name, box_pose, size=(0.4, 0.4, 0.4))
     # scene.attach_box('base_link', box_name, box_pose, size = (1, 1, 1))
-    
+
     # rospy.sleep(10)
 
     # print scene.get_objects()
@@ -76,7 +76,38 @@ if __name__ == '__main__':
     # # move_group.go(joint_goal, wait=True)
     # # move_group.stop()
 
-    joint_goal = [1.5585755451194119, 1.8164244835560899, 1.8969650689330928, 2.3326661009936167, -2.130728868721306, 1.5956517006099813]
+    joint_goal = [1.5585755451194119, 1.8164244835560899, 1.8969650689330928,
+                  2.3326661009936167, -2.130728868721306, 1.5956517006099813]
 
-    move_group.go(joint_goal, wait=True)
+    # move_group.go(joint_goal, wait=True)
+    # move_group.set_goal_tolerance(0.1)
+    # plan = move_group.plan(joint_goal)
+
+    # plan_success = False
+
+    # while not plan_success:
+
+    #     plan = move_group.plan(joint_goal)
+
+    #     for pos in plan.joint_trajectory.points:
+
+    #         pos.positions[3]
+
+    contraint = moveit_msgs.msg.Constraints()
+    joint3_contraint = moveit_msgs.msg.JointConstraint()
+
+    joint3_contraint.joint_name = "joint_3"
+    joint3_contraint.position = 0
+    joint3_contraint.tolerance_below = 1.187
+    joint3_contraint.tolerance_above = 1.362
+    joint3_contraint.weight = 1
+
+    contraint.joint_constraints.append(joint3_contraint)
+    move_group.set_path_constraints(contraint)
+
+    plan = move_group.plan(joint_goal)
+
+    # print plan.joint_trajectory
+
+    move_group.execute(plan, wait=False)
     move_group.stop()

@@ -423,6 +423,19 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     move_group.setPlanningTime(0.5);
     move_group.setNumPlanningAttempts(5);
 
+    moveit_msgs::Constraints constraints;
+    moveit_msgs::JointConstraint joint3_constraint;
+
+    constraints.name = "joint3_limit";
+
+    joint3_constraint.joint_name = "joint_3";
+    joint3_constraint.position = 0;
+    joint3_constraint.tolerance_below = M_PI / 180 * 65;
+    joint3_constraint.tolerance_above = M_PI / 180 * 75;
+    joint3_constraint.weight = 1;
+
+    constraints.joint_constraints.push_back(joint3_constraint);
+
     do
     {
       sorted_pose_idx++;
@@ -432,6 +445,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       ROS_INFO_STREAM("Planning " << sorted_pose_idx << " ...");
 
       // set_target = move_group.setJointValueTarget(best_pose, end_effector_link);
+      move_group.setPathConstraints(constraints);
       set_target = move_group.setPoseTarget(best_pose, end_effector_link);
       set_plan = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
@@ -498,7 +512,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   std::vector<double> joint_group_positions;
   current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
-  joint_group_positions[0] = -1.570723533630371; // radians
+  joint_group_positions[0] = -M_PI / 2; // radians
   joint_group_positions[1] = 0.0;                // radians
   joint_group_positions[2] = 0.0;                // radians
   joint_group_positions[3] = 0.0;                // radians
