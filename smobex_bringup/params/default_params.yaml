@@ -1,4 +1,4 @@
 {configure: true, fixed_frame_id: /base_link, params_path: /home/joao/catkin_ws/src/SmObEx/smobex_bringup,
   point_cloud_in: /camera/depth_registered/points, voxelize: false, x_max: 2.1494715213775635,
-  x_min: 0.746558427810669, x_voxel: 0.3, y_max: 0.7514228224754333, y_min: -0.5389764308929443,
-  y_voxel: 0.3, z_max: 1.465098261833191, z_min: -0.3906310200691223, z_voxel: 0.3}
+  x_min: 0.746558427810669, x_voxel: 0.3, y_max: 0.7514228224754333, y_min: -0.636709988117218,
+  y_voxel: 0.3, z_max: 1.3276382684707642, z_min: -0.3906310200691223, z_voxel: 0.3}

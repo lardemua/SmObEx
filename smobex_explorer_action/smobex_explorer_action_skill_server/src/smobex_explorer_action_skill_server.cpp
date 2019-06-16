@@ -435,7 +435,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     joint3_constraint.joint_name = "joint_3";
     joint3_constraint.position = 0;
-    joint3_constraint.tolerance_below = M_PI / 180 * 65;
+    joint3_constraint.tolerance_below = M_PI / 180 * 60;
     joint3_constraint.tolerance_above = M_PI / 180 * 75;
     joint3_constraint.weight = 1;
 
