@@ -37,7 +37,7 @@ def getVolume(voxels):
 
 if __name__ == '__main__':
 
-    rospy.init_node('expected_volume_results', anonymous=True)
+    rospy.init_node('unknown_volume_results', anonymous=True)
 
     topic = '/cells_vis_array'
 
