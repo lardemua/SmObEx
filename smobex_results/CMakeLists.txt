@@ -11,15 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  octomap
-  octomap_msgs
-  octomap_ros
 )
-
-find_package(octomap REQUIRED)
-include_directories(${OCTOMAP_INCLUDE_DIRS})
-# target_link_libraries(${OCTOMAP_LIBRARIES})
-link_directories(${OCTOMAP_LIBRARY_DIRS})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -142,7 +134,6 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/smobex_results_node.cpp)
-add_executable(get_expected_vol_node src/get_expected_vol.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,16 +144,11 @@ add_executable(get_expected_vol_node src/get_expected_vol.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(get_expected_vol_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(get_expected_vol_node
-    ${catkin_LIBRARIES}
-    ${OCTOMAP_LIBRARIES}
-)
 
 #############
 ## Install ##
