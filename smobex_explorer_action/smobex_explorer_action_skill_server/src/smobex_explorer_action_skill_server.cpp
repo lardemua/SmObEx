@@ -91,11 +91,11 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
   cec.setClusterTolerance(octomap_resolution * 3);
   cec.segment(*clusters);
 
+  pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
+  geometry_msgs::Point centroid;
+
   for (int i = 0; i < clusters->size(); ++i)
   {
-    pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
-    geometry_msgs::Point centroid;
-
     int label_r = ((double)rand() / RAND_MAX) * 255;
     int label_g = ((double)rand() / RAND_MAX) * 255;
     int label_b = ((double)rand() / RAND_MAX) * 255;
@@ -229,7 +229,7 @@ SmobexExplorerActionSkill::~SmobexExplorerActionSkill()
 
 void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillGoalConstPtr &goal)
 {
-  geometry_msgs::PoseStamped best_pose;
+  // geometry_msgs::PoseStamped best_pose;
 
   visualization_msgs::Marker arrow;
 
@@ -291,19 +291,41 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
   srand(time(NULL));
 
+  visualization_msgs::MarkerArray all_poses;
+  visualization_msgs::MarkerArray single_view_boxes;
+  sensor_msgs::PointCloud2ConstPtr unknown_cloud = NULL;
+  std::vector<aPose> poses_vector;
+  geometry_msgs::Point observation_point;
+  geometry_msgs::PoseStamped target_pose;
+  geometry_msgs::PoseStamped best_pose;
+  moveit_msgs::Constraints constraints;
+  moveit_msgs::JointConstraint joint3_constraint;
+  geometry_msgs::Quaternion quat_orient;
+  geometry_msgs::Quaternion q_arrow;
+  moveit::core::RobotStatePtr current_state;
+  std::vector<double> joint_group_positions;
+  tf::Quaternion q_rot, q_new;
+
+  constraints.name = "joint3_limit";
+
+  joint3_constraint.joint_name = "joint_3";
+  joint3_constraint.position = 0;
+  joint3_constraint.tolerance_below = M_PI / 180 * 60;
+  joint3_constraint.tolerance_above = M_PI / 180 * 75;
+  joint3_constraint.weight = 1;
+
+  constraints.joint_constraints.push_back(joint3_constraint);
+
   //do
   while (best_score > threshold)
   {
-    visualization_msgs::MarkerArray all_poses;
-    visualization_msgs::MarkerArray single_view_boxes;
-
+    // visualization_msgs::MarkerArray all_poses;
     arrow_id = -1;
     best_score = -1;
 
     move_group.clearPoseTargets();
 
-    sensor_msgs::PointCloud2ConstPtr unknown_cloud =
-        ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
+    unknown_cloud = ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
 
     pose_test.writeKnownOctomap();
     pose_test.writeUnknownOctomap();
@@ -337,23 +359,22 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     ROS_INFO_STREAM("Number of clusters: " << total_clusters);
     ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
-    std::vector<aPose> poses_vector;
 
     for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
     {
-      geometry_msgs::Point observation_point = clusters_centroids[cluster_idx];
+      observation_point = clusters_centroids[cluster_idx];
       // poses_vector.clear();
 
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
-        geometry_msgs::PoseStamped target_pose;
+
         bool set_target;
         aPose one_pose;
 
         target_pose = move_group.getRandomPose();
         target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
-        geometry_msgs::Quaternion quat_orient = getOrientation(target_pose, observation_point);
+        quat_orient = getOrientation(target_pose, observation_point);
         target_pose.pose.orientation = quat_orient;
 
         ROS_INFO_STREAM("Cluster " << cluster_idx + 1 << " of " << total_clusters << " Pose " << pose_idx + 1 << " of " << poses_by_cluster);
@@ -366,11 +387,10 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         arrow.id = ++arrow_id;
 
         arrow.type = visualization_msgs::Marker::ARROW;
+        arrow.action = visualization_msgs::Marker::ADD;
 
         arrow.pose.position = target_pose.pose.position;
 
-        tf::Quaternion q_rot, q_new;
-        geometry_msgs::Quaternion q_arrow;
         tf::quaternionMsgToTF(target_pose.pose.orientation, q_new);
 
         q_rot.setRPY(0, -M_PI / 2, 0);
@@ -424,22 +444,9 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     bool set_plan = false;
 
     int sorted_pose_idx = -1;
-    geometry_msgs::PoseStamped best_pose;
+
     move_group.setPlanningTime(0.5);
     move_group.setNumPlanningAttempts(5);
-
-    moveit_msgs::Constraints constraints;
-    moveit_msgs::JointConstraint joint3_constraint;
-
-    constraints.name = "joint3_limit";
-
-    joint3_constraint.joint_name = "joint_3";
-    joint3_constraint.position = 0;
-    joint3_constraint.tolerance_below = M_PI / 180 * 60;
-    joint3_constraint.tolerance_above = M_PI / 180 * 75;
-    joint3_constraint.weight = 1;
-
-    constraints.joint_constraints.push_back(joint3_constraint);
 
     do
     {
@@ -513,14 +520,17 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     }
     pub_space.publish(single_view_boxes);
 
+    all_poses.markers.clear();
+    single_view_boxes.markers.clear();
+    poses_vector.clear();
+
     ros::Duration(2).sleep(); //Give time for map to update
 
   } //while (best_score > threshold);
 
   ROS_INFO_STREAM("Final best score: " << best_score);
 
-  moveit::core::RobotStatePtr current_state = move_group.getCurrentState();
-  std::vector<double> joint_group_positions;
+  current_state = move_group.getCurrentState();
   current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
   joint_group_positions[0] = -M_PI / 2; // radians
