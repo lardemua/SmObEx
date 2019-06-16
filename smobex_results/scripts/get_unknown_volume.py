@@ -8,7 +8,7 @@ from rospy.numpy_msg import numpy_msg
 
 def getVolume(voxels):
 
-    rospy.loginfo("Received")
+    # rospy.loginfo("Received")
 
     total_volume = 0
     single_volume = 0
@@ -27,11 +27,12 @@ def getVolume(voxels):
             scale = marker.scale.x
 
             single_volume = scale ** 3
-            total_volume += single_volume
+            total_volume += single_volume * len(points)
         
     if one_zero:
         
         print str(total_volume) + ' m3'
+        return total_volume
 
     # rospy.signal_shutdown('Ended job')
 
@@ -41,17 +42,31 @@ if __name__ == '__main__':
 
     topic = '/cells_vis_array'
 
-    while not rospy.is_shutdown():
-        
-        # rospy.loginfo('Waiting for expected voxels to be published...')
+    one_take = False
+    vol_end = 0
 
-        raw_input('Press Enter to get volume')
-    
-        # rospy.Subscriber(topic, MarkerArray, getVolume)
+    while not rospy.is_shutdown():
+
+        if not one_take:
+
+            one_take = True
+        
+            raw_input('Press Enter to get before volume')
+        
+            msg = rospy.wait_for_message(topic, MarkerArray)
+
+            vol_start = getVolume(msg)
+
+        else:
+
+            vol_start = vol_end
+
+        raw_input('Press Enter to get after volume')
 
         msg = rospy.wait_for_message(topic, MarkerArray)
 
-        getVolume(msg)
+        vol_end = getVolume(msg)
 
-    rospy.spin()
+        print 'Unveiled volume: ' + str(vol_start-vol_end) + ' m3'
+
 

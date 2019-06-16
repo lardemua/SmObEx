@@ -8,7 +8,7 @@ from rospy.numpy_msg import numpy_msg
 
 def getVolume(voxels):
 
-    rospy.loginfo("Received")
+    # rospy.loginfo("Received")
 
     total_volume = 0
     single_volume = 0
@@ -27,7 +27,7 @@ def getVolume(voxels):
             scale = marker.scale.x
 
             single_volume = scale ** 3
-            total_volume += single_volume
+            total_volume += single_volume * len(points)
         
     if one_zero:
         
@@ -42,8 +42,6 @@ if __name__ == '__main__':
     rospy.loginfo('Waiting for expected voxels to be published...')
     
     rospy.Subscriber(topic, MarkerArray, getVolume)
-
-    
 
     rospy.spin()
 
