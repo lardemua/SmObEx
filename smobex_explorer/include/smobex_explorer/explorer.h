@@ -332,6 +332,11 @@ public:
 		pcl::fromROSMsg(*unknown_cloud, unknown_centers_pcl);
 	}
 
+	void writeUnknownCloud(sensor_msgs::PointCloud2ConstPtr unknown_cloud)
+	{
+		pcl::fromROSMsg(*unknown_cloud, unknown_centers_pcl);
+	}
+
 	void evalPose()
 	{
 		using namespace octomap;

@@ -5,7 +5,7 @@
     <arg name="online" doc="If robot is online or not"/>
     <arg name="octo_resolution" doc="Resolution of the OctoMap"/>
 
-    <arg name="scale" default="5" />
+    <arg name="scale" default="12" />
 
     <!-- Initializing robot and camera calibrated -->
     <!-- <include file="$(find smobex_calibration)/launch/calibrated.launch">
@@ -18,7 +18,7 @@
     </include>
 
     <!-- Init point cloud spacial filter, operation mode -->
-    <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+    <!-- <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
 
         <param name="point_cloud_in" value="/camera/depth_registered/points"/>
         <param name="fixed_frame_id" value="/base_link"/>
@@ -32,13 +32,13 @@
 
         <param name="params_path" value="$(find smobex_bringup)"/>
 
-    </node>
+    </node> -->
 
     <!-- OctoMap Server -->
     <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node">
 
-        <remap from="cloud_in" to="point_cloud_filter/points" />
-        <!-- <remap from="cloud_in" to="camera/depth_registered/points"/> -->
+        <!-- <remap from="cloud_in" to="point_cloud_filter/points" /> -->
+        <remap from="cloud_in" to="camera/depth_registered/points"/>
         <!-- <remap from="cloud_in" to="pcl_filters/pcl_filtered" /> -->
         <param name="publish_free_space" value="true"/>
 

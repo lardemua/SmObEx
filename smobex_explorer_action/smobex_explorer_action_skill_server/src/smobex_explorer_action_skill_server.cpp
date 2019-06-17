@@ -91,11 +91,12 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
   cec.setClusterTolerance(octomap_resolution * 3);
   cec.segment(*clusters);
 
-  pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
   geometry_msgs::Point centroid;
 
   for (int i = 0; i < clusters->size(); ++i)
   {
+    pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
+
     int label_r = ((double)rand() / RAND_MAX) * 255;
     int label_g = ((double)rand() / RAND_MAX) * 255;
     int label_b = ((double)rand() / RAND_MAX) * 255;
@@ -118,6 +119,8 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
     centroid.x = centroid_pcl.x;
     centroid.y = centroid_pcl.y;
     centroid.z = centroid_pcl.z;
+
+    ROS_INFO_STREAM("Centroid i: " << centroid);
 
     centroids_vect.push_back(centroid);
 
@@ -231,10 +234,6 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 {
   // geometry_msgs::PoseStamped best_pose;
 
-  visualization_msgs::Marker arrow;
-
-  std::vector<geometry_msgs::Point> clusters_centroids;
-
   static const std::string PLANNING_GROUP = "manipulator";
 
   // ros::AsyncSpinner spinner(1); // TODO see if improves performance
@@ -305,6 +304,8 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   moveit::core::RobotStatePtr current_state;
   std::vector<double> joint_group_positions;
   tf::Quaternion q_rot, q_new;
+  visualization_msgs::Marker arrow;
+  std::vector<geometry_msgs::Point> clusters_centroids;
 
   constraints.name = "joint3_limit";
 
@@ -330,7 +331,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     pose_test.writeKnownOctomap();
     pose_test.writeUnknownOctomap();
 
-    pose_test.writeUnknownCloud();
+    pose_test.writeUnknownCloud(unknown_cloud);
 
     clusters_centroids = findClusters(unknown_cloud);
 
@@ -338,7 +339,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     {
       pub_cloud_clusters.publish(cloud_clusters_publish);
 
-      centroid_clusters_publish.header.stamp = ros::Time::now();
+      centroid_clusters_publish.header.stamp = ros::Time(0);
       centroid_clusters_publish.header.frame_id = frame_id;
 
       pub_centers_clusters.publish(centroid_clusters_publish);
@@ -363,12 +364,12 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
     {
       observation_point = clusters_centroids[cluster_idx];
+      ROS_INFO_STREAM("Obervating towards: " << observation_point);
       // poses_vector.clear();
 
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
-
-        bool set_target;
+        // bool set_target;
         aPose one_pose;
 
         target_pose = move_group.getRandomPose();
@@ -523,8 +524,9 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     all_poses.markers.clear();
     single_view_boxes.markers.clear();
     poses_vector.clear();
+    clusters_centroids.clear();
 
-    ros::Duration(2).sleep(); //Give time for map to update
+    ros::Duration(5).sleep(); //Give time for map to update
 
   } //while (best_score > threshold);
 
