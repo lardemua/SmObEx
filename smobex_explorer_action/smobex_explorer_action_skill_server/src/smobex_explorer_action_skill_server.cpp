@@ -502,6 +502,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     // getchar();
 
     ROS_WARN("MOVING!!!");
+    ROS_INFO_STREAM("Moving towards score " << best_score);
 
     bool success = (move_group.execute(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 

@@ -16,7 +16,7 @@
         <arg name="depth_registration" value="true"/>
     </include>
 
-    <node if="$(arg play)" pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -r $(arg factor) -s $(arg start_sec) /mnt/HDD/Linux_Files/bagfiles/$(arg name).bag" />
+    <node if="$(arg play)" pkg="rosbag" type="play" name="play_bag" output="screen" args="--clock --pause -r $(arg factor) -s $(arg start_sec) /home/joao/bagfiles/$(arg name).bag" />
     <!-- <node pkg="rqt_bag" type="rqt_bag" name="play_bag" args="-clock /mnt/HDD/Linux_Files/bagfiles/$(arg name).bag" required="true" output="screen"/> -->
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />

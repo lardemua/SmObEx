@@ -31,7 +31,8 @@ def getVolume(voxels):
         
     if one_zero:
         
-        print str(total_volume) + ' m3'
+        # print str(total_volume) + ' m3'
+        print total_volume
 
 if __name__ == '__main__':
 
@@ -40,6 +41,8 @@ if __name__ == '__main__':
     topic = '/discovered_space'
 
     rospy.loginfo('Waiting for expected voxels to be published...')
+
+    print 'Expected volume, in m3'
     
     rospy.Subscriber(topic, MarkerArray, getVolume)
 

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="name" default="res"/>
+    <arg name="path" default="/jome/joao"/>
+
+    <node pkg="smobex_results" type="get_expected_volume.py" name="get_volume" cwd="node" />
+</launch>

@@ -2,11 +2,23 @@
 import rospy
 from std_msgs.msg import String
 from visualization_msgs.msg import MarkerArray, Marker
-from geometry_msgs.msg import Vector3, Point
 import numpy as np
-from rospy.numpy_msg import numpy_msg
 
-def getVolume(voxels):
+from moveit_msgs.msg import MoveGroupActionGoal, MoveGroupActionResult
+from trajectory_msgs.msg import JointTrajectory
+
+import industrial_msgs.msg 
+
+def isMoving():
+
+    status = rospy.wait_for_message('/robot_status', industrial_msgs.msg.RobotStatus)
+    
+    moving = status.in_motion.val == industrial_msgs.msg.TriState.TRUE
+
+    return moving
+
+
+def getVolume():
 
     # rospy.loginfo("Received")
 
@@ -14,59 +26,60 @@ def getVolume(voxels):
     single_volume = 0
     one_zero = False
 
-    for marker in voxels.markers:
+    while not one_zero:
 
-        # points = np.array([marker.points.x, marker.points.y, marker.points.z])
-        # print marker.action
+        voxels = rospy.wait_for_message('/cells_vis_array', MarkerArray)
 
-        if marker.action == 0 and marker.ns == 'unknown_boxes':
+        for marker in voxels.markers:
 
-            one_zero = True
-            
-            points = marker.points
-            scale = marker.scale.x
+            # points = np.array([marker.points.x, marker.points.y, marker.points.z])
+            # print marker.action
 
-            single_volume = scale ** 3
-            total_volume += single_volume * len(points)
-        
-    if one_zero:
-        
-        print str(total_volume) + ' m3'
-        return total_volume
+            if marker.action == 0 and marker.ns == 'unknown_boxes':
 
-    # rospy.signal_shutdown('Ended job')
+                one_zero = True
+
+                points = marker.points
+                scale = marker.scale.x
+
+                single_volume = scale ** 3
+                total_volume += single_volume * len(points)
+
+    # print total_volume
+    return total_volume
 
 if __name__ == '__main__':
 
     rospy.init_node('unknown_volume_results', anonymous=True)
 
-    topic = '/cells_vis_array'
+    # one_take = False
+    vol_init = -1
 
-    one_take = False
-    vol_end = 0
+    # i=0
+    print 'Unknown volume, in m3'
 
-    while not rospy.is_shutdown():
+    while not rospy.is_shutdown():   
 
-        if not one_take:
+        in_motion = False     
 
-            one_take = True
-        
-            raw_input('Press Enter to get before volume')
-        
-            msg = rospy.wait_for_message(topic, MarkerArray)
+        while not in_motion:
+            
+            rospy.Rate(3).sleep()
 
-            vol_start = getVolume(msg)
+            in_motion = isMoving()
 
-        else:
+            # print 1
 
-            vol_start = vol_end
+        vol_start = getVolume()
 
-        raw_input('Press Enter to get after volume')
+        print vol_start
 
-        msg = rospy.wait_for_message(topic, MarkerArray)
+        in_motion = True
 
-        vol_end = getVolume(msg)
+        while in_motion:
+            
+            rospy.Rate(3).sleep()
 
-        print 'Unveiled volume: ' + str(vol_start-vol_end) + ' m3'
+            in_motion = isMoving()
 
-
+            # print 2
