@@ -4,20 +4,6 @@ from std_msgs.msg import String
 from visualization_msgs.msg import MarkerArray, Marker
 import numpy as np
 
-from moveit_msgs.msg import MoveGroupActionGoal, MoveGroupActionResult
-from trajectory_msgs.msg import JointTrajectory
-
-import industrial_msgs.msg 
-
-def isMoving():
-
-    status = rospy.wait_for_message('/robot_status', industrial_msgs.msg.RobotStatus)
-    
-    moving = status.in_motion.val == industrial_msgs.msg.TriState.TRUE
-
-    return moving
-
-
 def getVolume():
 
     # rospy.loginfo("Received")
@@ -50,7 +36,7 @@ def getVolume():
 
 if __name__ == '__main__':
 
-    rospy.init_node('unknown_volume_results', anonymous=True)
+    rospy.init_node('unknown_volume_get', anonymous=True)
 
     # one_take = False
     vol_init = -1
@@ -58,28 +44,10 @@ if __name__ == '__main__':
     # i=0
     print 'Unknown volume, in m3'
 
-    while not rospy.is_shutdown():   
+    while not rospy.is_shutdown():
 
-        in_motion = False     
+        vol = getVolume()
 
-        while not in_motion:
-            
-            rospy.Rate(2).sleep()
+        print vol
 
-            in_motion = isMoving()
-
-            # print 1
-
-        vol_start = getVolume()
-
-        print vol_start
-
-        in_motion = True
-
-        while in_motion:
-            
-            rospy.Rate(2).sleep()
-
-            in_motion = isMoving()
-
-            # print 2
+        rospy.Rate(5).sleep()

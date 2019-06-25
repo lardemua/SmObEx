@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
         while not in_motion:
             
-            rospy.Rate(3).sleep()
+            rospy.Rate(2).sleep()
 
             in_motion = isMoving()
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
         while in_motion:
 
-            rospy.Rate(3).sleep()
+            rospy.Rate(2).sleep()
 
             in_motion = isMoving()
 

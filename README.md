@@ -169,6 +169,12 @@ Porto, Portugal
 
   - Getting results
 
+## Week 25
+
+  - [x] Finish up auto mode
+    - [x] Solve singularity issues
+  - Getting results
+
 # Built with
 
 ## Hardware
