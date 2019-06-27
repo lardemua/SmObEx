@@ -28,6 +28,10 @@ INESC TEC
 
 Porto, Portugal
 
+## Video PlayList
+
+Link: [PlayList](https://www.youtube.com/playlist?list=PLlFdlPPJjdmmCzNEbp_u2mB5nFM9WHmFo)
+
 # Table of contents
 
 - [Completed tasks](#completed-tasks)
