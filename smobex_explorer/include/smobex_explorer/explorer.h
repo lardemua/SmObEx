@@ -34,12 +34,32 @@
 
 #include <colormap/colormap.h>
 
-/*
-TYPEDEFS AND OVERLOADS
-*/
+// Unknown Voxel Class
+class unknownVoxel
+{
+public:
+	octomap::OcTreeKey key;
+	octomap::point3d center;
+	double distance_to_camera;
+	bool to_visit;
+	size_t map_key;
 
+	// Constructor
+	unknownVoxel()
+	{
+		to_visit = true;
+	}
+
+	// Overloads
+	bool operator==(const unknownVoxel &rhs) const { return this->key == rhs.key; }
+	bool operator==(const octomap::OcTreeKey &rhs) const { return this->key == rhs; }
+};
+
+// TYPEDEF
 typedef std::map<size_t, unknownVoxel> map_type;
 
+
+// OVERLOADS
 bool compareVoxelDistance(unknownVoxel const &a, unknownVoxel const &b)
 {
 	return a.distance_to_camera > b.distance_to_camera;
@@ -131,27 +151,7 @@ public:
 	}
 };
 
-// Unknown Voxel
-class unknownVoxel
-{
-public:
-	octomap::OcTreeKey key;
-	octomap::point3d center;
-	double distance_to_camera;
-	bool to_visit;
-	size_t map_key;
-
-	// Constructor
-	unknownVoxel()
-	{
-		to_visit = true;
-	}
-
-	// Overloads
-	bool operator==(const unknownVoxel &rhs) const { return this->key == rhs.key; }
-	bool operator==(const octomap::OcTreeKey &rhs) const { return this->key == rhs; }
-};
-
+// Evaluate Pose
 class evaluatePose : public generatePose
 {
 public:
