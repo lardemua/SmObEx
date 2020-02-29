@@ -25,6 +25,7 @@ It calls rosparams to find out the propper reference frames, and finds the trans
 """
 
 """
+Created by Miguel Riem de Oliveira for tangerinebot
 Edited by Joao Santos to include in the SmObEx package
 """
 

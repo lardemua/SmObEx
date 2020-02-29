@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-
+<!--
+    Launch file to launch the FANUC and XTION as separeted "robots"
+    Refer to smobex_bringup's bringup.launch
+-->
 <launch>
 
     <arg name="robot_ip" doc="IP of controller" />

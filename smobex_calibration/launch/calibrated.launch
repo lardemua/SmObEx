@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-
+<!--
+    Launch file that launches the calibrated robot
+    Refer to smobex_bringup's bringup.launch
+-->
 <launch>
 
     <arg name="robot_ip" doc="IP of controller" />
