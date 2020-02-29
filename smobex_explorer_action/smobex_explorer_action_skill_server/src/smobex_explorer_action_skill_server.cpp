@@ -42,6 +42,7 @@ float octomap_resolution = 0.1;
 
 using namespace std;
 
+// Define a pose attributes
 class aPose
 {
 public:
@@ -51,11 +52,13 @@ public:
   visualization_msgs::MarkerArray boxes;
 };
 
+// Compare two pose's score
 bool cmp_aPose(const aPose &a, const aPose &b)
 {
   return a.score > b.score;
 }
 
+// Evaluate if two voxels bellong to the same cluster or not
 bool customRegionGrowing(const PointTypeIO &point_a, const PointTypeIO &point_b, float squared_distance)
 {
   if (squared_distance < (octomap_resolution * 2) * (octomap_resolution * 2) * 1.1)
@@ -68,6 +71,8 @@ bool customRegionGrowing(const PointTypeIO &point_a, const PointTypeIO &point_b,
   }
 }
 
+// Separate the clusters and get their centroids. Also generate a point cloud colored accordingly 
+// to the clusters
 std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr unknown_cloud)
 {
   std::vector<geometry_msgs::Point> centroids_vect;
@@ -148,6 +153,7 @@ std::vector<geometry_msgs::Point> findClusters(sensor_msgs::PointCloud2ConstPtr 
   return centroids_vect;
 }
 
+// Get the orientation from a view point to a view goal
 geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geometry_msgs::Point point)
 {
   tf::Vector3 z_direction, y_direction, x_direction, rand_vector;
@@ -155,35 +161,6 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
   tf::Quaternion view_orientation;
 
   geometry_msgs::Quaternion quat_out;
-
-#if 0
-
-  pcl::PointCloud<pcl::PointXYZ> unknown_pcl;
-
-  pcl::fromROSMsg(*unknown_cloud, unknown_pcl);
-
-  size_t n_points = unknown_pcl.size();
-  pcl::PointXYZ point_pcl;
-
-    pcl::CentroidPoint<pcl::PointXYZ> centroid;
-
-    for (pcl::PointCloud<pcl::PointXYZ>::iterator it = unknown_pcl.begin(); it != unknown_pcl.end(); it++)
-    {
-        centroid.add(*it);
-    }
-
-    centroid.get(point_pcl);
-
-#elif 0
-
-  int pt_number = ((double)rand() / RAND_MAX) * n_points;
-  point_pcl = unknown_pcl.at(pt_number);
-
-  float xc = point_pcl.x;
-  float yc = point_pcl.y;
-  float zc = point_pcl.z;
-
-#endif
 
   float xc = point.x;
   float yc = point.y;
@@ -193,25 +170,31 @@ geometry_msgs::Quaternion getOrientation(geometry_msgs::PoseStamped pose, geomet
   float y = pose.pose.position.y;
   float z = pose.pose.position.z;
 
+  // z direction defines the view direction of the camera, so lets define it as
+  // the vector from the view point to the view goal
   z_direction.setX(xc - x);
   z_direction.setY(yc - y);
   z_direction.setZ(zc - z);
 
+  // Generate a random vector...
   rand_vector.setX((double)rand() / RAND_MAX);
   rand_vector.setY((double)rand() / RAND_MAX);
   rand_vector.setZ((double)rand() / RAND_MAX);
 
+  // ...so we can cross product it with z to obtain y...
   y_direction = z_direction.cross(rand_vector);
-  // y_direction.setZ(-1 * abs(y_direction.getZ()));
   y_direction.normalize();
 
+  // ...and them x
   x_direction = y_direction.cross(z_direction);
   x_direction.normalize();
 
+  // With the xyz get the rotation matrix...
   rotation_matrix.setValue(x_direction.getX(), y_direction.getX(), z_direction.getX(), x_direction.getY(),
                            y_direction.getY(), z_direction.getY(), x_direction.getZ(), y_direction.getZ(),
                            z_direction.getZ());
 
+  // ...and finally the quaternion
   rotation_matrix.getRotation(view_orientation);
   view_orientation.normalize();
 
@@ -230,14 +213,10 @@ SmobexExplorerActionSkill::~SmobexExplorerActionSkill()
 {
 }
 
+// Exploration Callback
 void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msgs::SmobexExplorerActionSkillGoalConstPtr &goal)
 {
-  // geometry_msgs::PoseStamped best_pose;
-
   static const std::string PLANNING_GROUP = "manipulator";
-
-  // ros::AsyncSpinner spinner(1); // TODO see if improves performance
-  // spinner.start();
 
   ros::NodeHandle n;
 
@@ -262,22 +241,19 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   green_color.b = 0.0;
   green_color.a = 1.0;
 
-  // int step = 1;
   float min_range = 0;
   float max_range = 1;
   float width_FOV = M_PI;
   float height_FOV = M_PI;
   std::string frame_id = "/world";
 
-  // ros::param::get("~" + ros::names::remap("step"), step);
   ros::param::get("~" + ros::names::remap("min_range"), min_range);
   ros::param::get("~" + ros::names::remap("max_range"), max_range);
   ros::param::get("~" + ros::names::remap("width_FOV"), width_FOV);
   ros::param::get("~" + ros::names::remap("height_FOV"), height_FOV);
   ros::param::get("~" + ros::names::remap("frame_id"), frame_id);
 
-  // evaluatePose pose_test(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
-  // evaluatePose pose_test(step, min_range, max_range, width_FOV, height_FOV);
+  // Set the parameters of the class
   evaluatePose pose_test(min_range, max_range, width_FOV, height_FOV);
 
   int n_poses = goal->n_poses;
@@ -307,6 +283,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
   visualization_msgs::Marker arrow;
   std::vector<geometry_msgs::Point> clusters_centroids;
 
+  // Joint constraints to escape problem
   constraints.name = "joint3_limit";
 
   joint3_constraint.joint_name = "joint_3";
@@ -317,24 +294,29 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
   constraints.joint_constraints.push_back(joint3_constraint);
 
-  //do
+  // Exploration cycle
   while (best_score > threshold)
   {
-    // visualization_msgs::MarkerArray all_poses;
     arrow_id = -1;
     best_score = -1;
 
+    // Clear pose targets
     move_group.clearPoseTargets();
 
+    // Wait for a unknown centroid PC to be received
     unknown_cloud = ros::topic::waitForMessage<sensor_msgs::PointCloud2>("/unknown_pc", n);
 
+    // Store the known (real) and unknown Octomaps...
     pose_test.writeKnownOctomap();
     pose_test.writeUnknownOctomap();
 
+    // ... and PC
     pose_test.writeUnknownCloud(unknown_cloud);
 
+    // Get the Unknown PC clusters
     clusters_centroids = findClusters(unknown_cloud);
 
+    // Publish cluster's data
     if (clusters_centroids.size() > 0)
     {
       pub_cloud_clusters.publish(cloud_clusters_publish);
@@ -345,12 +327,11 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       pub_centers_clusters.publish(centroid_clusters_publish);
     }
 
-    //  move_group.setPlanningTime(0.4);
-
     const std::string end_effector_link = move_group.getEndEffectorLink();
 
     size_t total_clusters = clusters_centroids.size();
 
+    // Define how many poses will look into a given cluster
     size_t poses_by_cluster = n_poses / total_clusters;
 
     if (poses_by_cluster < 1)
@@ -361,20 +342,27 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     ROS_INFO_STREAM("Number of clusters: " << total_clusters);
     ROS_INFO_STREAM("Poses by cluster: " << poses_by_cluster);
 
+    // Iteractive cycle
     for (size_t cluster_idx = 0; cluster_idx < total_clusters; cluster_idx++)
     {
+
+      // Set the point we will look at as a centroid of the current cluster
       observation_point = clusters_centroids[cluster_idx];
       ROS_INFO_STREAM("Obervating towards: " << observation_point);
-      // poses_vector.clear();
 
+      // For each pose
       for (size_t pose_idx = 0; pose_idx < poses_by_cluster; pose_idx++)
       {
-        // bool set_target;
+        
+        // Construct aPose class
         aPose one_pose;
 
+        // Get a random pose (set x positive to facilitate orientation reaching of the manipulator)
         target_pose = move_group.getRandomPose();
         target_pose.pose.position.x = abs(target_pose.pose.position.x);
 
+        // With that point, get the correct orientation that will make the camera look towards the
+        // cluster's centroid
         quat_orient = getOrientation(target_pose, observation_point);
         target_pose.pose.orientation = quat_orient;
 
@@ -382,6 +370,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
         tf::poseMsgToTF(target_pose.pose, pose_test.view_pose);
 
+        // Arrow for visualization
         arrow.header.stamp = ros::Time::now();
         arrow.header.frame_id = frame_id;
 
@@ -405,25 +394,18 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
         arrow.scale.y = 0.02;
         arrow.scale.z = 0.02;
 
+        // Evaluate the pose
         pose_test.evalPose();
 
         ROS_INFO_STREAM("Score: " << pose_test.score);
 
+        // Set the arrow color accordingly to the score
         arrow.color = pose_test.score_color;
 
-        // if (pose_test.score > best_score)
-        // {
-        //   best_score = pose_test.score;
-        //   best_pose = target_pose;
-        //   best_arrow_id = arrow_id;
-
-        //   single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
-        // }
-
+        // Store this information
         one_pose.score = pose_test.score;
         one_pose.pose = target_pose;
         one_pose.arrow_id = arrow_id;
-        // one_pose.boxes = pose_test.discoveredBoxesVis(frame_id);
 
         poses_vector.push_back(one_pose);
 
@@ -435,6 +417,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
       }
     }
 
+    // Sort the poses accordingly to the score
     ROS_INFO("Sorting...");
 
     std::sort(poses_vector.begin(), poses_vector.end(), cmp_aPose);
@@ -449,6 +432,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     move_group.setPlanningTime(0.5);
     move_group.setNumPlanningAttempts(5);
 
+    // Get the best pose that is reachable 
     do
     {
       sorted_pose_idx++;
@@ -482,14 +466,18 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     } while ((set_target == false) || (set_plan == false));
 
+    // Store it
     tf::poseMsgToTF(best_pose.pose, pose_test.view_pose);
     pose_test.evalPose();
 
     best_score = poses_vector[sorted_pose_idx].score;
     best_arrow_id = poses_vector[sorted_pose_idx].arrow_id;
     // single_view_boxes = poses_vector[sorted_pose_idx].boxes;
+    
+    // Get the possibly discovered voxels as marker Array
     single_view_boxes = pose_test.discoveredBoxesVis(frame_id);
 
+    // Give the marker (arrow) of the best pose a different look
     all_poses.markers[best_arrow_id].color = green_color;
     all_poses.markers[best_arrow_id].scale.x *= 2;
     all_poses.markers[best_arrow_id].scale.y *= 2;
@@ -501,6 +489,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     // ROS_INFO("getchar");
     // getchar();
 
+    // Actually move the robot to that pose
     ROS_WARN("MOVING!!!");
     ROS_INFO_STREAM("Moving towards score " << best_score);
 
@@ -510,6 +499,7 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
 
     ROS_INFO("---------");
 
+    // Clean Up before the next cycle
     for (size_t id_arrow_mrk = 0; id_arrow_mrk < all_poses.markers.size(); id_arrow_mrk++)
     {
       all_poses.markers[id_arrow_mrk].action = visualization_msgs::Marker::DELETEALL;
@@ -527,15 +517,17 @@ void SmobexExplorerActionSkill::executeCB(const smobex_explorer_action_skill_msg
     poses_vector.clear();
     clusters_centroids.clear();
 
-    ros::Duration(5).sleep(); //Give time for map to update
+    //Give time for map to update
+    ros::Duration(5).sleep(); 
 
-  } //while (best_score > threshold);
+  } 
 
   ROS_INFO_STREAM("Final best score: " << best_score);
 
   current_state = move_group.getCurrentState();
   current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
+  // In the end, go to the home position
   joint_group_positions[0] = -M_PI / 2; // radians
   joint_group_positions[1] = 0.0;       // radians
   joint_group_positions[2] = 0.0;       // radians
