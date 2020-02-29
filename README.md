@@ -14,13 +14,13 @@ The solution provided is, not only, adaptable to changes in the environment duri
 - [Article]() _Coming Soon_
 - [Video Playlist](https://www.youtube.com/playlist?list=PLlFdlPPJjdmmCzNEbp_u2mB5nFM9WHmFo)
 
-## Thesis title
+## Dissertation title
 
 _Smart object exploration by robotic manipulator_
 
 Department of Mechanical Engineering (DEM), University of Aveiro (UA)
 
-LAR: Laboratory of Automation and Robotics
+[LAR: Laboratory of Automation and Robotics](http://lars.mec.ua.pt/)
 
 2019
 
@@ -302,4 +302,4 @@ roslaunch smobex_bringup bringup.launch online:=false
 # Contributions
 
 - [FANUC M6iB/6S Packages](https://github.com/ros-industrial/fanuc/pull/277)
-- [Octomap Tolls](https://github.com/miguelriemoliveira/octomap_tools)
+- [Octomap Tools](https://github.com/miguelriemoliveira/octomap_tools)

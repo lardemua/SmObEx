@@ -1,3 +1,8 @@
+/*
+    ROS node that allows the visualization of a wireframe that delimits
+    the defined volume
+*/
+
 #include <geometry_msgs/Point.h>
 #include <ros/ros.h>
 #include <visualization_msgs/InteractiveMarkerControl.h>

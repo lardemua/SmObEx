@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!--
+    Launch file for the autonomous exploration 
+    Refer to bringup.launch
+-->
 <launch>
 
     <arg name="robot_ip" doc="IP of the manipulator"/>
@@ -8,10 +12,6 @@
     <arg name="scale" default="12" />
 
     <!-- Initializing robot and camera calibrated -->
-    <!-- <include file="$(find smobex_calibration)/launch/calibrated.launch">
-        <arg name="robot_ip" value="$(arg robot_ip)" />
-        <arg name="online" value="$(arg online)"/>
-    </include> -->
     <include file="$(find smobex_bringup)/launch/moveit_robot.launch">
         <arg if="$(arg online)" name="sim" value="false"/>
         <arg name="robot_ip" value="$(arg robot_ip)"/>
@@ -66,24 +66,7 @@
 
     </node>
 
-    <!-- Pose Evaluator -->
-    <!-- <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" output="screen">
-        <param name="~frame_id" value="/base_link"/>
-
-        <rosparam file="$(find smobex_bringup)/params/camera_specs.yaml" command="load" />
-
-    </node> -->
-
-    <!-- Pose Generator -->
-    <!-- <node pkg="smobex_explorer" type="explorer_node" name="explorer_node" output="screen">
-
-        <param name="~fixed_frame" value="/base_link"/>
-        <param name="~n_poses" value="5"/>
-        <param name="~r_min" value="0.8"/>
-        <param name="~r_max" value="1.2"/>
-
-    </node> -->
-
+    <!--Action for the single pose evaluation and autonomous exploration-->
     <arg name="action_name" default="SmobexExplorerActionSkill"/>
 
     <node pkg="smobex_explorer" type="robot_pose_evaluator" name="robot_pose_evaluator" output="screen">

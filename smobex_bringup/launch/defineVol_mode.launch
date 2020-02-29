@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!--
+    Exploration volume definition launch file
+    Refer to bringup.launch
+-->
 <launch>
 
     <arg name="robot_ip" doc="IP of the manipulator"/>

@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+    Launch file for playing bagfiles of SmObEx Results
+-->
 <launch>
     <arg name="name" default=""/>
     <arg name="load_bag" default="true"/>

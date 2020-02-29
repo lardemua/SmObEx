@@ -1,3 +1,7 @@
+<!-- 
+    Launch file with the nodes that allow the visualization of the TF of the aruco marker
+    Refer to bringup.launch
+-->
 <launch>
 
 <arg name="markerId" default="617"/>

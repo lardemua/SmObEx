@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+    Launch file for recording bagfiles of SmObEx Results
+-->
 <launch>
     <arg name="name" default=""/>
 

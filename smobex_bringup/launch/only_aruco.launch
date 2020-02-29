@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
+<!--
+    Aruco launch file
+    Refer to bringup.launch
+-->
 <launch>
      <include file="$(find aruco_hand_eye)/launch/aruco_hand_eye.launch">
 
-        <!-- ArUco gigante -->
+        <!-- ArUco gigant -->
         <arg name="markerid" value="617"/>
         <arg name="markersize" value="0.621"/>
 
