@@ -44,7 +44,7 @@ std::string frame_id = "/world";
 
 void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
-	ROS_INFO_STREAM("Evaluating pose...");
+	ROS_INFO_STREAM("Evaluating pose. Waiting 10sec...");
 
 	ros::NodeHandle n;
 
@@ -52,41 +52,48 @@ void clickCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
 
 	cam_feedback = ros::topic::waitForMessage<visualization_msgs::InteractiveMarkerInit>("/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update_full", n, ros::Duration(10));
 
-	ROS_INFO_STREAM("Pose received...");
+	if (cam_feedback != NULL)
+	{
+		ROS_INFO_STREAM("Pose received...");
 
-	// evaluatePose pose(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
-	// evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
-	evaluatePose pose(min_range, max_range, width_FOV, height_FOV);
-	// pose.view_pose = transform;
+		// evaluatePose pose(20, 0.8, 3.5, 58 * M_PI / 180, 45 * M_PI / 180);
+		// evaluatePose pose(step, min_range, max_range, width_FOV, height_FOV);
+		evaluatePose pose(min_range, max_range, width_FOV, height_FOV);
+		// pose.view_pose = transform;
 
-	//TODO catch
-	tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
+		//TODO catch
+		tf::poseMsgToTF(cam_feedback->markers[0].pose, pose.view_pose);
 
-	pose.writeKnownOctomap();
-	pose.writeUnknownOctomap();
-	pose.writeUnknownCloud();
+		pose.writeKnownOctomap();
+		pose.writeUnknownOctomap();
+		pose.writeUnknownCloud();
 
-	ROS_INFO_STREAM("Everything written...");
+		ROS_INFO_STREAM("Everything written...");
 
-	ros::Time t = ros::Time::now();
+		ros::Time t = ros::Time::now();
 
-	pose.evalPose();
+		pose.evalPose();
 
-	ros::Duration d = (ros::Time::now() - t);
+		ros::Duration d = (ros::Time::now() - t);
 
-	line = pose.rayLinesVis(frame_id);
-	frustum_lines = pose.frustumLinesVis(frame_id);
-	text = pose.textVis(frame_id);
-	single_view_boxes = pose.discoveredBoxesVis(frame_id);
+		line = pose.rayLinesVis(frame_id);
+		frustum_lines = pose.frustumLinesVis(frame_id);
+		text = pose.textVis(frame_id);
+		single_view_boxes = pose.discoveredBoxesVis(frame_id);
 
-	pub_lines.publish(line);
-	pub_lines.publish(frustum_lines);
-	pub_space.publish(single_view_boxes);
-	pub_text.publish(text);
+		pub_lines.publish(line);
+		pub_lines.publish(frustum_lines);
+		pub_space.publish(single_view_boxes);
+		pub_text.publish(text);
 
-	ros::spinOnce();
+		ros::spinOnce();
 
-	ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
+		ROS_INFO("Done. Evaluation took %f secs.", d.toSec());
+	}
+	else
+	{
+		ROS_WARN("No message revived. Was the right node initialized? Is there an interactive marker?");
+	}
 }
 
 void autoModeStartCB(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
@@ -144,7 +151,7 @@ void autoModeCancelCB(const visualization_msgs::InteractiveMarkerFeedbackConstPt
 	ac.getState();
 	ac.cancelAllGoals();
 	ac.getState();
-	
+
 	ROS_INFO("Cancelled.");
 }
 
