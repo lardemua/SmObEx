@@ -72,25 +72,8 @@ Porto, Portugal
 
 # Installation Guide
 
-After installing ROS Melodic, you will need to run the following commands:
+After installing ROS Melodic, you will need to run the [dependencies installer](./install_dependencies.sh) and the clone and build this repository.
 
-```bash
-cd ~/catkin_ws/src
-sudo apt install ros-melodic-industrial-core
-sudo apt-get install ros-melodic-ros-canopen
-sudo apt install ros-melodic-openni2-launch
-sudo apt install ros-melodic-octomap-server
-sudo apt install ros-melodic-pcl-ros
-sudo apt install ros-melodic-visp
-git clone https://github.com/ros-industrial/fanuc.git
-git clone https://github.com/pal-robotics/aruco_ros
-git clone https://github.com/jhu-lcsr/aruco_hand_eye
-git clone https://github.com/tu-darmstadt-ros-pkg/hector_models
-git clone https://github.com/miguelriemoliveira/octomap_tools
-cd ..
-catkin_make
-rospack profile
-```
 # Robot Simple Usage
 
 Everything is based on [this tutorial](http://wiki.ros.org/fanuc/Tutorials/Running).
