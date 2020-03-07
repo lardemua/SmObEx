@@ -1,3 +1,5 @@
+#include <ros/ros.h>
+
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseArray.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -5,7 +7,6 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include <math.h>
-#include <ros/ros.h>
 #include <cmath>
 
 #include <tf/LinearMath/Quaternion.h>
@@ -43,24 +44,9 @@ class UnknownVoxel;
 typedef std::map<size_t, UnknownVoxel> map_type;
 
 /*
-    OVERLOADS
+    CLASSES AND FUNCTIONS
 */
 
-bool compareVoxelDistance(UnknownVoxel const &a, UnknownVoxel const &b)
-{
-    return a.distance_to_camera > b.distance_to_camera;
-}
-
-bool compareVoxelDistanceIterator(map_type::iterator const &a, map_type::iterator const &b)
-{
-    return a->second.distance_to_camera > b->second.distance_to_camera;
-}
-
-/*
-    CLASSES
-*/
-
-// Unknown Voxel Class
 class UnknownVoxel
 {
 public:
@@ -80,6 +66,16 @@ public:
     bool operator==(const UnknownVoxel &rhs) const { return this->key == rhs.key; }
     bool operator==(const octomap::OcTreeKey &rhs) const { return this->key == rhs; }
 };
+
+bool compareVoxelDistance(UnknownVoxel const &a, UnknownVoxel const &b)
+{
+    return a.distance_to_camera > b.distance_to_camera;
+}
+
+bool compareVoxelDistanceIterator(map_type::iterator const &a, map_type::iterator const &b)
+{
+    return a->second.distance_to_camera > b->second.distance_to_camera;
+}
 
 class Smobex
 {
