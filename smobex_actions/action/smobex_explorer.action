@@ -1,8 +1,12 @@
 #goal definition
-int32 order
+float32 threshold
+int32 n_poses
 ---
 #result definition
-int32[] sequence
+int32 percentage
+string skillStatus
+string outcome
 ---
 #feedback
-int32[] sequence
+int32 percentage
+string skillStatus
