@@ -87,6 +87,7 @@ private:
     ros::NodeHandle _nh;
 
     std_msgs::ColorRGBA _score_color;
+    std::vector<std_msgs::ColorRGBA> _clusters_colors;
 
     octomap::point3d _min_bbx, _max_bbx;
     octomap::OcTree *_known_octree = NULL;
@@ -227,32 +228,144 @@ public:
     }
 
     // Callback to store the point cloud that are the centers of the unknown voxels
-    void writeUnknownCloud(sensor_msgs::PointCloud2ConstPtr unknown_cloud)
+    void writeUnknownCloud(sensor_msgs::PointCloud2Ptr unknown_cloud)
     {
         pcl::fromROSMsg(*unknown_cloud, _unknown_centers_pcl);
     }
 
-    pcl::IndicesClustersPtr getClustersIndices(sensor_msgs::PointCloud2ConstPtr clusters_cloud_in)
+    // Get the clusters (by the points indices) from a point cloud
+    pcl::IndicesClustersPtr getClustersIndices(sensor_msgs::PointCloud2Ptr cloud_in)
     {
         // Data containers used
-        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr clusters_cloud_out(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_in_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
         pcl::IndicesClustersPtr clusters(new pcl::IndicesClusters);
+        std_msgs::ColorRGBA aux_color;
+        int label_r;
+        int label_g;
+        int label_b;
+        int label_a;
 
         // Load the input point cloud
-        pcl::fromROSMsg(*clusters_cloud_in, *clusters_cloud_out);
+        pcl::fromROSMsg(*cloud_in, *cloud_in_pcl);
 
         // Set up a Conditional Euclidean Clustering class
         pcl::ConditionalEuclideanClustering<pcl::PointXYZRGBA> cec(true);
-        cec.setInputCloud(clusters_cloud_out);
-        cec.setConditionFunction(&customRegionGrowing); //TODO fix
-        cec.setClusterTolerance(_resolution * 3);
-        cec.segment(*clusters);
+        // cec.setInputCloud(cloud_in_pcl);
+        // cec.setConditionFunction(&customRegionGrowing); //TODO fix
+        // cec.setClusterTolerance(_resolution * 3);
+        // cec.segment(*clusters);
+
+        // Set the colors that correspond to each cluster
+        for (int i = 0; i < clusters->size(); ++i)
+        {
+            label_r = ((double)rand() / RAND_MAX) * 255;
+            label_g = ((double)rand() / RAND_MAX) * 255;
+            label_b = ((double)rand() / RAND_MAX) * 255;
+            label_a = 1;
+
+            aux_color.r = label_r;
+            aux_color.g = label_g;
+            aux_color.b = label_b;
+            aux_color.a = label_a;
+
+            _clusters_colors.push_back(aux_color);
+        }
 
         return clusters;
     }
 
-    //TODO method two colored PC (all points and centroids)
-    //TODO method centroids
+    // Colorizes a point cloud by its clusters
+    void setClustersPCColors(sensor_msgs::PointCloud2Ptr cloud_in, pcl::IndicesClustersPtr clusters)
+    {
+        // Data containers used
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_in_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        pcl::PointCloud<pcl::PointXYZRGBA> aux_cloud;
+
+        // Load the input point cloud
+        pcl::fromROSMsg(*cloud_in, *cloud_in_pcl);
+
+        for (int i = 0; i < clusters->size(); ++i)
+        {
+            for (int j = 0; j < (*clusters)[i].indices.size(); ++j)
+            {
+
+                cloud_in_pcl->points[(*clusters)[i].indices[j]].r = _clusters_colors[i].r;
+                cloud_in_pcl->points[(*clusters)[i].indices[j]].g = _clusters_colors[i].g;
+                cloud_in_pcl->points[(*clusters)[i].indices[j]].b = _clusters_colors[i].b;
+                cloud_in_pcl->points[(*clusters)[i].indices[j]].a = _clusters_colors[i].a;
+            }
+        }
+
+        aux_cloud = *cloud_in_pcl;
+        pcl::toROSMsg(aux_cloud, *cloud_in);
+       
+    }
+
+    // Generates a colored point cloud, each point is a cluster centroid
+    sensor_msgs::PointCloud2 getClustersCentroidsPC(sensor_msgs::PointCloud2Ptr cloud_in, pcl::IndicesClustersPtr clusters)
+    {
+        // Data containers used
+        sensor_msgs::PointCloud2 cloud_out;
+
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_in_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        pcl::PointXYZ point_from_cluster;
+        pcl::PointXYZ centroid_pcl;
+        pcl::PointXYZRGBA centroid_pcl_RGBA;
+        pcl::PointCloud<pcl::PointXYZRGBA> all_centroids_pcl;
+
+        // Load the input point cloud
+        pcl::fromROSMsg(*cloud_in, *cloud_in_pcl);
+
+        for (int i = 0; i < clusters->size(); ++i)
+        {
+            //TODO fix the declaration being inside the loop (there isn't a straightforward way to clean the points...)
+            pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
+
+            for (int j = 0; j < (*clusters)[i].indices.size(); ++j)
+            {
+                pcl::copyPoint(cloud_in_pcl->points[(*clusters)[i].indices[j]], point_from_cluster);
+                centroid_points.add(point_from_cluster);
+            }
+
+            centroid_points.get(centroid_pcl);
+
+            centroid_pcl_RGBA.x = centroid_pcl.x;
+            centroid_pcl_RGBA.y = centroid_pcl.y;
+            centroid_pcl_RGBA.z = centroid_pcl.z;
+
+            centroid_pcl_RGBA.r = _clusters_colors[i].r;
+            centroid_pcl_RGBA.g = _clusters_colors[i].g;
+            centroid_pcl_RGBA.b = _clusters_colors[i].b;
+            centroid_pcl_RGBA.a = _clusters_colors[i].a;
+
+            all_centroids_pcl.push_back(centroid_pcl_RGBA);
+        }
+
+        pcl::toROSMsg(all_centroids_pcl, cloud_out);
+
+        return cloud_out;
+    }
+
+    // Converts a point cloud to a std vector
+    std::vector<geometry_msgs::Point> convertPCtoPointVector(sensor_msgs::PointCloud2 pc_in)
+    {
+        geometry_msgs::Point point;
+        std::vector<geometry_msgs::Point> point_vect;
+        pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
+
+        pcl::fromROSMsg(pc_in, pcl_cloud);
+
+        for (pcl::PointCloud<pcl::PointXYZ>::iterator it = pcl_cloud.begin(); it != pcl_cloud.end(); it++)
+        {
+            point.x = it->x;
+            point.y = it->y;
+            point.z = it->z;
+
+            point_vect.push_back(point);
+        }
+
+        return point_vect;
+    }
 
     // Method to evaluate a pose (voxel based ray casting)
     void evalPose()
