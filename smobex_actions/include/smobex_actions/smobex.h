@@ -74,7 +74,7 @@ public:
 class Smobex
 {
 private:
-    //TODO set defaults for all
+    
     tf::Pose _view_pose;
 
     float _min_range;
@@ -89,7 +89,6 @@ private:
     std_msgs::ColorRGBA _score_color;
     std::vector<std_msgs::ColorRGBA> _clusters_colors;
 
-    octomap::point3d _min_bbx, _max_bbx;
     octomap::OcTree *_known_octree = NULL;
     octomap::OcTree *_unknown_octree = NULL;
     octomap::KeySet _first_keys;
@@ -125,6 +124,8 @@ public:
 
     Smobex()
     {
+        _score = 0;
+
         _min_range = 1.0;
         _max_range = 2.0;
         _width_FOV = 1.57;
@@ -142,39 +143,6 @@ public:
     {
     }
 
-    // Set only the values specific of the camera FOV/frustum
-    void setValues(float min_range, float max_range, float width_FOV, float height_FOV)
-    {
-        _min_range = _min_range;
-        _max_range = _max_range;
-        _width_FOV = _width_FOV;
-        _height_FOV = _height_FOV;
-
-        // TODO: remove this
-        ros::param::get("x_max", _max_bbx.x());
-        ros::param::get("y_max", _max_bbx.y());
-        ros::param::get("z_max", _max_bbx.z());
-
-        ros::param::get("x_min", _min_bbx.x());
-        ros::param::get("y_min", _min_bbx.y());
-        ros::param::get("z_min", _min_bbx.z());
-    }
-
-    // Set only the resolution
-    void setValues(float resolution)
-    {
-        _resolution = resolution;
-
-        // TODO: remove this
-        ros::param::get("x_max", _max_bbx.x());
-        ros::param::get("y_max", _max_bbx.y());
-        ros::param::get("z_max", _max_bbx.z());
-
-        ros::param::get("x_min", _min_bbx.x());
-        ros::param::get("y_min", _min_bbx.y());
-        ros::param::get("z_min", _min_bbx.z());
-    }
-
     // Set all values
     void setValues(float min_range, float max_range, float width_FOV, float height_FOV, float resolution)
     {
@@ -182,16 +150,14 @@ public:
         _max_range = _max_range;
         _width_FOV = _width_FOV;
         _height_FOV = _height_FOV;
+
         _resolution = resolution;
+    }
 
-        // TODO: remove this
-        ros::param::get("x_max", _max_bbx.x());
-        ros::param::get("y_max", _max_bbx.y());
-        ros::param::get("z_max", _max_bbx.z());
-
-        ros::param::get("x_min", _min_bbx.x());
-        ros::param::get("y_min", _min_bbx.y());
-        ros::param::get("z_min", _min_bbx.z());
+    // Set pose
+    void setPose(tf::Pose pose)
+    {
+        _view_pose = pose;
     }
 
     // Callback to store the real Octomap
@@ -302,6 +268,11 @@ public:
        
     }
 
+    void getSingleCentroid(pcl::PointIndices indices, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr)
+    {
+
+    }
+    
     // Generates a colored point cloud, each point is a cluster centroid
     sensor_msgs::PointCloud2 getClustersCentroidsPC(sensor_msgs::PointCloud2Ptr cloud_in, pcl::IndicesClustersPtr clusters)
     {
@@ -376,15 +347,11 @@ public:
 
         Vector3 origin;
 
-        // TODO: fix this
-        // while (_known_octree == NULL || _unknown_octree == NULL)
-        // {
-        //     ROS_WARN("No OcTrees... Did you call the writting functions? Calling them automatically.");
-
-        //     writeKnownOctomap();
-        //     writeUnknownOctomap();
-        // }
-
+        while (_known_octree == NULL || _unknown_octree == NULL)
+        {
+            ROS_WARN("No OcTrees... Did you call the writting functions?");
+        }
+        
         _first_keys.clear();
         _posterior_keys.clear();
 
@@ -533,8 +500,6 @@ public:
                     }
                 }
             }
-
-            getScore();
         }
         else
         {
@@ -544,7 +509,7 @@ public:
 
     // Compute the score of the pose
     // See the dissertation for further knowledge
-    void getScore()
+    void getScore(octomap::point3d max_bbx, octomap::point3d min_bbx)
     {
         using namespace octomap;
 
@@ -555,7 +520,7 @@ public:
 
         float found_volume = (_first_keys.size() + _posterior_keys.size() * weight) * one_volume;
 
-        point3d deltas = _max_bbx - _min_bbx;
+        point3d deltas = max_bbx - min_bbx;
 
         float total_volume = deltas.x() * deltas.y() * deltas.z();
         float inner_volume =
