@@ -268,19 +268,30 @@ public:
        
     }
 
-    void getSingleCentroid(pcl::PointIndices indices, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr)
+    // Get the centoid from a single cluster
+    pcl::PointXYZ getSingleCentroid(pcl::PointIndices pntIndices, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_in_pcl)
     {
+        pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
+        pcl::PointXYZ point_from_cluster;
+        pcl::PointXYZ centroid_pcl;
 
+        for (int j = 0; j < pntIndices.indices.size(); ++j)
+        {
+            pcl::copyPoint(cloud_in_pcl->points[pntIndices.indices[j]], point_from_cluster);
+            centroid_points.add(point_from_cluster);
+        }
+
+        centroid_points.get(centroid_pcl);
+
+        return centroid_pcl;
     }
-    
+
     // Generates a colored point cloud, each point is a cluster centroid
     sensor_msgs::PointCloud2 getClustersCentroidsPC(sensor_msgs::PointCloud2Ptr cloud_in, pcl::IndicesClustersPtr clusters)
     {
         // Data containers used
         sensor_msgs::PointCloud2 cloud_out;
-
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_in_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
-        pcl::PointXYZ point_from_cluster;
         pcl::PointXYZ centroid_pcl;
         pcl::PointXYZRGBA centroid_pcl_RGBA;
         pcl::PointCloud<pcl::PointXYZRGBA> all_centroids_pcl;
@@ -290,16 +301,7 @@ public:
 
         for (int i = 0; i < clusters->size(); ++i)
         {
-            //TODO fix the declaration being inside the loop (there isn't a straightforward way to clean the points...)
-            pcl::CentroidPoint<pcl::PointXYZ> centroid_points;
-
-            for (int j = 0; j < (*clusters)[i].indices.size(); ++j)
-            {
-                pcl::copyPoint(cloud_in_pcl->points[(*clusters)[i].indices[j]], point_from_cluster);
-                centroid_points.add(point_from_cluster);
-            }
-
-            centroid_points.get(centroid_pcl);
+            centroid_pcl = getSingleCentroid((*clusters)[i], cloud_in_pcl);
 
             centroid_pcl_RGBA.x = centroid_pcl.x;
             centroid_pcl_RGBA.y = centroid_pcl.y;
