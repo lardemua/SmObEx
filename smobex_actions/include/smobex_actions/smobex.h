@@ -82,7 +82,7 @@ private:
     float _width_FOV;
     float _height_FOV;
     float _score;
-    float _resolution;
+    static float _resolution;
 
     ros::NodeHandle _nh;
 
@@ -99,7 +99,7 @@ private:
     pcl::PointCloud<pcl::PointXYZ> _unknown_centers_pcl;
 
     // Evaluate if two voxels bellong to the same cluster or not
-    bool customRegionGrowing(const pcl::PointXYZRGBA &point_a, const pcl::PointXYZRGBA &point_b, float squared_distance)
+    static bool customRegionGrowing(const pcl::PointXYZRGBA &point_a, const pcl::PointXYZRGBA &point_b, float squared_distance)
     {
         if (squared_distance < (_resolution * 2) * (_resolution * 2) * 1.1)
         {
@@ -122,6 +122,7 @@ private:
     }
 
 public:
+
     Smobex()
     {
         _min_range = 1.0;
@@ -250,10 +251,10 @@ public:
 
         // Set up a Conditional Euclidean Clustering class
         pcl::ConditionalEuclideanClustering<pcl::PointXYZRGBA> cec(true);
-        // cec.setInputCloud(cloud_in_pcl);
-        // cec.setConditionFunction(&customRegionGrowing); //TODO fix
-        // cec.setClusterTolerance(_resolution * 3);
-        // cec.segment(*clusters);
+        cec.setInputCloud(cloud_in_pcl);
+        cec.setConditionFunction(this->customRegionGrowing);
+        cec.setClusterTolerance(_resolution * 3);
+        cec.segment(*clusters);
 
         // Set the colors that correspond to each cluster
         for (int i = 0; i < clusters->size(); ++i)
