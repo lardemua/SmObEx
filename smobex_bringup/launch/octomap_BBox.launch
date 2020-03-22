@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+    <rosparam file="$(find smobex_bringup)/params/shelf.yaml" command="load"/>
+
+    <node pkg="point_cloud_spatial_filter" type="point_cloud_spatial_filter_node" name="point_cloud_filter" output="screen">
+
+        <param name="point_cloud_in" value="/camera/depth_registered/points"/>
+        <param name="fixed_frame_id" value="/base_link"/>
+        <param name="wireframe" value="true"/>
+        <param name="scale" value="2"/>
+
+        <param name="configure" value="false"/>
+        <param name="voxelize" value="false"/>
+
+        <!-- <rosparam file="$(find smobex_bringup)/params/default_params.yaml" command="load" /> -->
+
+        <remap from="~x_min" to="x_min"/>
+        <remap from="~y_min" to="y_min"/>
+        <remap from="~z_min" to="z_min"/>
+
+        <remap from="~x_max" to="x_max"/>
+        <remap from="~y_max" to="y_max"/>
+        <remap from="~z_max" to="z_max"/>
+
+        <param name="params_path" value="$(find smobex_bringup)"/>
+
+    </node>
+
+</launch>
