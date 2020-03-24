@@ -17,6 +17,11 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_eigen
   pcl_ros
   colormap
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  # moveit_visual_tools
+  # moveit_ros_perception
 )
 
 find_package(Eigen3 REQUIRED)
