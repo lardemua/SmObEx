@@ -11,7 +11,7 @@ The solution provided is, not only, adaptable to changes in the environment duri
 ## Released Content
 
 - [Dissertation](http://hdl.handle.net/10773/27683)
-- [Article]() _Coming Soon_
+- [Article](https://www.mdpi.com/1424-8220/20/15/4331) 
 - [Video Playlist](https://www.youtube.com/playlist?list=PLlFdlPPJjdmmCzNEbp_u2mB5nFM9WHmFo)
 
 ## Dissertation title
